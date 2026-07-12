@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Basket v4.5</title>
+<title>Basket v4.8</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -34,6 +34,7 @@ html[data-theme=dark]{
   --sh:0 2px 14px rgba(0,0,0,.35);--sh2:0 6px 28px rgba(0,0,0,.5);
 }}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{max-width:100%;overflow-x:hidden}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:16px;transition:background .3s,color .3s}
 .auth-ov{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:2000;flex-direction:column;padding:24px}
 .auth-card{text-align:center;max-width:320px;width:100%}
@@ -60,9 +61,10 @@ header::before{width:80px;height:80px;right:90px;bottom:5px}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .tbtn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:20px;padding:6px 12px;font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;transition:background .2s;white-space:nowrap}
 .tbtn:hover{background:rgba(255,255,255,.25)}
-nav{background:var(--surf);border-bottom:1px solid var(--bdr);display:flex;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.06);overflow-x:auto}
+nav{background:var(--surf);border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.06);overflow-x:auto}
 nav::-webkit-scrollbar{display:none}
-.nb{padding:10px 13px;border:none;background:none;font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:500;color:var(--mid);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:color .2s,background .2s,border-color .2s;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:56px}
+.nav-inner{display:flex;max-width:760px;margin:0 auto}
+.nb{padding:10px 13px;border:none;background:none;font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:500;color:var(--mid);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:color .2s,background .2s,border-color .2s;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:56px;flex:1}
 .nb svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .nb.active{color:var(--gdk);border-bottom-color:var(--gdk)}
 .nb:hover:not(.active){color:var(--tx);background:var(--glt)}
@@ -70,15 +72,15 @@ nav::-webkit-scrollbar{display:none}
 main{max-width:760px;margin:0 auto;padding:20px 13px 80px}
 .tab{display:none;animation:fu .22s ease}.tab.active{display:block}
 @keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-/* tab headings — no subtitle, slightly more breathing room */
 .sh{margin-bottom:20px}
 .sh h2{font-size:1.6rem;font-weight:700}
-.sh-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.sh-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:nowrap;gap:10px;margin-bottom:20px}
+.sh-row h2{font-size:1.6rem;font-weight:700;flex-shrink:0}
+.sh-row-btns{display:flex;gap:7px;flex-shrink:0}
 .card{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:17px;margin-bottom:12px;box-shadow:var(--sh);transition:background .3s,border-color .3s}
 .ct{font-size:1rem;font-weight:700;color:var(--gdk);margin-bottom:13px;display:flex;align-items:center;gap:8px}
 .ct svg{width:18px;height:18px;stroke:var(--gdk);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-.add-form-name{width:100%;margin-bottom:8px}
-.add-form-name label{display:block;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mid);margin-bottom:4px}
+/* Forms — no labels, ghost text only */
 .add-form-row{display:flex;gap:7px;align-items:flex-end;flex-wrap:nowrap}
 .add-form-row .fg-qty{width:64px;flex-shrink:0}
 .add-form-row .fg-unit{width:88px;flex-shrink:0}
@@ -111,13 +113,12 @@ select.isel{padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg x
 .qb{background:none;border:none;cursor:pointer;padding:5px 10px;font-size:.95rem;color:var(--mid);font-weight:600;transition:background .15s;line-height:1}
 .qb:hover{background:var(--glt);color:var(--gdk)}
 .qn{width:32px;text-align:center;font-size:.88rem;font-weight:600;color:var(--tx);border:none;background:none;pointer-events:none}
-/* shared dropdown arrow */
 .card-arr{background:none;border:none;cursor:pointer;font-size:.75rem;color:var(--mid);padding:5px 8px;border-radius:6px;transition:background .15s,color .15s;flex-shrink:0;line-height:1}
 .card-arr:hover{background:var(--glt);color:var(--gdk)}
 .card-drop{max-height:0;overflow:hidden;transition:max-height .28s ease}
 .card-drop.open{max-height:400px}
 .card-drop-inner{padding:10px 15px 13px;border-top:1px solid var(--bdr);display:flex;gap:8px;flex-wrap:wrap}
-/* shopping item — same card style as recipes/staples */
+/* shopping item — source badge fixed 64px */
 .si{background:var(--surf);border:1.5px solid var(--bdr);border-radius:12px;margin-bottom:8px;box-shadow:var(--sh);transition:opacity .2s,background .2s,box-shadow .2s;overflow:hidden}
 .si:hover{box-shadow:var(--sh2)}
 .si.ticked{opacity:.42;background:var(--glt);box-shadow:none}
@@ -127,12 +128,14 @@ select.isel{padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg x
 .si-body-cost{font-size:.9rem;font-weight:700;margin-left:auto;font-variant-numeric:tabular-nums;white-space:nowrap}
 .sck{width:19px;height:19px;cursor:pointer;accent-color:var(--gdk);flex-shrink:0}
 .iln{font-size:.97rem;font-weight:600;flex:1;min-width:0}
-.sp{font-size:.68rem;font-weight:600;color:var(--gdk);background:var(--glt);padding:2px 8px;border-radius:20px;flex-shrink:0;white-space:nowrap}
+/* fixed-width badge — 64px, centred text */
+.sp{font-size:.68rem;font-weight:600;color:var(--gdk);background:var(--glt);padding:2px 4px;border-radius:20px;width:64px;flex-shrink:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sp.manual{background:var(--pmbg);color:var(--pmc)}
+.sp.recipe{background:var(--stlbg);color:var(--stlc)}
 .sp.staple{background:var(--psbg);color:var(--psc)}
+.sp.scan{background:var(--surf2);color:var(--mid)}
 .dh{cursor:grab;color:var(--lgt);font-size:1rem;padding:0 3px;user-select:none;flex-shrink:0}
 .dh:active{cursor:grabbing}
-/* item edit form inside dropdown */
 .si-edit{padding:11px 13px;border-top:1px solid var(--bdr);background:var(--surf2)}
 .si-edit-name{width:100%;margin-bottom:8px}
 .si-edit-row{display:flex;gap:7px;align-items:flex-end;flex-wrap:nowrap}
@@ -140,29 +143,41 @@ select.isel{padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg x
 .si-edit-row .fg-unit{width:88px;flex-shrink:0}
 .si-edit-row .fg-cost{flex:1;min-width:72px}
 .si-edit-btns{display:flex;gap:6px;margin-top:9px}
+.shop-actions{display:flex;gap:7px;margin-top:10px;flex-wrap:nowrap;align-items:stretch}
+.shop-actions .btn-complete{flex:1;padding:12px;min-width:0;font-size:.88rem}
+.shop-actions .btn-ticked{flex-shrink:0;padding:9px 10px;font-size:.8rem}
+.shop-actions .btn-clear{flex-shrink:0;padding:9px 10px;font-size:.8rem}
 /* recipe card */
 .rc{background:var(--surf);border:1.5px solid var(--bdr);border-radius:12px;overflow:hidden;margin-bottom:11px;box-shadow:var(--sh);transition:box-shadow .2s,background .3s,border-color .3s}
 .rc:hover{box-shadow:var(--sh2)}
 .rc.stale{background:var(--stbg);border-color:var(--stbr)}
-.rh-r1{padding:13px 15px 5px;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.rh-r1{padding:13px 15px 4px;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
 .rh-r1:hover{background:rgba(122,196,126,.07)}
 .rname{font-size:1.08rem;font-weight:700;flex:1;min-width:0}
+.rh-stale{padding:0 15px 5px}
+.slbl{display:inline-block;font-size:.7rem;font-weight:600;color:var(--stlc);background:var(--stlbg);padding:2px 8px;border-radius:10px}
 .rh-r2{padding:2px 15px 11px;display:flex;align-items:center;gap:8px}
 .rmeta{font-size:.8rem;color:var(--mid);flex:1}
-.slbl{font-size:.7rem;font-weight:600;color:var(--stlc);background:var(--stlbg);padding:2px 8px;border-radius:10px;white-space:nowrap}
 .rb{max-height:0;overflow:hidden;transition:max-height .35s ease}
-.rb.open{max-height:2000px;border-top:1px solid var(--bdr);padding:4px 15px 14px}
+.rb.open{max-height:3000px;border-top:1px solid var(--bdr);padding:4px 15px 14px}
 .ir{display:flex;align-items:center;gap:7px;padding:8px 0;border-bottom:1px solid var(--glt)}
 .ir:last-child{border-bottom:none}
 .ir.drag-over{border-top:2px solid var(--g);background:var(--glt)}
 .ir.dragging{opacity:.35}
 .in{flex:1;font-size:.92rem}
 .ic{font-size:.85rem;color:var(--mid);min-width:60px;text-align:right;font-variant-numeric:tabular-nums}
+.ir-edit{padding:8px 0;border-bottom:1px solid var(--glt)}
+.ir-edit:last-child{border-bottom:none}
+.ir-edit-name{width:100%;margin-bottom:6px}
+.ir-edit-row{display:flex;gap:6px;align-items:flex-end;flex-wrap:nowrap}
+.ir-edit-row .ir-eq{width:60px;flex-shrink:0}
+.ir-edit-row .ir-eu{width:80px;flex-shrink:0}
+.ir-edit-row .ir-ec{flex:1;min-width:60px}
+.ir-edit-row .btn{flex-shrink:0}
 .scaler-wrap{display:flex;align-items:center;gap:10px;padding:9px 0 8px;border-bottom:1px solid var(--glt);margin-bottom:4px;flex-wrap:wrap}
 .scaler-lbl{font-size:.76rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--mid);flex-shrink:0}
 .sbtn{padding:5px 12px;border:1.5px solid var(--bdr);border-radius:7px;background:var(--surf2);color:var(--mid);font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s}
 .sbtn:hover,.sbtn.active{background:var(--gdk);border-color:var(--gdk);color:#fff}
-.air-name{width:100%;margin-bottom:7px}
 .air-row{display:flex;gap:6px;align-items:flex-end;flex-wrap:nowrap}
 .air-row .air-qty{width:64px;flex-shrink:0}
 .air-row .air-unit{width:84px;flex-shrink:0}
@@ -170,7 +185,6 @@ select.isel{padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg x
 .air-row .btn{flex-shrink:0}
 .drag-over{border:2px dashed var(--g)!important;background:var(--glt)!important}
 .dragging{opacity:.35}
-/* staples */
 .sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:9px}
 .sc{background:var(--surf);border:1.5px solid var(--bdr);border-radius:11px;overflow:hidden;box-shadow:var(--sh);transition:box-shadow .2s,background .3s,border-color .3s}
 .sc:hover{box-shadow:var(--sh2)}
@@ -201,15 +215,16 @@ select.isel{padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg x
 .hrow:last-child{border-bottom:none}
 .hsrc{font-size:.72rem;color:var(--mid);margin-left:5px}
 .htr{display:flex;justify-content:space-between;padding:9px 0 0;font-weight:700;font-size:.9rem;border-top:2px solid var(--bdr);margin-top:3px}
+/* spend stat boxes — overflow-safe */
 .srow{display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap}
-.sbox{flex:1;min-width:110px;background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;padding:12px 14px}
-.sv{font-size:1.4rem;font-weight:700;color:var(--gdk)}
-.slb{font-size:.76rem;color:var(--mid);margin-top:2px}
+.sbox{flex:1;min-width:100px;background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;padding:12px 10px;overflow:hidden}
+.sv{font-size:1.4rem;font-weight:700;color:var(--gdk);word-break:break-all;overflow-wrap:anywhere;line-height:1.2}
+.slb{font-size:.76rem;color:var(--mid);margin-top:3px}
 .cwrap{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:18px 14px 14px;box-shadow:var(--sh);margin-bottom:12px}
 .ct2{font-size:1.05rem;font-weight:700;margin-bottom:3px}
 .cs{font-size:.8rem;color:var(--mid);margin-bottom:14px}
-.time-filter{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
-.tfbtn{padding:6px 15px;border:1.5px solid var(--bdr);border-radius:20px;background:none;color:var(--mid);font-family:'Outfit',sans-serif;font-size:.83rem;font-weight:500;cursor:pointer;transition:all .15s}
+.time-filter{display:flex;gap:5px;margin-bottom:16px;flex-wrap:nowrap}
+.tfbtn{padding:6px 10px;border:1.5px solid var(--bdr);border-radius:20px;background:none;color:var(--mid);font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;flex:1;text-align:center}
 .tfbtn.active{background:var(--gdk);border-color:var(--gdk);color:#fff}
 .tfbtn:hover:not(.active){border-color:var(--g);color:var(--gdk)}
 .cat-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--glt)}
@@ -251,7 +266,6 @@ select.isel{padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg x
 .toast.show{opacity:1;transform:none;pointer-events:auto}
 .undo-btn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:inherit;border-radius:6px;padding:3px 10px;font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .15s}
 .undo-btn:hover{background:rgba(255,255,255,.3)}
-.ar{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
 hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 @media(max-width:480px){.htitle{font-size:1.55rem}.hright{gap:6px}.sync-ind{display:none}}
 </style>
@@ -271,18 +285,20 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 <header>
   <div class="hl">
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M9.5 14C9.5 7 22.5 7 22.5 14" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="1.9" stroke-linejoin="round"/><line x1="11" y1="14" x2="10" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="16" y1="14" x2="16" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="21" y1="14" x2="22" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="4.5" y1="19.5" x2="27.5" y2="19.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="5.5" y1="24.5" x2="26.5" y2="24.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/></svg>
-    <div><div class="htitle">Basket</div><div class="hver">v4.5 — Smart Shopping</div></div>
+    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v4.8</div></div>
   </div>
   <div class="hright"><div class="sync-ind"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Local</span></div><button class="tbtn" id="tbtn" onclick="cycleTheme()">Auto</button></div>
 </header>
 
 <nav>
-  <button class="nb active" data-tab="shopping"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>List <span class="nbd" id="lbadge" style="display:none">0</span></button>
-  <button class="nb" data-tab="recipes"><svg viewBox="0 0 24 24"><path d="M6 13.87A4 4 0 017.41 6a5.11 5.11 0 019.18 0A4 4 0 0118 13.87V21H6z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>Recipes</button>
-  <button class="nb" data-tab="staples"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>Staples</button>
-  <button class="nb" data-tab="spend"><svg viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/><line x1="3" y1="20" x2="21" y2="20"/></svg>Spend</button>
-  <button class="nb" data-tab="history"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>History</button>
-  <button class="nb" data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</button>
+  <div class="nav-inner">
+    <button class="nb active" data-tab="shopping"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>List <span class="nbd" id="lbadge" style="display:none">0</span></button>
+    <button class="nb" data-tab="recipes"><svg viewBox="0 0 24 24"><path d="M6 13.87A4 4 0 017.41 6a5.11 5.11 0 019.18 0A4 4 0 0118 13.87V21H6z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>Recipes</button>
+    <button class="nb" data-tab="staples"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>Staples</button>
+    <button class="nb" data-tab="spend"><svg viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/><line x1="3" y1="20" x2="21" y2="20"/></svg>Spend</button>
+    <button class="nb" data-tab="history"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>History</button>
+    <button class="nb" data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</button>
+  </div>
 </nav>
 
 <main>
@@ -290,19 +306,20 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 <!-- SHOPPING TAB -->
 <div id="tab-shopping" class="tab active">
   <div class="sh-row">
-    <h2 style="font-size:1.6rem;font-weight:700">Shopping List</h2>
-    <div style="display:flex;gap:7px;flex-shrink:0">
-      <button class="btn bg sm" onclick="sortByCategory()">Sort by Aisle ↕</button>
-      <button class="btn bs sm" onclick="openScanModal()"><svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;margin-right:3px" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>Scan Image</button>
+    <h2>Shopping List</h2>
+    <div class="sh-row-btns">
+      <button class="btn bg sm" onclick="sortByCategory()">Aisle Sort ↕</button>
+      <button class="btn bs sm" onclick="openScanModal()"><svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;margin-right:3px" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>Scan</button>
     </div>
   </div>
   <div class="card">
-    <div class="ct"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Add Item Manually</div>
-    <div class="add-form-name"><label>Item Name</label><input type="text" id="m-name" placeholder="e.g. Free-range eggs" autocomplete="off"></div>
+    <div class="ct"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Add Item</div>
+    <!-- name full width, then qty/unit/cost on same row, no labels -->
+    <div style="margin-bottom:8px"><input type="text" id="m-name" placeholder="NAME" autocomplete="off"></div>
     <div class="add-form-row">
-      <div class="fg-qty"><label>Qty</label><input type="number" id="m-qty" value="1" min="0.1" step="0.1"></div>
-      <div class="fg-unit"><label>Unit</label><select id="m-unit" class="isel"></select></div>
-      <div class="fg-cost"><label>$ / Unit</label><input type="number" id="m-cost" placeholder="0.00" min="0" step="0.01"></div>
+      <div class="fg-qty"><input type="number" id="m-qty" value="1" min="0" step="0.1" placeholder="QTY"></div>
+      <div class="fg-unit"><select id="m-unit" class="isel"></select></div>
+      <div class="fg-cost"><input type="number" id="m-cost" placeholder="$ / UNIT" min="0" step="0.01"></div>
       <button class="btn bp" onclick="addManual()" style="align-self:flex-end">Add</button>
     </div>
   </div>
@@ -311,16 +328,16 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
     <div class="card" style="margin-top:4px">
       <div class="ct"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/><circle cx="17" cy="15" r="1" fill="var(--gdk)"/></svg>Budget</div>
       <div style="display:flex;gap:8px;align-items:flex-end">
-        <div style="flex:1"><label>Target Budget</label><input type="number" id="bud-in" placeholder="e.g. 150.00" min="0" step="0.01" oninput="saveBudget()"></div>
+        <div style="flex:1"><input type="number" id="bud-in" placeholder="TARGET" min="0" step="0.01" oninput="saveBudget()"></div>
         <button class="btn bg sm" onclick="clearBudget()">Clear</button>
       </div>
       <div id="budwrap" style="display:none"><div class="bbg"><div class="bbf" id="budfill"></div></div><div class="binfo"><span id="budspent">$0.00 spent</span><span id="budleft"></span></div></div>
     </div>
     <div class="totbar"><div><div class="tl">Estimated Total</div></div><div class="ta" id="totdisp">$0.00</div></div>
-    <div class="ar">
-      <button class="btn ba" style="flex:1;padding:12px" onclick="completeShop()">&#10003; Complete &amp; Save Shop</button>
-      <button class="btn bg" onclick="clearTicked()">Remove Ticked</button>
-      <button class="btn bd sm" onclick="clearAll()">Clear All</button>
+    <div class="shop-actions">
+      <button class="btn ba btn-complete" onclick="completeShop()">&#10003; Completed</button>
+      <button class="btn bg btn-ticked" onclick="clearTicked()">Remove Ticked</button>
+      <button class="btn bd btn-clear" onclick="clearAll()">Clear All</button>
     </div>
   </div>
 </div>
@@ -330,19 +347,18 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
   <div class="sh"><h2>Recipes</h2></div>
   <div class="card">
     <div class="ct"><svg viewBox="0 0 24 24"><path d="M6 13.87A4 4 0 017.41 6a5.11 5.11 0 019.18 0A4 4 0 0118 13.87V21H6z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>New Recipe</div>
-    <div style="margin-bottom:10px"><label>Recipe Name</label><input type="text" id="r-name" placeholder="e.g. Spaghetti Bolognese"></div>
-    <label style="margin-bottom:6px;display:block">Ingredients</label>
+    <div style="margin-bottom:10px"><input type="text" id="r-name" placeholder="NAME"></div>
     <div id="r-ing-list"></div>
     <div style="margin-top:9px">
-      <div class="air-name"><input type="text" id="r-ing-name" placeholder="Ingredient name" autocomplete="off" style="width:100%"></div>
+      <div style="margin-bottom:7px"><input type="text" id="r-ing-name" placeholder="INGREDIENT NAME" autocomplete="off" style="width:100%"></div>
       <div class="air-row">
-        <div class="air-qty"><label>Qty</label><input type="number" id="r-ing-qty" placeholder="Qty" min="0.1" step="0.1" value="1"></div>
-        <div class="air-unit"><label>Unit</label><select id="r-ing-unit" class="isel"></select></div>
-        <div class="air-cost"><label>$ / Unit</label><input type="number" id="r-ing-cost" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="air-qty"><input type="number" id="r-ing-qty" placeholder="QTY" min="0.1" step="0.1" value="1"></div>
+        <div class="air-unit"><select id="r-ing-unit" class="isel"></select></div>
+        <div class="air-cost"><input type="number" id="r-ing-cost" placeholder="$ / UNIT" min="0" step="0.01"></div>
         <button class="btn bs sm" onclick="addIngToForm()" style="align-self:flex-end">+ Add</button>
       </div>
     </div>
-    <div class="ar" style="margin-top:13px"><button class="btn bp" onclick="saveRecipe()">Save Recipe</button><button class="btn bg" onclick="clearRecipeForm()">Clear</button></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:13px"><button class="btn bp" onclick="saveRecipe()">Save Recipe</button><button class="btn bg" onclick="clearRecipeForm()">Clear</button></div>
   </div>
   <div id="recipes-cont"></div>
 </div>
@@ -352,10 +368,10 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
   <div class="sh"><h2>Staples</h2></div>
   <div class="card">
     <div class="ct"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>Add Staple</div>
-    <div class="add-form-name"><label>Name</label><input type="text" id="st-name" placeholder="e.g. Whole Milk" autocomplete="off"></div>
+    <div style="margin-bottom:8px"><input type="text" id="st-name" placeholder="NAME" autocomplete="off"></div>
     <div class="add-form-row">
-      <div class="fg-cost" style="max-width:160px"><label>$ / Unit</label><input type="number" id="st-cost" placeholder="0.00" min="0" step="0.01"></div>
-      <button class="btn bp" onclick="addStaple()" style="align-self:flex-end">Add</button>
+      <div class="fg-cost" style="max-width:160px"><input type="number" id="st-cost" placeholder="$ / UNIT" min="0" step="0.01"></div>
+      <button class="btn bp" onclick="addStaple()" style="align-self:flex-end">Save Staple</button>
     </div>
   </div>
   <div class="sg" id="staples-cont"></div>
@@ -423,13 +439,16 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-const FIREBASE_CONFIG={apiKey:"AIzaSyCuKI9QNfmK5mZEaaHZ4vgERX0RKqhndkw",authDomain:"basket-da091.firebaseapp.com",databaseURL:"https://basket-da091-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"basket-da091",storageBucket:"basket-da091.firebasestorage.app",messagingSenderId:"731098681945",appId:"1:731098681945:web:2fe20b1c3713144c46d748"};
+const FIREBASE_CONFIG={apiKey:"AIzaSyCuKI9QNfmK5mZEaaHZ4vgERX0RKqhndkw",authDomain:"basket-da091.firebaseapp.com",databaseURL:"https://basket-da091-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"basket-da091D",storageBucket:"basket-da091.firebasestorage.app",messagingSenderId:"731098681945",appId:"1:731098681945:web:2fe20b1c3713144c46d748"};
 const ALLOWED_EMAILS=["kaedom.t@gmail.com","hannah.k.tin@gmail.com"];
 const KEY='basket_v4';
 const UNITS=['','each','g','kg','ml','L','tsp','tbsp','cup','bunch','can','bag','pack','bottle','clove','pinch','slice','piece','loaf','dozen'];
 const SCI_THRESHOLD=1e13;
+// Abbreviation threshold: 7 significant digits + symbol/comma/decimal = ~$9,999,999.99
+// We abbreviate when value >= 10,000,000 (8+ digits before decimal)
+const ABBREV_THRESHOLD=10000000;
 let S={recipes:[],staples:[],list:[],history:[],budget:null,darkMode:'auto',lastUpdatedBy:null};
-let currentUser=null,editItemId=null,editId=null,editTmpName='',formIngs=[],recipeScalers={};
+let currentUser=null,editId=null,editTmpName='',formIngs=[],recipeScalers={};
 let dragId=null,dragType=null,undoData=null,toastT,fbPushTimer,lastPush=0,spendFilter='all';
 let scanImgData=null,scanImgType=null,scanResults=[];
 let ingDragRid=null,ingDragIdx=null,stDragId=null;
@@ -442,11 +461,49 @@ function save(){localStorage.setItem(KEY,JSON.stringify(S));clearTimeout(fbPushT
 function load(){try{const r=localStorage.getItem(KEY);if(r)S={...S,...JSON.parse(r)};}catch(e){}}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function fmt(n){const v=Number(n||0);if(Math.abs(v)>=SCI_THRESHOLD)return '$'+v.toExponential(2);return '$'+v.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function lt(item){return(item.cost||0)*(item.qty||1);}
-function qtyDisp(q){const n=Number(q||1);return n===Math.round(n)?String(n):n.toFixed(1);}
+
+/* Currency formatting:
+   - values < ABBREV_THRESHOLD: full format with commas e.g. $56,001.45
+   - values >= ABBREV_THRESHOLD: abbreviated e.g. $10.0M, $1.2B
+   - values >= SCI_THRESHOLD (10 trillion): scientific notation */
+function fmtCurrency(n){
+  const v=Math.abs(Number(n||0));
+  const sign=Number(n||0)<0?'-':'';
+  if(v>=SCI_THRESHOLD) return sign+'$'+(Number(n||0)).toExponential(2).replace('-','');
+  if(v>=1e9) return sign+'$'+(v/1e9).toLocaleString('en-AU',{minimumFractionDigits:1,maximumFractionDigits:1})+'B';
+  if(v>=1e6) return sign+'$'+(v/1e6).toLocaleString('en-AU',{minimumFractionDigits:1,maximumFractionDigits:1})+'M';
+  if(v>=ABBREV_THRESHOLD) return sign+'$'+(v/1e6).toLocaleString('en-AU',{minimumFractionDigits:1,maximumFractionDigits:1})+'M';
+  return sign+'$'+v.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function fmt(n){return fmtCurrency(n);}
+
+/* Chart labels: abbreviated always for axis (keeps chart clean) */
+function fmtChartLabel(v){
+  const av=Math.abs(v);
+  if(av>=1e9) return '$'+(av/1e9).toFixed(1)+'B';
+  if(av>=1e6) return '$'+(av/1e6).toFixed(1)+'M';
+  if(av>=1e3) return '$'+(av/1e3).toFixed(0)+'k';
+  return '$'+av.toFixed(0);
+}
+
+function lt(item){return(item.cost||0)*(item.qty||0);}
+function qtyDisp(q){const n=Number(q||0);return n===Math.round(n)?String(n):n.toFixed(1);}
 function ingQtyDisp(ing){if(ing.unit)return qtyDisp(ing.qty)+' '+ing.unit;return qtyDisp(ing.qty)+'\xd7';}
 function timeAgo(iso){const d=Math.floor((Date.now()-new Date(iso).getTime())/1000);if(d<10)return 'just now';if(d<60)return d+'s ago';if(d<3600)return Math.floor(d/60)+'m ago';return Math.floor(d/3600)+'h ago';}
+
+/* badge class helper */
+function badgeClass(source){
+  if(source==='manual')return 'manual';
+  if(source==='staple')return 'staple';
+  if(source==='scan')return 'scan';
+  return 'recipe';
+}
+function badgeLabel(source){
+  if(source==='manual')return 'Manual';
+  if(source==='staple')return 'Staple';
+  if(source==='scan')return 'Scan';
+  return 'Recipe';
+}
 
 function loadQuickEnter(){quickEnter=localStorage.getItem('basket_quick_enter')==='1';const t=document.getElementById('quick-enter-tog');if(t)t.checked=quickEnter;}
 function saveQuickEnter(){quickEnter=document.getElementById('quick-enter-tog').checked;localStorage.setItem('basket_quick_enter',quickEnter?'1':'0');}
@@ -473,6 +530,7 @@ function saveForUndo(){undoData=JSON.parse(JSON.stringify(S.list));}
 function doUndo(){if(!undoData)return;S.list=undoData;undoData=null;clearTimeout(toastT);document.getElementById('toast').classList.remove('show');save();renderList();toast('Undone \u2713');}
 
 function getPriceFromHistory(name){if(!name||name.length<2)return null;const nl=name.toLowerCase().trim();for(const entry of S.history){const found=entry.items.find(i=>i.name.toLowerCase()===nl);if(found&&found.cost>0)return found.cost;}return null;}
+function findMerge(name,cost){return S.list.find(i=>i.name.toLowerCase()===name.toLowerCase()&&(i.cost||0)===(cost||0)&&!i.ticked);}
 
 function saveBudget(){S.budget=parseFloat(document.getElementById('bud-in').value)||null;save();renderBudget();}
 function clearBudget(){S.budget=null;document.getElementById('bud-in').value='';save();renderBudget();}
@@ -481,20 +539,26 @@ function renderBudget(){const wrap=document.getElementById('budwrap');if(!wrap)r
 let pmTimer;
 document.addEventListener('DOMContentLoaded',()=>{const mn=document.getElementById('m-name');if(mn)mn.addEventListener('input',function(){clearTimeout(pmTimer);pmTimer=setTimeout(()=>{if(document.getElementById('m-cost').value)return;const p=getPriceFromHistory(this.value);if(p!==null)document.getElementById('m-cost').value=p.toFixed(2);},350);});});
 
-function addManual(){const name=document.getElementById('m-name').value.trim();const qty=Math.max(0.1,parseFloat(document.getElementById('m-qty').value)||1);const unit=document.getElementById('m-unit').value;const cost=parseFloat(document.getElementById('m-cost').value)||0;if(!name){toast('Enter an item name');return;}S.list.push({id:uid(),name,qty,unit,cost,ticked:false,source:'manual'});document.getElementById('m-name').value='';document.getElementById('m-qty').value='1';document.getElementById('m-cost').value='';buildUnitSel('m-unit','');save();renderList();toast('"'+name+'" added');if(quickEnter)setTimeout(focusItemName,50);else document.getElementById('m-name').focus();}
+function addManual(){const name=document.getElementById('m-name').value.trim();const qty=Math.max(0,parseFloat(document.getElementById('m-qty').value)||0);const unit=document.getElementById('m-unit').value;const cost=parseFloat(document.getElementById('m-cost').value)||0;if(!name){toast('Enter an item name');return;}S.list.push({id:uid(),name,qty,unit,cost,ticked:false,source:'manual'});document.getElementById('m-name').value='';document.getElementById('m-qty').value='1';document.getElementById('m-cost').value='';buildUnitSel('m-unit','');save();renderList();toast('"'+name+'" added');if(quickEnter)setTimeout(focusItemName,50);else document.getElementById('m-name').focus();}
 function removeItem(id){saveForUndo();S.list=S.list.filter(i=>i.id!==id);openItemId=null;save();renderList();toast('Item removed',true);}
 function tickItem(id){const it=S.list.find(i=>i.id===id);if(it)it.ticked=!it.ticked;save();renderList();}
-function chgQty(id,d){const it=S.list.find(i=>i.id===id);if(it){it.qty=Math.max(0.1,Math.round(((it.qty||1)+d)*10)/10);save();renderList();}}
+function chgQty(id,d){const it=S.list.find(i=>i.id===id);if(it){const nq=Math.round(((it.qty||0)+d)*10)/10;it.qty=Math.max(0,nq);save();renderList();}}
 function togItem(id,e){if(e)e.stopPropagation();openItemId=openItemId===id?null:id;renderList();}
-function saveEditItem(id){const item=S.list.find(i=>i.id===id);if(!item)return;const name=document.getElementById('ei-n-'+id).value.trim();const qty=Math.max(0.1,parseFloat(document.getElementById('ei-q-'+id).value)||1);const unit=document.getElementById('ei-u-'+id).value;const cost=parseFloat(document.getElementById('ei-c-'+id).value)||0;if(!name){toast('Enter a name');return;}item.name=name;item.qty=qty;item.unit=unit;item.cost=cost;openItemId=null;save();renderList();toast('Item updated');}
+function saveEditItem(id){const item=S.list.find(i=>i.id===id);if(!item)return;const name=document.getElementById('ei-n-'+id).value.trim();const qty=Math.max(0,parseFloat(document.getElementById('ei-q-'+id).value)||0);const unit=document.getElementById('ei-u-'+id).value;const cost=parseFloat(document.getElementById('ei-c-'+id).value)||0;if(!name){toast('Enter a name');return;}item.name=name;item.qty=qty;item.unit=unit;item.cost=cost;openItemId=null;save();renderList();toast('Item updated');}
 function clearTicked(){const n=S.list.filter(i=>i.ticked).length;if(!n){toast('No ticked items');return;}saveForUndo();S.list=S.list.filter(i=>!i.ticked);save();renderList();toast(n+' item'+(n>1?'s':'')+' removed',true);}
 function clearAll(){if(!S.list.length)return;if(!confirm('Clear the entire list? This cannot be undone.'))return;saveForUndo();S.list=[];openItemId=null;save();renderList();toast('List cleared',true);}
 function sortByCategory(){if(!S.list.length){toast('List is empty');return;}saveForUndo();const order={};CATS.forEach((c,i)=>order[c.name]=i);S.list.sort((a,b)=>{const ia=order[getCatName(a.name)]??CATS.length,ib=order[getCatName(b.name)]??CATS.length;return ia-ib||a.name.localeCompare(b.name);});save();renderList();toast('Sorted by supermarket aisle',true);}
 function getCatName(n){const nl=n.toLowerCase();for(const cat of CATS){if(cat.kw.some(kw=>nl.includes(kw)))return cat.name;}return 'Other';}
-function completeShop(){if(!S.list.length)return;const total=S.list.reduce((s,i)=>s+lt(i),0),now=new Date().toISOString();[...new Set(S.list.map(i=>i.recipeId).filter(Boolean))].forEach(rid=>{const r=S.recipes.find(r=>r.id===rid);if(r)r.lastSavedToShop=now;});S.history.unshift({id:uid(),date:now,items:S.list.map(i=>({...i})),total});downloadShopHTML(S.list,now,total);S.list=[];openItemId=null;save();renderList();renderHistory();renderSpend();toast('Shop saved & downloaded! \uD83C\uDF89');}
-
-/* merge helper: same name (case-insensitive) + same cost */
-function findMerge(name,cost){return S.list.find(i=>i.name.toLowerCase()===name.toLowerCase()&&(i.cost||0)===(cost||0)&&!i.ticked);}
+function completeShop(){
+  if(!S.list.length)return;
+  const now=new Date().toISOString();
+  [...new Set(S.list.map(i=>i.recipeId).filter(Boolean))].forEach(rid=>{const r=S.recipes.find(r=>r.id===rid);if(r)r.lastSavedToShop=now;});
+  const itemsToSave=S.list.filter(i=>i.qty>0);
+  const total=itemsToSave.reduce((s,i)=>s+lt(i),0);
+  S.history.unshift({id:uid(),date:now,items:itemsToSave.map(i=>({...i})),total});
+  downloadShopHTML(itemsToSave,now,total);
+  S.list=[];openItemId=null;save();renderList();renderHistory();renderSpend();toast('Shop saved & downloaded! \uD83C\uDF89');
+}
 
 function renderList(){
   const cont=document.getElementById('shopitems'),foot=document.getElementById('shopfoot'),badge=document.getElementById('lbadge');
@@ -502,7 +566,8 @@ function renderList(){
   if(!all.length){cont.innerHTML='<div class="empty"><div class="ei">\uD83D\uDED2</div><div class="et">Your list is empty.<br>Add from Recipes, Staples, or manually above.</div></div>';foot.style.display='none';badge.style.display='none';return;}
   const total=S.list.reduce((s,i)=>s+lt(i),0);document.getElementById('totdisp').textContent=fmt(total);foot.style.display='block';badge.style.display='';badge.textContent=S.list.filter(i=>!i.ticked).length||'\u2713';if(S.budget)document.getElementById('bud-in').value=S.budget;
   cont.innerHTML=all.map(item=>{
-    const sc=item.source==='manual'?'manual':item.source==='staple'?'staple':'';
+    const bc=badgeClass(item.source);
+    const bl=badgeLabel(item.source);
     const isOpen=openItemId===item.id;
     const uSel=UNITS.map(u=>'<option value="'+u+'"'+(u===(item.unit||'')?'selected':'')+'>'+( u||'\u2014' )+'</option>').join('');
     return `<div class="si${item.ticked?' ticked':''}" id="si-${item.id}" draggable="true" ondragstart="ds(event,'${item.id}','list')" ondragend="de()" ondragover="dov(event,'${item.id}','list')" ondragleave="dlv(event)" ondrop="drp(event,'${item.id}','list')">
@@ -510,17 +575,17 @@ function renderList(){
         <span class="dh">\u2807</span>
         <input type="checkbox" class="sck" ${item.ticked?'checked':''} onchange="tickItem('${item.id}')">
         <span class="iln">${esc(item.name)}</span>
-        <button class="card-arr" onclick="togItem('${item.id}',event)" title="Options">${isOpen?'\u25b2':'\u25bc'}</button>
+        <button class="card-arr" onclick="togItem('${item.id}',event)">${isOpen?'\u25b2':'\u25bc'}</button>
       </div>
       <div class="si-body">
-        <span class="sp ${sc}">${esc(item.source)}</span>
+        <span class="sp ${bc}">${bl}</span>
         <div class="qc"><button class="qb" onclick="chgQty('${item.id}',-1)">&minus;</button><span class="qn">${qtyDisp(item.qty)}</span><button class="qb" onclick="chgQty('${item.id}',1)">+</button></div>
         <span class="si-body-cost">${fmt(lt(item))}</span>
       </div>
       ${isOpen?`<div class="si-edit">
         <div class="si-edit-name"><label>Name</label><input type="text" id="ei-n-${item.id}" value="${esc(item.name)}" style="width:100%"></div>
         <div class="si-edit-row">
-          <div class="fg-qty"><label>Qty</label><input type="number" id="ei-q-${item.id}" value="${qtyDisp(item.qty)}" min="0.1" step="0.1"></div>
+          <div class="fg-qty"><label>Qty</label><input type="number" id="ei-q-${item.id}" value="${qtyDisp(item.qty)}" min="0" step="0.1"></div>
           <div class="fg-unit"><label>Unit</label><select id="ei-u-${item.id}" class="isel">${uSel}</select></div>
           <div class="fg-cost"><label>$ / Unit</label><input type="number" id="ei-c-${item.id}" value="${Number(item.cost||0).toFixed(2)}" min="0" step="0.01"></div>
         </div>
@@ -568,19 +633,25 @@ function setScaler(id,val){recipeScalers[id]=val;renderRecipes();}
 function addRecipeToList(id){
   const recipe=S.recipes.find(r=>r.id===id);if(!recipe)return;
   const scaler=recipeScalers[id]||1;let added=0,merged=0;
-  recipe.ingredients.forEach(ing=>{
-    const scaledQty=Math.round((ing.qty||1)*scaler*100)/100;
-    const ex=findMerge(ing.name,ing.cost);
-    if(ex){ex.qty=Math.round(((ex.qty||1)+scaledQty)*100)/100;merged++;}
-    else{S.list.push({id:uid(),name:ing.name,qty:scaledQty,unit:ing.unit||'',cost:ing.cost,ticked:false,source:recipe.name,recipeId:recipe.id});added++;}
-  });
+  recipe.ingredients.forEach(ing=>{const scaledQty=Math.round((ing.qty||1)*scaler*100)/100;const ex=findMerge(ing.name,ing.cost);if(ex){ex.qty=Math.round(((ex.qty||0)+scaledQty)*100)/100;merged++;}else{S.list.push({id:uid(),name:ing.name,qty:scaledQty,unit:ing.unit||'',cost:ing.cost,ticked:false,source:recipe.name,recipeId:recipe.id});added++;}});
   save();renderList();const sLabel=scaler!==1?' ('+scaler+'\xd7)':'';
   toast(added&&merged?'Added '+added+', merged '+merged+' from "'+recipe.name+'"'+sLabel:added?'Added '+added+' item'+(added>1?'s':'')+' from "'+recipe.name+'"'+sLabel:recipe.name+': items merged'+sLabel);
 }
 function isStale(r){return !r.lastSavedToShop||Date.now()-new Date(r.lastSavedToShop).getTime()>14*864e5;}
 function startEdit(id){const r=S.recipes.find(r=>r.id===id);editId=id;editTmpName=r?r.name:'';openRecipeId=null;renderRecipes();}
 function cancelEdit(){editId=null;editTmpName='';renderRecipes();}
-function saveEdit(id){const r=S.recipes.find(r=>r.id===id);if(!r)return;const name=document.getElementById('en-'+id).value.trim();if(!name){toast('Recipe name required');return;}r.name=name;editId=null;save();renderRecipes();toast('Recipe updated');}
+function saveEdit(id){
+  const r=S.recipes.find(r=>r.id===id);if(!r)return;
+  const name=document.getElementById('en-'+id).value.trim();if(!name){toast('Recipe name required');return;}
+  r.ingredients=r.ingredients.map((ing,i)=>{
+    const nameEl=document.getElementById('ei-ing-n-'+id+'-'+i);
+    const qtyEl=document.getElementById('ei-ing-q-'+id+'-'+i);
+    const unitEl=document.getElementById('ei-ing-u-'+id+'-'+i);
+    const costEl=document.getElementById('ei-ing-c-'+id+'-'+i);
+    return{name:(nameEl?nameEl.value.trim():ing.name)||ing.name,qty:Math.max(0.1,parseFloat(qtyEl?qtyEl.value:ing.qty)||1),unit:unitEl?unitEl.value:ing.unit,cost:parseFloat(costEl?costEl.value:ing.cost)||0};
+  }).filter(ing=>ing.name);
+  r.name=name;editId=null;save();renderRecipes();toast('Recipe updated');
+}
 function addEditIng(id){const r=S.recipes.find(r=>r.id===id);if(!r)return;const tn=document.getElementById('en-'+id);if(tn)editTmpName=tn.value||editTmpName;const nm=document.getElementById('ein-n-'+id).value.trim();if(!nm){toast('Enter ingredient name');return;}r.ingredients.push({name:nm,qty:Math.max(0.1,parseFloat(document.getElementById('ein-q-'+id).value)||1),unit:document.getElementById('ein-u-'+id).value,cost:parseFloat(document.getElementById('ein-c-'+id).value)||0});save();renderRecipes();const nn=document.getElementById('en-'+id);if(nn&&editTmpName)nn.value=editTmpName;const ni=document.getElementById('ein-n-'+id);if(ni){ni.value='';ni.focus();}}
 function removeEditIng(rid,idx){const r=S.recipes.find(r=>r.id===rid);if(!r)return;const tn=document.getElementById('en-'+rid);if(tn)editTmpName=tn.value||editTmpName;r.ingredients.splice(idx,1);save();renderRecipes();const nn=document.getElementById('en-'+rid);if(nn&&editTmpName)nn.value=editTmpName;}
 
@@ -594,19 +665,47 @@ function renderRecipes(){
     const isOpen=openRecipeId===r.id;
     if(editId===r.id){
       const uSel=(sel)=>UNITS.map(u=>'<option value="'+u+'"'+(u===sel?' selected':'')+'>'+( u||'\u2014' )+'</option>').join('');
-      const ingRows=r.ingredients.map((ing,i)=>`<div class="ir" id="ir-${r.id}-${i}" draggable="true" ondragstart="ingDs(event,'${r.id}',${i})" ondragend="ingDe()" ondragover="ingDov(event,'${r.id}',${i})" ondragleave="ingDlv(event)" ondrop="ingDrp(event,'${r.id}',${i})"><span class="dh" style="font-size:.85rem">\u2807</span><span class="in">${esc(ing.name)}</span><span class="ic">${ingQtyDisp(ing)} ${fmt(ing.cost)}</span><button class="ib" onclick="removeEditIng('${r.id}',${i})">&times;</button></div>`).join('');
-      return `<div class="rc${stale?' stale':''}" id="rc-${r.id}"><div style="padding:13px 15px 5px;display:flex;align-items:center;gap:8px"><input type="text" id="en-${r.id}" value="${esc(editTmpName||r.name)}" style="font-size:1rem;font-weight:700;flex:1"></div><div style="padding:4px 15px 13px;border-top:1px solid var(--bdr)">${ingRows}<div style="margin-top:10px"><div style="margin-bottom:7px"><input type="text" id="ein-n-${r.id}" placeholder="Ingredient name" style="width:100%"></div><div style="display:flex;gap:6px;align-items:flex-end;flex-wrap:nowrap"><div style="width:64px;flex-shrink:0"><label>Qty</label><input type="number" id="ein-q-${r.id}" min="0.1" step="0.1" value="1"></div><div style="width:84px;flex-shrink:0"><label>Unit</label><select id="ein-u-${r.id}" class="isel">${uSel('')}</select></div><div style="flex:1;min-width:66px"><label>$ / Unit</label><input type="number" id="ein-c-${r.id}" placeholder="0.00" min="0" step="0.01"></div><button class="btn bs sm" onclick="addEditIng('${r.id}')" style="align-self:flex-end">+ Add</button></div></div><div style="display:flex;gap:7px;margin-top:12px"><button class="btn bp sm" onclick="saveEdit('${r.id}')">Save</button><button class="btn bg sm" onclick="cancelEdit()">Cancel</button></div></div></div>`;
+      const ingRows=r.ingredients.map((ing,i)=>`
+        <div class="ir-edit" id="ir-${r.id}-${i}">
+          <div class="ir-edit-name"><input type="text" id="ei-ing-n-${r.id}-${i}" value="${esc(ing.name)}" placeholder="Ingredient name" style="width:100%"></div>
+          <div class="ir-edit-row">
+            <div class="ir-eq"><label>Qty</label><input type="number" id="ei-ing-q-${r.id}-${i}" value="${qtyDisp(ing.qty)}" min="0.1" step="0.1"></div>
+            <div class="ir-eu"><label>Unit</label><select id="ei-ing-u-${r.id}-${i}" class="isel">${uSel(ing.unit||'')}</select></div>
+            <div class="ir-ec"><label>$ / Unit</label><input type="number" id="ei-ing-c-${r.id}-${i}" value="${Number(ing.cost||0).toFixed(2)}" min="0" step="0.01"></div>
+            <button class="btn bd sm" onclick="removeEditIng('${r.id}',${i})" style="align-self:flex-end">&times;</button>
+          </div>
+        </div>`).join('');
+      return `<div class="rc${stale?' stale':''}" id="rc-${r.id}">
+        <div style="padding:13px 15px 8px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--bdr)">
+          <input type="text" id="en-${r.id}" value="${esc(editTmpName||r.name)}" style="font-size:1rem;font-weight:700;flex:1">
+        </div>
+        <div style="padding:8px 15px 13px">
+          ${ingRows}
+          <div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--bdr)">
+            <div style="margin-bottom:7px"><input type="text" id="ein-n-${r.id}" placeholder="Add ingredient name" style="width:100%"></div>
+            <div style="display:flex;gap:6px;align-items:flex-end;flex-wrap:nowrap">
+              <div style="width:64px;flex-shrink:0"><label>Qty</label><input type="number" id="ein-q-${r.id}" min="0.1" step="0.1" value="1"></div>
+              <div style="width:84px;flex-shrink:0"><label>Unit</label><select id="ein-u-${r.id}" class="isel">${uSel('')}</select></div>
+              <div style="flex:1;min-width:66px"><label>$ / Unit</label><input type="number" id="ein-c-${r.id}" placeholder="0.00" min="0" step="0.01"></div>
+              <button class="btn bs sm" onclick="addEditIng('${r.id}')" style="align-self:flex-end">+ Add</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:7px;margin-top:12px">
+            <button class="btn bp sm" onclick="saveEdit('${r.id}')">Save Recipe</button>
+            <button class="btn bg sm" onclick="cancelEdit()">Cancel</button>
+          </div>
+        </div>
+      </div>`;
     }
     const ingRows=r.ingredients.map((ing,i)=>`<div class="ir" id="ir-${r.id}-${i}" draggable="true" ondragstart="ingDs(event,'${r.id}',${i})" ondragend="ingDe()" ondragover="ingDov(event,'${r.id}',${i})" ondragleave="ingDlv(event)" ondrop="ingDrp(event,'${r.id}',${i})"><span class="dh" style="font-size:.85rem">\u2807</span><span class="in">${esc(ing.name)}</span><span class="ic">${ingQtyDisp(ing)} ${fmt(ing.cost)}</span></div>`).join('');
     return `<div class="rc${stale?' stale':''}" id="rc-${r.id}" draggable="true" ondragstart="ds(event,'${r.id}','recipe')" ondragend="de()" ondragover="dov(event,'${r.id}','recipe')" ondragleave="dlv(event)" ondrop="drp(event,'${r.id}','recipe')">
       <div class="rh-r1" onclick="addRecipeToList('${r.id}')">
         <span class="dh" onclick="event.stopPropagation()">\u2807</span>
-        <div style="flex:1;min-width:0">
-          <div class="rname">${esc(r.name)}${stale?` <span class="slbl">Not used in 2+ wks</span>`:''}</div>
-          <div class="rmeta" style="margin-top:3px">${r.ingredients.length} ingredient${r.ingredients.length!==1?'s':''} &middot; ${fmt(tot)}</div>
-        </div>
-        <button class="card-arr" onclick="togRecipe('${r.id}',event)" title="Options">${isOpen?'\u25b2':'\u25bc'}</button>
+        <span class="rname">${esc(r.name)}</span>
+        <button class="card-arr" onclick="togRecipe('${r.id}',event)">${isOpen?'\u25b2':'\u25bc'}</button>
       </div>
+      ${stale?`<div class="rh-stale"><span class="slbl">Not used in 2+ wks</span></div>`:''}
+      <div class="rh-r2"><span class="rmeta">${r.ingredients.length} ingredient${r.ingredients.length!==1?'s':''} &middot; ${fmt(tot)}</span></div>
       <div class="card-drop${isOpen?' open':''}">
         <div class="card-drop-inner">
           <button class="btn bg sm" onclick="startEdit('${r.id}')">Edit Recipe</button>
@@ -624,29 +723,13 @@ function renderRecipes(){
 document.addEventListener('DOMContentLoaded',()=>{const ri=document.getElementById('r-ing-name');if(ri)ri.addEventListener('input',function(){clearTimeout(pmRTimer);pmRTimer=setTimeout(()=>{if(document.getElementById('r-ing-cost').value)return;const p=getPriceFromHistory(this.value);if(p!==null)document.getElementById('r-ing-cost').value=p.toFixed(2);},350);});});
 
 function addStaple(){const name=document.getElementById('st-name').value.trim();const cost=parseFloat(document.getElementById('st-cost').value)||0;if(!name){toast('Enter an item name');return;}S.staples.push({id:uid(),name,cost});document.getElementById('st-name').value='';document.getElementById('st-cost').value='';document.getElementById('st-name').focus();save();renderStaples();toast('"'+name+'" added to staples');}
-function addStapleToList(id){
-  const s=S.staples.find(x=>x.id===id);if(!s)return;
-  const ex=findMerge(s.name,s.cost);
-  if(ex){ex.qty=Math.round(((ex.qty||1)+1)*100)/100;save();renderList();toast('"'+s.name+'" merged into list');}
-  else{S.list.push({id:uid(),name:s.name,qty:1,unit:'',cost:s.cost,ticked:false,source:'staple'});save();renderList();toast('"'+s.name+'" added to list');}
-}
+function addStapleToList(id){const s=S.staples.find(x=>x.id===id);if(!s)return;const ex=findMerge(s.name,s.cost);if(ex){ex.qty=Math.round(((ex.qty||0)+1)*100)/100;save();renderList();toast('"'+s.name+'" merged into list');}else{S.list.push({id:uid(),name:s.name,qty:1,unit:'',cost:s.cost,ticked:false,source:'staple'});save();renderList();toast('"'+s.name+'" added to list');}}
 function deleteStaple(id){if(!confirm('Delete this staple?'))return;S.staples=S.staples.filter(s=>s.id!==id);openStapleId=null;save();renderStaples();toast('Staple deleted');}
 function saveStaple(id){const s=S.staples.find(x=>x.id===id);if(!s)return;const nameEl=document.getElementById('se-n-'+id),costEl=document.getElementById('se-c-'+id);const name=(nameEl?.value||'').trim();const cost=parseFloat(costEl?.value)||0;if(!name){toast('Enter a name');return;}s.name=name;s.cost=cost;openStapleId=null;save();renderStaples();toast('Staple updated');}
 function renderStaples(){
   const c=document.getElementById('staples-cont');
   if(!S.staples.length){c.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ei">\uD83D\uDCCB</div><div class="et">No staples yet.<br>Add items you buy regularly.</div></div>';return;}
-  c.innerHTML=S.staples.map(s=>{
-    const isOpen=openStapleId===s.id;
-    return `<div class="sc" id="sc-${s.id}" draggable="true" ondragstart="stDs(event,'${s.id}')" ondragend="stDe()" ondragover="stDov(event,'${s.id}')" ondragleave="stDlv(event)" ondrop="stDrp(event,'${s.id}')">
-      <div class="sc-head" onclick="addStapleToList('${s.id}')">
-        <span class="dh" style="font-size:.8rem" onclick="event.stopPropagation()">\u2807</span>
-        <span class="scn">${esc(s.name)}</span>
-        <button class="card-arr" onclick="togStaple('${s.id}',event)" title="Options">${isOpen?'\u25b2':'\u25bc'}</button>
-      </div>
-      <div class="scc">${fmt(s.cost)}</div>
-      ${isOpen?`<div class="sc-edit"><label style="font-size:.68rem">Name</label><input type="text" id="se-n-${s.id}" value="${esc(s.name)}"><label style="font-size:.68rem">$ / Unit</label><input type="number" id="se-c-${s.id}" value="${Number(s.cost||0).toFixed(2)}" min="0" step="0.01"><div class="sc-edit-btns"><button class="btn bp sm" onclick="saveStaple('${s.id}')">Save</button><button class="btn bd sm" onclick="deleteStaple('${s.id}')">Delete</button></div></div>`:''}
-    </div>`;
-  }).join('');
+  c.innerHTML=S.staples.map(s=>{const isOpen=openStapleId===s.id;return `<div class="sc" id="sc-${s.id}" draggable="true" ondragstart="stDs(event,'${s.id}')" ondragend="stDe()" ondragover="stDov(event,'${s.id}')" ondragleave="stDlv(event)" ondrop="stDrp(event,'${s.id}')"><div class="sc-head" onclick="addStapleToList('${s.id}')"><span class="dh" style="font-size:.8rem" onclick="event.stopPropagation()">\u2807</span><span class="scn">${esc(s.name)}</span><button class="card-arr" onclick="togStaple('${s.id}',event)">${isOpen?'\u25b2':'\u25bc'}</button></div><div class="scc">${fmt(s.cost)}</div>${isOpen?`<div class="sc-edit"><label style="font-size:.68rem">Name</label><input type="text" id="se-n-${s.id}" value="${esc(s.name)}"><label style="font-size:.68rem">$ / Unit</label><input type="number" id="se-c-${s.id}" value="${Number(s.cost||0).toFixed(2)}" min="0" step="0.01"><div class="sc-edit-btns"><button class="btn bp sm" onclick="saveStaple('${s.id}')">Save</button><button class="btn bd sm" onclick="deleteStaple('${s.id}')">Delete</button></div></div>`:''}</div>`;}).join('');
 }
 
 const CATS=[
@@ -675,10 +758,10 @@ function renderSpend(){
   const tots=filtered.map(h=>h.total),avg=tots.reduce((a,b)=>a+b,0)/tots.length,overall=tots.reduce((a,b)=>a+b,0);
   stats.innerHTML='<div class="sbox"><div class="sv">'+fmt(avg)+'</div><div class="slb">Average shop</div></div><div class="sbox"><div class="sv">'+fmt(overall)+'</div><div class="slb">Total spent</div></div><div class="sbox"><div class="sv">'+filtered.length+'</div><div class="slb">Shops</div></div>';
   const data=filtered.slice(0,12).reverse();
-  const W=680,H=240,pL=62,pR=22,pT=26,pB=46,cW=W-pL-pR,cH=H-pT-pB,n=data.length;
+  const W=680,H=240,pL=52,pR=22,pT=26,pB=46,cW=W-pL-pR,cH=H-pT-pB,n=data.length;
   const slot=cW/n,bw=Math.min(46,slot*.68),mx=Math.max(...data.map(h=>h.total),1),avgY=pT+cH-(avg/mx)*cH;
-  const grid=[0,.25,.5,.75,1].map(f=>{const y=pT+cH*(1-f),v=mx*f;return '<line x1="'+pL+'" y1="'+y+'" x2="'+(W-pR)+'" y2="'+y+'" stroke="var(--bdr)" stroke-width="1"/><text x="'+(pL-5)+'" y="'+(y+4)+'" text-anchor="end" font-size="9" fill="var(--mid)" font-family="Outfit,sans-serif">'+fmt(v)+'</text>';}).join('');
-  const bars=data.map((e,i)=>{const x=pL+slot*i+(slot-bw)/2,bh=Math.max(3,(e.total/mx)*cH),by=pT+cH-bh,lbl=new Date(e.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'});return '<rect x="'+x+'" y="'+by+'" width="'+bw+'" height="'+bh+'" rx="4" fill="var(--gmd)" opacity=".82"/><text x="'+(x+bw/2)+'" y="'+(by-5)+'" text-anchor="middle" font-size="9" fill="var(--tx)" font-weight="600" font-family="Outfit,sans-serif">'+fmt(e.total)+'</text><text x="'+(x+bw/2)+'" y="'+(H-pB+14)+'" text-anchor="middle" font-size="9.5" fill="var(--mid)" font-family="Outfit,sans-serif">'+lbl+'</text>';}).join('');
+  const grid=[0,.25,.5,.75,1].map(f=>{const y=pT+cH*(1-f),v=mx*f;return '<line x1="'+pL+'" y1="'+y+'" x2="'+(W-pR)+'" y2="'+y+'" stroke="var(--bdr)" stroke-width="1"/><text x="'+(pL-4)+'" y="'+(y+4)+'" text-anchor="end" font-size="9" fill="var(--mid)" font-family="Outfit,sans-serif">'+fmtChartLabel(v)+'</text>';}).join('');
+  const bars=data.map((e,i)=>{const x=pL+slot*i+(slot-bw)/2,bh=Math.max(3,(e.total/mx)*cH),by=pT+cH-bh,lbl=new Date(e.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'});return '<rect x="'+x+'" y="'+by+'" width="'+bw+'" height="'+bh+'" rx="4" fill="var(--gmd)" opacity=".82"/><text x="'+(x+bw/2)+'" y="'+(by-5)+'" text-anchor="middle" font-size="9" fill="var(--tx)" font-weight="600" font-family="Outfit,sans-serif">'+fmtChartLabel(e.total)+'</text><text x="'+(x+bw/2)+'" y="'+(H-pB+14)+'" text-anchor="middle" font-size="9.5" fill="var(--mid)" font-family="Outfit,sans-serif">'+lbl+'</text>';}).join('');
   chart.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;overflow:visible">'+grid+bars+'<line x1="'+pL+'" y1="'+avgY+'" x2="'+(W-pR)+'" y2="'+avgY+'" stroke="var(--amb)" stroke-width="1.5" stroke-dasharray="5,3"/><text x="'+(W-pR+3)+'" y="'+(avgY+4)+'" font-size="9" fill="var(--amb)" font-family="Outfit,sans-serif">avg</text></svg>';
   const catSpend={};filtered.forEach(entry=>entry.items.forEach(item=>{const cat=getCatName(item.name);catSpend[cat]=(catSpend[cat]||0)+lt(item);}));
   const sorted=Object.entries(catSpend).sort((a,b)=>b[1]-a[1]),catTotal=sorted.reduce((s,[,v])=>s+v,0),catMax=sorted[0]?.[1]||1;
@@ -686,7 +769,7 @@ function renderSpend(){
 }
 
 function deleteHist(id){if(!confirm('Delete this history entry?'))return;S.history=S.history.filter(h=>h.id!==id);openHistId=null;save();renderHistory();renderSpend();toast('History entry deleted');}
-function reloadShop(id){const entry=S.history.find(h=>h.id===id);if(!entry)return;if(!confirm('Add '+entry.items.length+' items from this shop to your current list?'))return;saveForUndo();let added=0,merged=0;entry.items.forEach(item=>{const ex=findMerge(item.name,item.cost);if(ex){ex.qty=Math.round(((ex.qty||1)+(item.qty||1))*100)/100;merged++;}else{S.list.push({id:uid(),name:item.name,qty:item.qty||1,unit:item.unit||'',cost:item.cost,ticked:false,source:item.source,recipeId:item.recipeId});added++;}});save();switchToTab('shopping');toast('Loaded '+(added+merged)+' items from past shop',true);}
+function reloadShop(id){const entry=S.history.find(h=>h.id===id);if(!entry)return;if(!confirm('Add '+entry.items.length+' items from this shop to your current list?'))return;saveForUndo();let added=0,merged=0;entry.items.forEach(item=>{const ex=findMerge(item.name,item.cost);if(ex){ex.qty=Math.round(((ex.qty||0)+(item.qty||1))*100)/100;merged++;}else{S.list.push({id:uid(),name:item.name,qty:item.qty||1,unit:item.unit||'',cost:item.cost,ticked:false,source:item.source,recipeId:item.recipeId});added++;}});save();switchToTab('shopping');toast('Loaded '+(added+merged)+' items from past shop',true);}
 function renderHistory(){
   const c=document.getElementById('history-cont');
   if(!S.history.length){c.innerHTML='<div class="empty"><div class="ei">\uD83D\uDCC5</div><div class="et">No history yet.<br>Complete a shop to save it here.</div></div>';return;}
@@ -695,23 +778,7 @@ function renderHistory(){
     const ds=d.toLocaleDateString('en-AU',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
     const ts=d.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
     const isOpen=openHistId===e.id;
-    return `<div class="hc">
-      <div class="hh" onclick="togHist('${e.id}')">
-        <div><div class="hdate">${esc(ds)}</div><div class="hmeta">${ts} &middot; ${e.items.length} item${e.items.length!==1?'s':''}</div></div>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0" onclick="event.stopPropagation()">
-          <span class="htot">${fmt(e.total)}</span>
-          <button class="btn bs sm" onclick="reloadShop('${e.id}')">&#8635; Reload</button>
-          <button class="card-arr" onclick="togHist('${e.id}')" title="Expand">${isOpen?'\u25b2':'\u25bc'}</button>
-        </div>
-      </div>
-      <div class="hb${isOpen?' open':''}">
-        ${e.items.map(i=>'<div class="hrow"><span>'+esc(i.name)+(i.qty>1?' \xd7'+qtyDisp(i.qty):'')+(i.unit?' '+i.unit:'')+' <span class="hsrc">('+esc(i.source)+')</span></span><span>'+fmt(lt(i))+'</span></div>').join('')}
-        <div class="htr"><span>Total</span><span>${fmt(e.total)}</span></div>
-        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr)">
-          <button class="btn bd sm" onclick="deleteHist('${e.id}')">Delete this entry</button>
-        </div>
-      </div>
-    </div>`;
+    return `<div class="hc"><div class="hh" onclick="togHist('${e.id}')"><div><div class="hdate">${esc(ds)}</div><div class="hmeta">${ts} &middot; ${e.items.length} item${e.items.length!==1?'s':''}</div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0" onclick="event.stopPropagation()"><span class="htot">${fmt(e.total)}</span><button class="btn bs sm" onclick="reloadShop('${e.id}')">&#8635; Reload</button><button class="card-arr" onclick="togHist('${e.id}')">${isOpen?'\u25b2':'\u25bc'}</button></div></div><div class="hb${isOpen?' open':''}"><div>${e.items.map(i=>'<div class="hrow"><span>'+esc(i.name)+(i.qty>1?' \xd7'+qtyDisp(i.qty):'')+(i.unit?' '+i.unit:'')+' <span class="hsrc">('+esc(i.source)+')</span></span><span>'+fmt(lt(i))+'</span></div>').join('')}</div><div class="htr"><span>Total</span><span>${fmt(e.total)}</span></div><div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr)"><button class="btn bd sm" onclick="deleteHist('${e.id}')">Delete this entry</button></div></div></div>`;
   }).join('');
 }
 
@@ -735,11 +802,30 @@ function resetScanner(){scanImgData=null;scanImgType=null;scanResults=[];showSca
 function showScanStep(n){['scan-s1','scan-s2','scan-s3','scan-s4'].forEach((id,i)=>{document.getElementById(id).style.display=i===n?'':'none';});}
 function showScanErr(msg){document.getElementById('scan-s3').style.display='none';document.getElementById('scan-s4').style.display='none';document.getElementById('scan-s1').style.display=scanImgData?'none':'';document.getElementById('scan-s2').style.display=scanImgData?'':'none';const el=document.getElementById('scan-err');el.textContent=msg;el.style.display='';}
 function onImgSelected(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const originalDataUrl=e.target.result;compressImage(originalDataUrl,file.type||'image/jpeg',(compressedData,compressedType)=>{scanImgData=compressedData;scanImgType=compressedType;document.getElementById('scan-preview').src=originalDataUrl;showScanStep(1);});};reader.readAsDataURL(file);}
-async function analyseImg(){const key=localStorage.getItem('basket_api_key');if(!key||!scanImgData){toast('No image or API key');return;}document.getElementById('scan-err').style.display='none';showScanStep(2);const prompt='Analyse this image carefully. It may be a handwritten or printed shopping list, or a recipe.\n\nIf it is a shopping list: extract all items.\nIf it is a recipe: extract only the ingredients (not instructions).\n\nReturn ONLY a valid JSON array with no surrounding text, markdown, or explanation. Each element must have:\n- "name": string (item or ingredient name, clean and concise)\n- "qty": number (quantity, default 1)\n- "unit": string \u2014 use one of: "each","g","kg","ml","L","tsp","tbsp","cup","bunch","can","bag","pack","bottle","clove","pinch","slice","loaf","dozen" \u2014 or "" if not applicable\n- "cost": number (0 if not visible)\n\nExample: [{"name":"Milk","qty":2,"unit":"L","cost":0},{"name":"Eggs","qty":12,"unit":"each","cost":0}]';try{const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:scanImgType,data:scanImgData}},{type:'text',text:prompt}]}]})});if(!resp.ok){const err=await resp.json();console.error('Basket scan API error:',resp.status,err);throw new Error(err.error?.message||'API error '+resp.status);}const data=await resp.json();const raw=data.content?.find(c=>c.type==='text')?.text||'';const clean=raw.replace(/```json|```/g,'').trim();const items=JSON.parse(clean);if(!Array.isArray(items)||!items.length)throw new Error('No items found in image');scanResults=items.map(i=>({...i,selected:true,id:uid()}));document.getElementById('scan-results').innerHTML=scanResults.map(i=>'<div class="scan-item"><input type="checkbox" class="scan-ck" id="sc-'+i.id+'" checked onchange="scanResults.find(r=>r.id===\''+i.id+'\').selected=this.checked"><label for="sc-'+i.id+'" style="flex:1;cursor:pointer"><div class="scan-nm">'+esc(i.name)+'</div></label><span class="scan-mt">'+ingQtyDisp(i)+'</span></div>').join('');showScanStep(3);}catch(err){console.error('Basket scan error:',err);showScanErr('Error: '+err.message+'. Check your API key in Settings or try a clearer image.');}}
-function addScannedItems(){const toAdd=scanResults.filter(i=>i.selected);if(!toAdd.length){toast('No items selected');return;}toAdd.forEach(i=>{const price=getPriceFromHistory(i.name)||0;const ex=findMerge(i.name,i.cost||price);if(ex){ex.qty=Math.round(((ex.qty||1)+(i.qty||1))*100)/100;}else{S.list.push({id:uid(),name:i.name,qty:i.qty||1,unit:i.unit||'',cost:i.cost||price,ticked:false,source:'scan'});}});save();closeScanModal();switchToTab('shopping');toast('Added '+toAdd.length+' item'+(toAdd.length>1?'s':'')+' from image');}
+
+async function analyseImg(){
+  const key=localStorage.getItem('basket_api_key');if(!key||!scanImgData){toast('No image or API key');return;}
+  document.getElementById('scan-err').style.display='none';showScanStep(2);
+  const prompt='Analyse this image carefully. It may be a handwritten or printed shopping list, or a recipe.\n\nIf it is a shopping list: extract all items.\nIf it is a recipe: extract only the ingredients (not instructions).\n\nReturn ONLY a valid JSON array. Do not include any explanation, commentary, preamble, or text before or after the JSON array. If you are uncertain about an item, include your best guess inside the array. Each element must have:\n- "name": string (item or ingredient name, clean and concise)\n- "qty": number (quantity, default 1)\n- "unit": string \u2014 use one of: "each","g","kg","ml","L","tsp","tbsp","cup","bunch","can","bag","pack","bottle","clove","pinch","slice","loaf","dozen" \u2014 or "" if not applicable\n- "cost": number (0 if not visible)\n\nExample: [{"name":"Milk","qty":2,"unit":"L","cost":0},{"name":"Eggs","qty":12,"unit":"each","cost":0}]';
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:scanImgType,data:scanImgData}},{type:'text',text:prompt}]}]})});
+    if(!resp.ok){const err=await resp.json();console.error('Basket scan API error:',resp.status,err);throw new Error(err.error?.message||'API error '+resp.status);}
+    const data=await resp.json();
+    const raw=data.content?.find(c=>c.type==='text')?.text||'';
+    const firstBracket=raw.indexOf('['),lastBracket=raw.lastIndexOf(']');
+    if(firstBracket===-1||lastBracket===-1||lastBracket<=firstBracket)throw new Error('No item list found in response');
+    const items=JSON.parse(raw.slice(firstBracket,lastBracket+1));
+    if(!Array.isArray(items)||!items.length)throw new Error('No items found in image');
+    scanResults=items.map(i=>({...i,selected:true,id:uid()}));
+    document.getElementById('scan-results').innerHTML=scanResults.map(i=>'<div class="scan-item"><input type="checkbox" class="scan-ck" id="sc-'+i.id+'" checked onchange="scanResults.find(r=>r.id===\''+i.id+'\').selected=this.checked"><label for="sc-'+i.id+'" style="flex:1;cursor:pointer"><div class="scan-nm">'+esc(i.name)+'</div></label><span class="scan-mt">'+ingQtyDisp(i)+'</span></div>').join('');
+    showScanStep(3);
+  }catch(err){console.error('Basket scan error:',err);showScanErr('Error: '+err.message+'. Check your API key in Settings or try a clearer image.');}
+}
+
+function addScannedItems(){const toAdd=scanResults.filter(i=>i.selected);if(!toAdd.length){toast('No items selected');return;}toAdd.forEach(i=>{const price=getPriceFromHistory(i.name)||0;const ex=findMerge(i.name,i.cost||price);if(ex){ex.qty=Math.round(((ex.qty||0)+(i.qty||1))*100)/100;}else{S.list.push({id:uid(),name:i.name,qty:i.qty||1,unit:i.unit||'',cost:i.cost||price,ticked:false,source:'scan'});}});save();closeScanModal();switchToTab('shopping');toast('Added '+toAdd.length+' item'+(toAdd.length>1?'s':'')+' from image');}
 
 const BSVG='<svg width="38" height="38" viewBox="0 0 32 32" fill="none"><path d="M9.5 14C9.5 7 22.5 7 22.5 14" stroke="#3d6647" stroke-width="2.2" stroke-linecap="round"/><path d="M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z" fill="rgba(61,102,71,.18)" stroke="#3d6647" stroke-width="1.9" stroke-linejoin="round"/><line x1="11" y1="14" x2="10" y2="28" stroke="#3d6647" stroke-width="1.2" stroke-opacity=".5"/><line x1="16" y1="14" x2="16" y2="28" stroke="#3d6647" stroke-width="1.2" stroke-opacity=".5"/><line x1="21" y1="14" x2="22" y2="28" stroke="#3d6647" stroke-width="1.2" stroke-opacity=".5"/><line x1="4.5" y1="19.5" x2="27.5" y2="19.5" stroke="#3d6647" stroke-width="1.2" stroke-opacity=".5"/><line x1="5.5" y1="24.5" x2="26.5" y2="24.5" stroke="#3d6647" stroke-width="1.2" stroke-opacity=".5"/></svg>';
-function downloadShopHTML(items,dateISO,total){const cats=catItems(items),d=new Date(dateISO);const ds=d.toLocaleDateString('en-AU',{weekday:'long',year:'numeric',month:'long',day:'numeric'});const ts=d.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});let rows='';for(const[cat,citems]of Object.entries(cats)){rows+='<tr><td colspan="3" class="ch">'+cat+'</td></tr>';citems.forEach(i=>{const lti=lt(i),qs=ingQtyDisp(i);rows+='<tr><td class="cb">\u2610</td><td>'+esc(i.name)+(qs?' <span class="q">'+qs+'</span>':'')+'<span class="src">'+esc(i.source)+'</span></td><td class="pr">'+fmt(lti)+'</td></tr>';});}const html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Basket \u2014 '+ds+'</title><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Outfit,sans-serif;max-width:660px;margin:36px auto;padding:24px;color:#222;background:#fff}.header{display:flex;align-items:center;gap:14px;border-bottom:3px solid #3d6647;padding-bottom:13px;margin-bottom:4px}.htext h1{font-size:1.85rem;font-weight:700;color:#3d6647;line-height:1}.htext .date{font-size:.88rem;color:#666;margin-top:4px}.pinfo{margin-left:auto;font-size:.78rem;color:#999;text-align:right}.pbtn{display:block;margin-top:7px;padding:5px 13px;background:#3d6647;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.82rem;font-family:Outfit,sans-serif;font-weight:600}table{width:100%;border-collapse:collapse;margin-top:8px}td{padding:7px 5px;border-bottom:1px solid #f0f0f0;font-size:.91rem;vertical-align:middle}.ch{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#3d6647;background:#ecf3ed;padding:9px 5px 7px;border-bottom:none}.cb{width:24px;font-size:1.1rem;color:#aaa;padding:7px 10px}.pr{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;min-width:68px;white-space:nowrap}.q{color:#888;font-size:.83rem;margin-left:4px}.src{display:block;font-size:.72rem;color:#999;margin-top:1px;font-style:italic}.trow td{font-weight:700;font-size:1rem;border-top:2px solid #3d6647;border-bottom:none;padding:12px 5px 4px}@media print{body{margin:12px;padding:0}.pinfo{display:none}}</style></head><body><div class="header">'+BSVG+'<div class="htext"><h1>Basket</h1><div class="date">'+ds+' at '+ts+'</div></div><div class="pinfo">v4.5<button class="pbtn" onclick="window.print()">Print</button></div></div><table>'+rows+'<tr class="trow"><td></td><td>Total</td><td class="pr">'+fmt(total)+'</td></tr></table></body></html>';const blob=new Blob([html],{type:'text/html'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='basket-'+d.toISOString().slice(0,10)+'.html';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
+function downloadShopHTML(items,dateISO,total){const cats=catItems(items),d=new Date(dateISO);const ds=d.toLocaleDateString('en-AU',{weekday:'long',year:'numeric',month:'long',day:'numeric'});const ts=d.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});let rows='';for(const[cat,citems]of Object.entries(cats)){rows+='<tr><td colspan="3" class="ch">'+cat+'</td></tr>';citems.forEach(i=>{const lti=lt(i),qs=ingQtyDisp(i);rows+='<tr><td class="cb">\u2610</td><td>'+esc(i.name)+(qs?' <span class="q">'+qs+'</span>':'')+'<span class="src">'+esc(i.source)+'</span></td><td class="pr">'+fmt(lti)+'</td></tr>';});}const html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Basket \u2014 '+ds+'</title><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Outfit,sans-serif;max-width:660px;margin:36px auto;padding:24px;color:#222;background:#fff}.header{display:flex;align-items:center;gap:14px;border-bottom:3px solid #3d6647;padding-bottom:13px;margin-bottom:4px}.htext h1{font-size:1.85rem;font-weight:700;color:#3d6647;line-height:1}.htext .date{font-size:.88rem;color:#666;margin-top:4px}.pinfo{margin-left:auto;font-size:.78rem;color:#999;text-align:right}.pbtn{display:block;margin-top:7px;padding:5px 13px;background:#3d6647;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.82rem;font-family:Outfit,sans-serif;font-weight:600}table{width:100%;border-collapse:collapse;margin-top:8px}td{padding:7px 5px;border-bottom:1px solid #f0f0f0;font-size:.91rem;vertical-align:middle}.ch{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#3d6647;background:#ecf3ed;padding:9px 5px 7px;border-bottom:none}.cb{width:24px;font-size:1.1rem;color:#aaa;padding:7px 10px}.pr{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;min-width:68px;white-space:nowrap}.q{color:#888;font-size:.83rem;margin-left:4px}.src{display:block;font-size:.72rem;color:#999;margin-top:1px;font-style:italic}.trow td{font-weight:700;font-size:1rem;border-top:2px solid #3d6647;border-bottom:none;padding:12px 5px 4px}@media print{body{margin:12px;padding:0}.pinfo{display:none}}</style></head><body><div class="header">'+BSVG+'<div class="htext"><h1>Basket</h1><div class="date">'+ds+' at '+ts+'</div></div><div class="pinfo">v4.8<button class="pbtn" onclick="window.print()">Print</button></div></div><table>'+rows+'<tr class="trow"><td></td><td>Total</td><td class="pr">'+fmt(total)+'</td></tr></table></body></html>';const blob=new Blob([html],{type:'text/html'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='basket-'+d.toISOString().slice(0,10)+'.html';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
 
 ['r-ing-name','r-ing-cost','r-ing-qty'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addIngToForm();}});});
 ['m-name','m-cost','m-qty'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addManual();}});});
