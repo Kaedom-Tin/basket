@@ -439,14 +439,20 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-const FIREBASE_CONFIG={apiKey:"AIzaSyCuKI9QNfmK5mZEaaHZ4vgERX0RKqhndkw",authDomain:"basket-da091.firebaseapp.com",databaseURL:"https://basket-da091-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"basket-da091D",storageBucket:"basket-da091.firebasestorage.app",messagingSenderId:"731098681945",appId:"1:731098681945:web:2fe20b1c3713144c46d748"};
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyCuKI9QNfmK5mZEaaHZ4vgERX0RKqhndkw",
+  authDomain:        "basket-da091.firebaseapp.com",
+  databaseURL:       "https://basket-da091-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "basket-da091",
+  storageBucket:     "basket-da091.firebasestorage.app",
+  messagingSenderId: "731098681945",
+  appId:             "1:731098681945:web:2fe20b1c3713144c46d748"};
 const ALLOWED_EMAILS=["kaedom.t@gmail.com","hannah.k.tin@gmail.com"];
 const KEY='basket_v4';
 const UNITS=['','each','g','kg','ml','L','tsp','tbsp','cup','bunch','can','bag','pack','bottle','clove','pinch','slice','piece','loaf','dozen'];
 const SCI_THRESHOLD=1e13;
 // Abbreviation threshold: 7 significant digits + symbol/comma/decimal = ~$9,999,999.99
-// We abbreviate when value >= 10,000,000 (8+ digits before decimal)
-const ABBREV_THRESHOLD=10000000;
+// Values >= $10M abbreviate; >= SCI_THRESHOLD use scientific notation
 let S={recipes:[],staples:[],list:[],history:[],budget:null,darkMode:'auto',lastUpdatedBy:null};
 let currentUser=null,editId=null,editTmpName='',formIngs=[],recipeScalers={};
 let dragId=null,dragType=null,undoData=null,toastT,fbPushTimer,lastPush=0,spendFilter='all';
@@ -455,29 +461,26 @@ let ingDragRid=null,ingDragIdx=null,stDragId=null;
 let openItemId=null,openStapleId=null,openRecipeId=null,openHistId=null;
 let quickEnter=false;
 
-function buildUnitSel(id,sel){const el=document.getElementById(id);if(!el)return;el.innerHTML=UNITS.map(u=>'<option value="'+u+'"'+(u===sel?' selected':'')+'>'+( u||'\u2014' )+'</option>').join('');}
+function unitOptions(sel){return UNITS.map(u=>'<option value="'+u+'"'+(u===(sel||'')?' selected':'')+'>'+( u||'\u2014' )+'</option>').join('');}
+function buildUnitSel(id,sel){const el=document.getElementById(id);if(!el)return;el.innerHTML=unitOptions(sel);}
 ['m-unit','r-ing-unit'].forEach(id=>buildUnitSel(id,''));
 function save(){localStorage.setItem(KEY,JSON.stringify(S));clearTimeout(fbPushTimer);fbPushTimer=setTimeout(pushToFirebase,900);}
 function load(){try{const r=localStorage.getItem(KEY);if(r)S={...S,...JSON.parse(r)};}catch(e){}}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-/* Currency formatting:
-   - values < ABBREV_THRESHOLD: full format with commas e.g. $56,001.45
-   - values >= ABBREV_THRESHOLD: abbreviated e.g. $10.0M, $1.2B
-   - values >= SCI_THRESHOLD (10 trillion): scientific notation */
-function fmtCurrency(n){
+/* Currency: full format up to $9,999,999.99; abbreviated ($M/$B) above; scientific above SCI_THRESHOLD */
+function fmt(n){
   const v=Math.abs(Number(n||0));
   const sign=Number(n||0)<0?'-':'';
   if(v>=SCI_THRESHOLD) return sign+'$'+(Number(n||0)).toExponential(2).replace('-','');
   if(v>=1e9) return sign+'$'+(v/1e9).toLocaleString('en-AU',{minimumFractionDigits:1,maximumFractionDigits:1})+'B';
   if(v>=1e6) return sign+'$'+(v/1e6).toLocaleString('en-AU',{minimumFractionDigits:1,maximumFractionDigits:1})+'M';
-  if(v>=ABBREV_THRESHOLD) return sign+'$'+(v/1e6).toLocaleString('en-AU',{minimumFractionDigits:1,maximumFractionDigits:1})+'M';
   return sign+'$'+v.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
-function fmt(n){return fmtCurrency(n);}
 
-/* Chart labels: abbreviated always for axis (keeps chart clean) */
+/* Chart labels: abbreviated always for axis (keeps chart clean).
+   No scientific notation handling — values above $10T won't occur in practice. */
 function fmtChartLabel(v){
   const av=Math.abs(v);
   if(av>=1e9) return '$'+(av/1e9).toFixed(1)+'B';
@@ -487,6 +490,8 @@ function fmtChartLabel(v){
 }
 
 function lt(item){return(item.cost||0)*(item.qty||0);}
+function clampQty(n){return Math.max(0,n);}
+function clampIngQty(n){return Math.max(0.1,n);}
 function qtyDisp(q){const n=Number(q||0);return n===Math.round(n)?String(n):n.toFixed(1);}
 function ingQtyDisp(ing){if(ing.unit)return qtyDisp(ing.qty)+' '+ing.unit;return qtyDisp(ing.qty)+'\xd7';}
 function timeAgo(iso){const d=Math.floor((Date.now()-new Date(iso).getTime())/1000);if(d<10)return 'just now';if(d<60)return d+'s ago';if(d<3600)return Math.floor(d/60)+'m ago';return Math.floor(d/3600)+'h ago';}
@@ -531,6 +536,8 @@ function doUndo(){if(!undoData)return;S.list=undoData;undoData=null;clearTimeout
 
 function getPriceFromHistory(name){if(!name||name.length<2)return null;const nl=name.toLowerCase().trim();for(const entry of S.history){const found=entry.items.find(i=>i.name.toLowerCase()===nl);if(found&&found.cost>0)return found.cost;}return null;}
 function findMerge(name,cost){return S.list.find(i=>i.name.toLowerCase()===name.toLowerCase()&&(i.cost||0)===(cost||0)&&!i.ticked);}
+/* mergeOrPush: merges qty into existing unticked item with same name+cost, or pushes new. Returns true if merged. */
+function mergeOrPush(item,addQty){const ex=findMerge(item.name,item.cost);if(ex){ex.qty=Math.round(((ex.qty||0)+(addQty||item.qty||1))*100)/100;return true;}S.list.push(item);return false;}
 
 function saveBudget(){S.budget=parseFloat(document.getElementById('bud-in').value)||null;save();renderBudget();}
 function clearBudget(){S.budget=null;document.getElementById('bud-in').value='';save();renderBudget();}
@@ -539,12 +546,12 @@ function renderBudget(){const wrap=document.getElementById('budwrap');if(!wrap)r
 let pmTimer;
 document.addEventListener('DOMContentLoaded',()=>{const mn=document.getElementById('m-name');if(mn)mn.addEventListener('input',function(){clearTimeout(pmTimer);pmTimer=setTimeout(()=>{if(document.getElementById('m-cost').value)return;const p=getPriceFromHistory(this.value);if(p!==null)document.getElementById('m-cost').value=p.toFixed(2);},350);});});
 
-function addManual(){const name=document.getElementById('m-name').value.trim();const qty=Math.max(0,parseFloat(document.getElementById('m-qty').value)||0);const unit=document.getElementById('m-unit').value;const cost=parseFloat(document.getElementById('m-cost').value)||0;if(!name){toast('Enter an item name');return;}S.list.push({id:uid(),name,qty,unit,cost,ticked:false,source:'manual'});document.getElementById('m-name').value='';document.getElementById('m-qty').value='1';document.getElementById('m-cost').value='';buildUnitSel('m-unit','');save();renderList();toast('"'+name+'" added');if(quickEnter)setTimeout(focusItemName,50);else document.getElementById('m-name').focus();}
+function addManual(){const name=document.getElementById('m-name').value.trim();const qty=clampQty(parseFloat(document.getElementById('m-qty').value)||0);const unit=document.getElementById('m-unit').value;const cost=parseFloat(document.getElementById('m-cost').value)||0;if(!name){toast('Enter an item name');return;}S.list.push({id:uid(),name,qty,unit,cost,ticked:false,source:'manual'});document.getElementById('m-name').value='';document.getElementById('m-qty').value='1';document.getElementById('m-cost').value='';buildUnitSel('m-unit','');save();renderList();toast('"'+name+'" added');if(quickEnter)setTimeout(focusItemName,50);else document.getElementById('m-name').focus();}
 function removeItem(id){saveForUndo();S.list=S.list.filter(i=>i.id!==id);openItemId=null;save();renderList();toast('Item removed',true);}
 function tickItem(id){const it=S.list.find(i=>i.id===id);if(it)it.ticked=!it.ticked;save();renderList();}
-function chgQty(id,d){const it=S.list.find(i=>i.id===id);if(it){const nq=Math.round(((it.qty||0)+d)*10)/10;it.qty=Math.max(0,nq);save();renderList();}}
+function chgQty(id,d){const it=S.list.find(i=>i.id===id);if(it){const nq=Math.round(((it.qty||0)+d)*10)/10;it.qty=clampQty(nq);save();renderList();}}
 function togItem(id,e){if(e)e.stopPropagation();openItemId=openItemId===id?null:id;renderList();}
-function saveEditItem(id){const item=S.list.find(i=>i.id===id);if(!item)return;const name=document.getElementById('ei-n-'+id).value.trim();const qty=Math.max(0,parseFloat(document.getElementById('ei-q-'+id).value)||0);const unit=document.getElementById('ei-u-'+id).value;const cost=parseFloat(document.getElementById('ei-c-'+id).value)||0;if(!name){toast('Enter a name');return;}item.name=name;item.qty=qty;item.unit=unit;item.cost=cost;openItemId=null;save();renderList();toast('Item updated');}
+function saveEditItem(id){const item=S.list.find(i=>i.id===id);if(!item)return;const name=document.getElementById('ei-n-'+id).value.trim();const qty=clampQty(parseFloat(document.getElementById('ei-q-'+id).value)||0);const unit=document.getElementById('ei-u-'+id).value;const cost=parseFloat(document.getElementById('ei-c-'+id).value)||0;if(!name){toast('Enter a name');return;}item.name=name;item.qty=qty;item.unit=unit;item.cost=cost;openItemId=null;save();renderList();toast('Item updated');}
 function clearTicked(){const n=S.list.filter(i=>i.ticked).length;if(!n){toast('No ticked items');return;}saveForUndo();S.list=S.list.filter(i=>!i.ticked);save();renderList();toast(n+' item'+(n>1?'s':'')+' removed',true);}
 function clearAll(){if(!S.list.length)return;if(!confirm('Clear the entire list? This cannot be undone.'))return;saveForUndo();S.list=[];openItemId=null;save();renderList();toast('List cleared',true);}
 function sortByCategory(){if(!S.list.length){toast('List is empty');return;}saveForUndo();const order={};CATS.forEach((c,i)=>order[c.name]=i);S.list.sort((a,b)=>{const ia=order[getCatName(a.name)]??CATS.length,ib=order[getCatName(b.name)]??CATS.length;return ia-ib||a.name.localeCompare(b.name);});save();renderList();toast('Sorted by supermarket aisle',true);}
@@ -569,7 +576,7 @@ function renderList(){
     const bc=badgeClass(item.source);
     const bl=badgeLabel(item.source);
     const isOpen=openItemId===item.id;
-    const uSel=UNITS.map(u=>'<option value="'+u+'"'+(u===(item.unit||'')?'selected':'')+'>'+( u||'\u2014' )+'</option>').join('');
+    const uSel=unitOptions(item.unit||'');
     return `<div class="si${item.ticked?' ticked':''}" id="si-${item.id}" draggable="true" ondragstart="ds(event,'${item.id}','list')" ondragend="de()" ondragover="dov(event,'${item.id}','list')" ondragleave="dlv(event)" ondrop="drp(event,'${item.id}','list')">
       <div class="si-head">
         <span class="dh">\u2807</span>
@@ -623,7 +630,7 @@ function togRecipe(id,e){e.stopPropagation();openRecipeId=openRecipeId===id?null
 function togHist(id){openHistId=openHistId===id?null:id;renderHistory();}
 
 let pmRTimer;
-function addIngToForm(){const name=document.getElementById('r-ing-name').value.trim();const qty=Math.max(0.1,parseFloat(document.getElementById('r-ing-qty').value)||1);const unit=document.getElementById('r-ing-unit').value;const cost=parseFloat(document.getElementById('r-ing-cost').value)||0;if(!name)return;formIngs.push({id:uid(),name,qty,unit,cost});document.getElementById('r-ing-name').value='';document.getElementById('r-ing-qty').value='1';document.getElementById('r-ing-cost').value='';buildUnitSel('r-ing-unit','');document.getElementById('r-ing-name').focus();renderFormIngs();}
+function addIngToForm(){const name=document.getElementById('r-ing-name').value.trim();const qty=clampIngQty(parseFloat(document.getElementById('r-ing-qty').value)||1);const unit=document.getElementById('r-ing-unit').value;const cost=parseFloat(document.getElementById('r-ing-cost').value)||0;if(!name)return;formIngs.push({id:uid(),name,qty,unit,cost});document.getElementById('r-ing-name').value='';document.getElementById('r-ing-qty').value='1';document.getElementById('r-ing-cost').value='';buildUnitSel('r-ing-unit','');document.getElementById('r-ing-name').focus();renderFormIngs();}
 function removeFormIng(id){formIngs=formIngs.filter(i=>i.id!==id);renderFormIngs();}
 function renderFormIngs(){document.getElementById('r-ing-list').innerHTML=formIngs.map(i=>'<div class="ir"><span class="in">'+esc(i.name)+'</span><span class="ic">'+ingQtyDisp(i)+' '+fmt(i.cost)+'</span><button class="ib" onclick="removeFormIng(\''+i.id+'\')">&times;</button></div>').join('');}
 function saveRecipe(){const name=document.getElementById('r-name').value.trim();if(!name){toast('Enter a recipe name');return;}if(!formIngs.length){toast('Add at least one ingredient');return;}S.recipes.push({id:uid(),name,ingredients:formIngs.map(i=>({name:i.name,qty:i.qty||1,unit:i.unit||'',cost:i.cost})),lastSavedToShop:null});save();clearRecipeForm();renderRecipes();toast('"'+name+'" saved!');}
@@ -633,7 +640,7 @@ function setScaler(id,val){recipeScalers[id]=val;renderRecipes();}
 function addRecipeToList(id){
   const recipe=S.recipes.find(r=>r.id===id);if(!recipe)return;
   const scaler=recipeScalers[id]||1;let added=0,merged=0;
-  recipe.ingredients.forEach(ing=>{const scaledQty=Math.round((ing.qty||1)*scaler*100)/100;const ex=findMerge(ing.name,ing.cost);if(ex){ex.qty=Math.round(((ex.qty||0)+scaledQty)*100)/100;merged++;}else{S.list.push({id:uid(),name:ing.name,qty:scaledQty,unit:ing.unit||'',cost:ing.cost,ticked:false,source:recipe.name,recipeId:recipe.id});added++;}});
+  recipe.ingredients.forEach(ing=>{const scaledQty=Math.round((ing.qty||1)*scaler*100)/100;const merged_=mergeOrPush({id:uid(),name:ing.name,qty:scaledQty,unit:ing.unit||'',cost:ing.cost,ticked:false,source:recipe.name,recipeId:recipe.id},scaledQty);if(merged_)merged++;else added++;});
   save();renderList();const sLabel=scaler!==1?' ('+scaler+'\xd7)':'';
   toast(added&&merged?'Added '+added+', merged '+merged+' from "'+recipe.name+'"'+sLabel:added?'Added '+added+' item'+(added>1?'s':'')+' from "'+recipe.name+'"'+sLabel:recipe.name+': items merged'+sLabel);
 }
@@ -648,11 +655,11 @@ function saveEdit(id){
     const qtyEl=document.getElementById('ei-ing-q-'+id+'-'+i);
     const unitEl=document.getElementById('ei-ing-u-'+id+'-'+i);
     const costEl=document.getElementById('ei-ing-c-'+id+'-'+i);
-    return{name:(nameEl?nameEl.value.trim():ing.name)||ing.name,qty:Math.max(0.1,parseFloat(qtyEl?qtyEl.value:ing.qty)||1),unit:unitEl?unitEl.value:ing.unit,cost:parseFloat(costEl?costEl.value:ing.cost)||0};
+    return{name:(nameEl?nameEl.value.trim():ing.name)||ing.name,qty:clampIngQty(parseFloat(qtyEl?qtyEl.value:ing.qty)||1),unit:unitEl?unitEl.value:ing.unit,cost:parseFloat(costEl?costEl.value:ing.cost)||0};
   }).filter(ing=>ing.name);
   r.name=name;editId=null;save();renderRecipes();toast('Recipe updated');
 }
-function addEditIng(id){const r=S.recipes.find(r=>r.id===id);if(!r)return;const tn=document.getElementById('en-'+id);if(tn)editTmpName=tn.value||editTmpName;const nm=document.getElementById('ein-n-'+id).value.trim();if(!nm){toast('Enter ingredient name');return;}r.ingredients.push({name:nm,qty:Math.max(0.1,parseFloat(document.getElementById('ein-q-'+id).value)||1),unit:document.getElementById('ein-u-'+id).value,cost:parseFloat(document.getElementById('ein-c-'+id).value)||0});save();renderRecipes();const nn=document.getElementById('en-'+id);if(nn&&editTmpName)nn.value=editTmpName;const ni=document.getElementById('ein-n-'+id);if(ni){ni.value='';ni.focus();}}
+function addEditIng(id){const r=S.recipes.find(r=>r.id===id);if(!r)return;const tn=document.getElementById('en-'+id);if(tn)editTmpName=tn.value||editTmpName;const nm=document.getElementById('ein-n-'+id).value.trim();if(!nm){toast('Enter ingredient name');return;}r.ingredients.push({name:nm,qty:clampIngQty(parseFloat(document.getElementById('ein-q-'+id).value)||1),unit:document.getElementById('ein-u-'+id).value,cost:parseFloat(document.getElementById('ein-c-'+id).value)||0});save();renderRecipes();const nn=document.getElementById('en-'+id);if(nn&&editTmpName)nn.value=editTmpName;const ni=document.getElementById('ein-n-'+id);if(ni){ni.value='';ni.focus();}}
 function removeEditIng(rid,idx){const r=S.recipes.find(r=>r.id===rid);if(!r)return;const tn=document.getElementById('en-'+rid);if(tn)editTmpName=tn.value||editTmpName;r.ingredients.splice(idx,1);save();renderRecipes();const nn=document.getElementById('en-'+rid);if(nn&&editTmpName)nn.value=editTmpName;}
 
 function renderRecipes(){
@@ -664,7 +671,7 @@ function renderRecipes(){
     const scalerBtns=[0.5,1,2,3,4].map(v=>'<button class="sbtn'+(scaler===v?' active':'')+'" onclick="setScaler(\''+r.id+'\','+v+')">'+(v===0.5?'\xbd\xd7':v+'\xd7')+'</button>').join('');
     const isOpen=openRecipeId===r.id;
     if(editId===r.id){
-      const uSel=(sel)=>UNITS.map(u=>'<option value="'+u+'"'+(u===sel?' selected':'')+'>'+( u||'\u2014' )+'</option>').join('');
+      const uSel=(sel)=>unitOptions(sel);
       const ingRows=r.ingredients.map((ing,i)=>`
         <div class="ir-edit" id="ir-${r.id}-${i}">
           <div class="ir-edit-name"><input type="text" id="ei-ing-n-${r.id}-${i}" value="${esc(ing.name)}" placeholder="Ingredient name" style="width:100%"></div>
@@ -723,7 +730,7 @@ function renderRecipes(){
 document.addEventListener('DOMContentLoaded',()=>{const ri=document.getElementById('r-ing-name');if(ri)ri.addEventListener('input',function(){clearTimeout(pmRTimer);pmRTimer=setTimeout(()=>{if(document.getElementById('r-ing-cost').value)return;const p=getPriceFromHistory(this.value);if(p!==null)document.getElementById('r-ing-cost').value=p.toFixed(2);},350);});});
 
 function addStaple(){const name=document.getElementById('st-name').value.trim();const cost=parseFloat(document.getElementById('st-cost').value)||0;if(!name){toast('Enter an item name');return;}S.staples.push({id:uid(),name,cost});document.getElementById('st-name').value='';document.getElementById('st-cost').value='';document.getElementById('st-name').focus();save();renderStaples();toast('"'+name+'" added to staples');}
-function addStapleToList(id){const s=S.staples.find(x=>x.id===id);if(!s)return;const ex=findMerge(s.name,s.cost);if(ex){ex.qty=Math.round(((ex.qty||0)+1)*100)/100;save();renderList();toast('"'+s.name+'" merged into list');}else{S.list.push({id:uid(),name:s.name,qty:1,unit:'',cost:s.cost,ticked:false,source:'staple'});save();renderList();toast('"'+s.name+'" added to list');}}
+function addStapleToList(id){const s=S.staples.find(x=>x.id===id);if(!s)return;const merged_=mergeOrPush({id:uid(),name:s.name,qty:1,unit:'',cost:s.cost,ticked:false,source:'staple'});save();renderList();toast(merged_?'"'+s.name+'" merged into list':'"'+s.name+'" added to list');}
 function deleteStaple(id){if(!confirm('Delete this staple?'))return;S.staples=S.staples.filter(s=>s.id!==id);openStapleId=null;save();renderStaples();toast('Staple deleted');}
 function saveStaple(id){const s=S.staples.find(x=>x.id===id);if(!s)return;const nameEl=document.getElementById('se-n-'+id),costEl=document.getElementById('se-c-'+id);const name=(nameEl?.value||'').trim();const cost=parseFloat(costEl?.value)||0;if(!name){toast('Enter a name');return;}s.name=name;s.cost=cost;openStapleId=null;save();renderStaples();toast('Staple updated');}
 function renderStaples(){
@@ -769,7 +776,7 @@ function renderSpend(){
 }
 
 function deleteHist(id){if(!confirm('Delete this history entry?'))return;S.history=S.history.filter(h=>h.id!==id);openHistId=null;save();renderHistory();renderSpend();toast('History entry deleted');}
-function reloadShop(id){const entry=S.history.find(h=>h.id===id);if(!entry)return;if(!confirm('Add '+entry.items.length+' items from this shop to your current list?'))return;saveForUndo();let added=0,merged=0;entry.items.forEach(item=>{const ex=findMerge(item.name,item.cost);if(ex){ex.qty=Math.round(((ex.qty||0)+(item.qty||1))*100)/100;merged++;}else{S.list.push({id:uid(),name:item.name,qty:item.qty||1,unit:item.unit||'',cost:item.cost,ticked:false,source:item.source,recipeId:item.recipeId});added++;}});save();switchToTab('shopping');toast('Loaded '+(added+merged)+' items from past shop',true);}
+function reloadShop(id){const entry=S.history.find(h=>h.id===id);if(!entry||!entry.items||!entry.items.length)return;if(!confirm('Add '+entry.items.length+' items from this shop to your current list?'))return;saveForUndo();let added=0,merged=0;entry.items.forEach(item=>{const merged_=mergeOrPush({id:uid(),name:item.name,qty:item.qty||1,unit:item.unit||'',cost:item.cost||0,ticked:false,source:item.source||'manual',recipeId:item.recipeId||null},item.qty||1);if(merged_)merged++;else added++;});save();switchToTab('shopping');toast('Loaded '+(added+merged)+' items from past shop',true);}
 function renderHistory(){
   const c=document.getElementById('history-cont');
   if(!S.history.length){c.innerHTML='<div class="empty"><div class="ei">\uD83D\uDCC5</div><div class="et">No history yet.<br>Complete a shop to save it here.</div></div>';return;}
@@ -822,10 +829,79 @@ async function analyseImg(){
   }catch(err){console.error('Basket scan error:',err);showScanErr('Error: '+err.message+'. Check your API key in Settings or try a clearer image.');}
 }
 
-function addScannedItems(){const toAdd=scanResults.filter(i=>i.selected);if(!toAdd.length){toast('No items selected');return;}toAdd.forEach(i=>{const price=getPriceFromHistory(i.name)||0;const ex=findMerge(i.name,i.cost||price);if(ex){ex.qty=Math.round(((ex.qty||0)+(i.qty||1))*100)/100;}else{S.list.push({id:uid(),name:i.name,qty:i.qty||1,unit:i.unit||'',cost:i.cost||price,ticked:false,source:'scan'});}});save();closeScanModal();switchToTab('shopping');toast('Added '+toAdd.length+' item'+(toAdd.length>1?'s':'')+' from image');}
+function addScannedItems(){const toAdd=scanResults.filter(i=>i.selected);if(!toAdd.length){toast('No items selected');return;}toAdd.forEach(i=>{const price=getPriceFromHistory(i.name)||0;mergeOrPush({id:uid(),name:i.name,qty:i.qty||1,unit:i.unit||'',cost:i.cost||price,ticked:false,source:'scan'},i.qty||1);});save();closeScanModal();switchToTab('shopping');toast('Added '+toAdd.length+' item'+(toAdd.length>1?'s':'')+' from image');}
 
 const BSVG='<svg width="38" height="38" viewBox="0 0 32 32" fill="none"><path d="M9.5 14C9.5 7 22.5 7 22.5 14" stroke="#3d6647" stroke-width="2.2" stroke-linecap="round"/><path d="M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z" fill="rgba(61,102,71,.18)" stroke="#3d6647" stroke-width="1.9" stroke-linejoin="round"/><line x1="11" y1="14" x2="10" y2="28" stroke="#3d6647" stroke-width="1.2" stroke-opacity=".5"/><line x1="16" y1="14" x2="16" y2="28" stroke="#3d6647" stroke-width="1.2" stroke-opacity=".5"/><line x1="21" y1="14" x2="22" y2="28" stroke="#3d6647" stroke-width="1.2" stroke-opacity=".5"/><line x1="4.5" y1="19.5" x2="27.5" y2="19.5" stroke="#3d6647" stroke-width="1.2" stroke-opacity=".5"/><line x1="5.5" y1="24.5" x2="26.5" y2="24.5" stroke="#3d6647" stroke-width="1.2" stroke-opacity=".5"/></svg>';
-function downloadShopHTML(items,dateISO,total){const cats=catItems(items),d=new Date(dateISO);const ds=d.toLocaleDateString('en-AU',{weekday:'long',year:'numeric',month:'long',day:'numeric'});const ts=d.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});let rows='';for(const[cat,citems]of Object.entries(cats)){rows+='<tr><td colspan="3" class="ch">'+cat+'</td></tr>';citems.forEach(i=>{const lti=lt(i),qs=ingQtyDisp(i);rows+='<tr><td class="cb">\u2610</td><td>'+esc(i.name)+(qs?' <span class="q">'+qs+'</span>':'')+'<span class="src">'+esc(i.source)+'</span></td><td class="pr">'+fmt(lti)+'</td></tr>';});}const html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Basket \u2014 '+ds+'</title><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Outfit,sans-serif;max-width:660px;margin:36px auto;padding:24px;color:#222;background:#fff}.header{display:flex;align-items:center;gap:14px;border-bottom:3px solid #3d6647;padding-bottom:13px;margin-bottom:4px}.htext h1{font-size:1.85rem;font-weight:700;color:#3d6647;line-height:1}.htext .date{font-size:.88rem;color:#666;margin-top:4px}.pinfo{margin-left:auto;font-size:.78rem;color:#999;text-align:right}.pbtn{display:block;margin-top:7px;padding:5px 13px;background:#3d6647;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.82rem;font-family:Outfit,sans-serif;font-weight:600}table{width:100%;border-collapse:collapse;margin-top:8px}td{padding:7px 5px;border-bottom:1px solid #f0f0f0;font-size:.91rem;vertical-align:middle}.ch{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#3d6647;background:#ecf3ed;padding:9px 5px 7px;border-bottom:none}.cb{width:24px;font-size:1.1rem;color:#aaa;padding:7px 10px}.pr{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;min-width:68px;white-space:nowrap}.q{color:#888;font-size:.83rem;margin-left:4px}.src{display:block;font-size:.72rem;color:#999;margin-top:1px;font-style:italic}.trow td{font-weight:700;font-size:1rem;border-top:2px solid #3d6647;border-bottom:none;padding:12px 5px 4px}@media print{body{margin:12px;padding:0}.pinfo{display:none}}</style></head><body><div class="header">'+BSVG+'<div class="htext"><h1>Basket</h1><div class="date">'+ds+' at '+ts+'</div></div><div class="pinfo">v4.8<button class="pbtn" onclick="window.print()">Print</button></div></div><table>'+rows+'<tr class="trow"><td></td><td>Total</td><td class="pr">'+fmt(total)+'</td></tr></table></body></html>';const blob=new Blob([html],{type:'text/html'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='basket-'+d.toISOString().slice(0,10)+'.html';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
+function downloadShopHTML(items,dateISO,total){
+  const cats=catItems(items);
+  const d=new Date(dateISO);
+  const ds=d.toLocaleDateString('en-AU',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const ts=d.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+  const dateStr=`${ds} at ${ts}`;
+  const filename=`basket-${d.toISOString().slice(0,10)}.html`;
+
+  // Build table rows grouped by category
+  let rows='';
+  for(const[cat,citems] of Object.entries(cats)){
+    rows+=`<tr><td colspan="3" class="ch">${cat}</td></tr>`;
+    citems.forEach(i=>{
+      const qs=ingQtyDisp(i);
+      rows+=`<tr>
+        <td class="cb">&#9744;</td>
+        <td>${esc(i.name)}${qs?` <span class="q">${qs}</span>`:''}<span class="src">${esc(i.source)}</span></td>
+        <td class="pr">${fmt(lt(i))}</td>
+      </tr>`;
+    });
+  }
+
+  const html=`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Basket \u2014 ${ds}</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Outfit,sans-serif;max-width:660px;margin:36px auto;padding:24px;color:#222;background:#fff}
+.header{display:flex;align-items:center;gap:14px;border-bottom:3px solid #3d6647;padding-bottom:13px;margin-bottom:4px}
+.htext h1{font-size:1.85rem;font-weight:700;color:#3d6647;line-height:1}
+.htext .date{font-size:.88rem;color:#666;margin-top:4px}
+.pinfo{margin-left:auto;font-size:.78rem;color:#999;text-align:right}
+.pbtn{display:block;margin-top:7px;padding:5px 13px;background:#3d6647;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.82rem;font-family:Outfit,sans-serif;font-weight:600}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+td{padding:7px 5px;border-bottom:1px solid #f0f0f0;font-size:.91rem;vertical-align:middle}
+.ch{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#3d6647;background:#ecf3ed;padding:9px 5px 7px;border-bottom:none}
+.cb{width:24px;font-size:1.1rem;color:#aaa;padding:7px 10px}
+.pr{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;min-width:68px;white-space:nowrap}
+.q{color:#888;font-size:.83rem;margin-left:4px}
+.src{display:block;font-size:.72rem;color:#999;margin-top:1px;font-style:italic}
+.trow td{font-weight:700;font-size:1rem;border-top:2px solid #3d6647;border-bottom:none;padding:12px 5px 4px}
+@media print{body{margin:12px;padding:0}.pinfo{display:none}}
+</style>
+</head>
+<body>
+<div class="header">
+  ${BSVG}
+  <div class="htext"><h1>Basket</h1><div class="date">${dateStr}</div></div>
+  <div class="pinfo">v4.8<button class="pbtn" onclick="window.print()">Print</button></div>
+</div>
+<table>
+  ${rows}
+  <tr class="trow"><td></td><td>Total</td><td class="pr">${fmt(total)}</td></tr>
+</table>
+</body>
+</html>`;
+
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 ['r-ing-name','r-ing-cost','r-ing-qty'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addIngToForm();}});});
 ['m-name','m-cost','m-qty'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addManual();}});});
