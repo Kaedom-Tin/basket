@@ -3,7 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Basket v4.16</title>
+<title>Basket v4.17</title>
+<!-- PWA manifest -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1E8E5A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Basket">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -351,7 +358,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 <header>
   <div class="hl">
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M9.5 14C9.5 7 22.5 7 22.5 14" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="1.9" stroke-linejoin="round"/><line x1="11" y1="14" x2="10" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="16" y1="14" x2="16" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="21" y1="14" x2="22" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="4.5" y1="19.5" x2="27.5" y2="19.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="5.5" y1="24.5" x2="26.5" y2="24.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/></svg>
-    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v4.16</div></div>
+    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v4.17</div></div>
   </div>
   <div class="hright"><div class="sync-ind"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Local</span></div><button class="tbtn" id="tbtn" onclick="cycleTheme()">Auto</button></div>
 </header>
@@ -893,13 +900,24 @@ async function analyseImg(){
     const data=await resp.json();
     const raw=data.content?.find(c=>c.type==='text')?.text||'';
     const firstBracket=raw.indexOf('['),lastBracket=raw.lastIndexOf(']');
-    if(firstBracket===-1||lastBracket===-1||lastBracket<=firstBracket)throw new Error('No item list found in response');
+    if(firstBracket===-1||lastBracket===-1||lastBracket<=firstBracket)throw new Error('NOTHING_FOUND');
     const items=JSON.parse(raw.slice(firstBracket,lastBracket+1));
-    if(!Array.isArray(items)||!items.length)throw new Error('No items found in image');
+    if(!Array.isArray(items)||!items.length)throw new Error('NOTHING_FOUND');
     scanResults=items.map(i=>({...i,selected:true,id:uid()}));
     document.getElementById('scan-results').innerHTML=scanResults.map(i=>'<div class="scan-item"><input type="checkbox" class="scan-ck" id="sc-'+i.id+'" checked onchange="scanResults.find(r=>r.id===\''+i.id+'\').selected=this.checked"><label for="sc-'+i.id+'" style="flex:1;cursor:pointer"><div class="scan-nm">'+esc(i.name)+'</div></label><span class="scan-mt">'+ingQtyDisp(i)+'</span></div>').join('');
     showScanStep(3);
-  }catch(err){console.error('Basket scan error:',err);showScanErr('Error: '+err.message+'. Check your API key in Settings or try a clearer image.');}
+  }catch(err){
+    console.error('Basket scan error:',err);
+    if(err.message==='NOTHING_FOUND'){
+      showScanErr('No shopping list or recipe ingredients were found in this image. Make sure the image contains a list or recipe and try again.');
+    } else if(err.message&&(err.message.includes('401')||err.message.includes('403')||err.message.includes('invalid_api_key'))){
+      showScanErr('API key error — please check your Claude API key in Settings.');
+    } else if(err.message&&err.message.includes('429')){
+      showScanErr('Too many requests — please wait a moment and try again.');
+    } else {
+      showScanErr('Something went wrong analysing the image. Check your API key in Settings or try a different image. ('+err.message+')');
+    }
+  }
 }
 
 function addScannedItems(){const toAdd=scanResults.filter(i=>i.selected);if(!toAdd.length){toast('No items selected');return;}toAdd.forEach(i=>{const price=getPriceFromHistory(i.name)||0;mergeOrPush({id:uid(),name:i.name,qty:i.qty||1,unit:i.unit||'',cost:i.cost||price,ticked:false,source:'scan'},i.qty||1);});save();closeScanModal();switchToTab('shopping');toast('Added '+toAdd.length+' item'+(toAdd.length>1?'s':'')+' from image');}
