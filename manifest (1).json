@@ -2,7 +2,7 @@
   "name": "Basket",
   "short_name": "Basket",
   "description": "Smart shopping list for households",
-  "start_url": "./",
+  "start_url": "https://kaedom-tin.github.io/basket/",
   "display": "standalone",
   "orientation": "any",
   "theme_color": "#1E8E5A",
