@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Basket v4.17</title>
+<title>Basket v4.20</title>
 <!-- PWA manifest -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1E8E5A">
@@ -330,6 +330,106 @@ select.isel{padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg x
 hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 @media(max-width:480px){.htitle{font-size:1.55rem}.hright{gap:6px}.sync-ind{display:none}}
 
+/* ═══════════════════════════════════════════════
+   ONBOARDING
+   ═══════════════════════════════════════════════ */
+.ob-ov{position:fixed;inset:0;background:rgba(10,25,18,.55);display:flex;align-items:center;justify-content:center;z-index:3000;padding:20px;backdrop-filter:blur(2px)}
+.ob-card{background:var(--surf);border-radius:20px;width:100%;max-width:420px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--sh2)}
+.ob-viewport{position:relative;overflow:hidden;touch-action:pan-y}
+.ob-track{display:flex;transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.ob-slide{flex:0 0 100%;width:100%;display:flex;flex-direction:column;align-items:center;padding:28px 24px 8px;box-sizing:border-box}
+.ob-stage{width:100%;height:220px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:18px}
+.ob-title{font-size:1.15rem;font-weight:700;color:var(--tx);margin-bottom:6px;text-align:center}
+.ob-desc{font-size:.88rem;color:var(--mid);text-align:center;line-height:1.5;max-width:320px}
+.ob-dots{display:flex;gap:7px;justify-content:center;padding:16px 0}
+.ob-dot{width:7px;height:7px;border-radius:50%;background:var(--bdr);transition:background .25s,width .25s}
+.ob-dot.active{background:var(--gdk);width:20px;border-radius:4px}
+.ob-footer{padding:14px 24px 22px}
+.ob-gotit{width:100%;padding:13px;border-radius:10px;border:none;font-family:'Outfit',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .2s;background:var(--bdr);color:var(--lgt)}
+.ob-gotit.enabled{background:linear-gradient(135deg,var(--complete-start),var(--complete-end));color:#fff;cursor:pointer;box-shadow:var(--sh)}
+.ob-gotit:not(.enabled){cursor:not-allowed}
+.ob-gotit.enabled:hover{filter:brightness(1.08)}
+
+/* Slide 1 stage — mini app mockup elements */
+.ob-mock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.ob-mock-inner{position:relative;width:280px;height:210px}
+.ob-frame{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;animation-duration:5s;animation-iteration-count:infinite;animation-timing-function:ease-in-out}
+
+/* Camera icon frame */
+.ob-f-camera{animation-name:obCamera}
+.ob-cam-icon{width:64px;height:64px;border-radius:16px;background:var(--add-bg);border:2px solid var(--add-bdr);display:flex;align-items:center;justify-content:center}
+.ob-cam-icon svg{width:32px;height:32px;stroke:var(--add-accent);fill:none;stroke-width:1.8}
+
+/* Handwritten note frame */
+.ob-f-note{animation-name:obNote}
+.ob-note{width:150px;background:#FFFDF6;border:1.5px solid var(--bdr);border-radius:8px;padding:14px 12px;box-shadow:var(--sh);transform:rotate(-2deg)}
+.ob-note-line{height:9px;border-radius:2px;background:#3a3a3a;opacity:.55;margin-bottom:9px;font-family:'Outfit',sans-serif}
+.ob-note-line:nth-child(1){width:70%}
+.ob-note-line:nth-child(2){width:85%}
+.ob-note-line:nth-child(3){width:60%}
+
+/* List items appearing frame */
+.ob-f-list{animation-name:obList}
+.ob-mini-list{width:220px;display:flex;flex-direction:column;gap:6px}
+.ob-mini-item{background:var(--surf);border:1.5px solid var(--bdr);border-radius:9px;padding:8px 10px;display:flex;align-items:center;gap:7px;opacity:0;box-shadow:var(--sh);font-size:.78rem;font-weight:600;color:var(--tx)}
+.ob-mini-ck{width:13px;height:13px;border:1.5px solid var(--bdr);border-radius:4px;flex-shrink:0}
+.ob-mini-item.i1{animation:obItemIn .4s ease forwards;animation-delay:.1s}
+.ob-mini-item.i2{animation:obItemIn .4s ease forwards;animation-delay:.35s}
+.ob-mini-item.i3{animation:obItemIn .4s ease forwards;animation-delay:.6s}
+.ob-mini-item.i4{animation:obItemIn .4s ease forwards;animation-delay:.15s}
+
+/* Add item card frame (manual entry) */
+.ob-f-add{animation-name:obAdd}
+.ob-add-card{width:220px;background:var(--add-bg);border:1.5px solid var(--add-bdr);border-radius:10px;padding:10px 12px;box-shadow:var(--sh)}
+.ob-add-input{background:rgba(255,255,255,.7);border:1.3px solid var(--add-bdr);border-radius:6px;height:26px;margin-bottom:8px;position:relative;overflow:hidden}
+.ob-add-input-txt{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.72rem;color:var(--tx);font-weight:600;white-space:nowrap;width:0;overflow:hidden;animation:obType 5s ease-in-out infinite}
+.ob-add-btn{background:var(--gdk);color:#fff;font-size:.72rem;font-weight:700;text-align:center;border-radius:6px;padding:5px 0;opacity:.4;animation:obBtnPulse 5s ease-in-out infinite}
+
+@keyframes obItemIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+@keyframes obType{
+  0%,68%{width:0}
+  78%,100%{width:66px}
+}
+@keyframes obBtnPulse{
+  0%,78%{opacity:.4;transform:scale(1)}
+  81%{opacity:1;transform:scale(1.05)}
+  84%,100%{opacity:1;transform:scale(1)}
+}
+
+/* Timeline: camera(0-15%) -> note(15-35%) -> list(35-60%) -> add(60-85%) -> pan back to camera(85-100%) */
+@keyframes obCamera{
+  0%,4%{opacity:1;transform:translateX(0) scale(1)}
+  15%{opacity:1;transform:translateX(0) scale(1)}
+  20%{opacity:0;transform:translateX(-40px) scale(.92)}
+  84%{opacity:0;transform:translateX(40px) scale(.92)}
+  90%,96%{opacity:1;transform:translateX(0) scale(1)}
+  100%{opacity:1;transform:translateX(0) scale(1)}
+}
+@keyframes obNote{
+  0%,17%{opacity:0;transform:translateX(40px) scale(.92)}
+  24%,33%{opacity:1;transform:translateX(0) scale(1)}
+  40%{opacity:0;transform:translateX(-40px) scale(.92)}
+  100%{opacity:0}
+}
+@keyframes obList{
+  0%,37%{opacity:0;transform:translateX(40px) scale(.92)}
+  44%,58%{opacity:1;transform:translateX(0) scale(1)}
+  65%{opacity:0;transform:translateX(-40px) scale(.92)}
+  100%{opacity:0}
+}
+@keyframes obAdd{
+  0%,62%{opacity:0;transform:translateX(40px) scale(.92)}
+  68%,82%{opacity:1;transform:translateX(0) scale(1)}
+  88%{opacity:0;transform:translateX(-40px) scale(.92)}
+  100%{opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .ob-frame{animation:none!important;opacity:0}
+  .ob-f-camera{opacity:1}
+  .ob-mini-item,.ob-add-input-txt,.ob-add-btn{animation:none!important;opacity:1;width:auto}
+}
+
+
 /* Rocking basket animation for empty list state */
 @keyframes rock{
   0%,100%{transform:rotate(-12deg)}
@@ -338,12 +438,86 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 .basket-rock{
   display:inline-block;
   transform-origin:50% 8%;
-  animation:rock 1.8s ease-in-out infinite;
   width:56px;height:56px;
+}
+@media(prefers-reduced-motion:no-preference){
+  .basket-rock{animation:rock 1.8s ease-in-out infinite}
 }
 </style>
 </head>
 <body>
+
+
+<!-- ONBOARDING -->
+<div id="ob-ov" class="ob-ov" style="display:none">
+  <div class="ob-card">
+    <div class="ob-viewport">
+      <div class="ob-track" id="ob-track">
+
+        <!-- Slide 1: Scan + Manual Entry -->
+        <div class="ob-slide">
+          <div class="ob-stage">
+            <div class="ob-mock">
+              <div class="ob-mock-inner">
+                <div class="ob-frame ob-f-camera">
+                  <div class="ob-cam-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+                </div>
+                <div class="ob-frame ob-f-note">
+                  <div class="ob-note">
+                    <div class="ob-note-line"></div>
+                    <div class="ob-note-line"></div>
+                    <div class="ob-note-line"></div>
+                  </div>
+                </div>
+                <div class="ob-frame ob-f-list">
+                  <div class="ob-mini-list">
+                    <div class="ob-mini-item i1"><span class="ob-mini-ck"></span>Milk</div>
+                    <div class="ob-mini-item i2"><span class="ob-mini-ck"></span>Eggs</div>
+                    <div class="ob-mini-item i3"><span class="ob-mini-ck"></span>Bread</div>
+                  </div>
+                </div>
+                <div class="ob-frame ob-f-add">
+                  <div class="ob-mini-list" style="margin-bottom:8px">
+                    <div class="ob-mini-item i4" style="opacity:1"><span class="ob-mini-ck"></span>Milk</div>
+                  </div>
+                  <div class="ob-add-card">
+                    <div class="ob-add-input"><span class="ob-add-input-txt">Bananas</span></div>
+                    <div class="ob-add-btn">Add</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ob-title">Snap or type — your list either way</div>
+          <div class="ob-desc">Take a photo of a handwritten list or recipe and Basket adds the items for you. Or type items in manually — whatever's fastest.</div>
+        </div>
+
+        <!-- Slide 2: Recipe Entry (Phase 2 placeholder) -->
+        <div class="ob-slide">
+          <div class="ob-stage"></div>
+          <div class="ob-title">Save recipes, shop in one tap</div>
+          <div class="ob-desc">Build a recipe once. Next time you need it, tap it and every ingredient jumps onto your list.</div>
+        </div>
+
+        <!-- Slide 3: Multi-person sync (Phase 3 placeholder) -->
+        <div class="ob-slide">
+          <div class="ob-stage"></div>
+          <div class="ob-title">One list, whole household</div>
+          <div class="ob-desc">Everyone adds items from their own phone — the list stays in sync for everyone, instantly.</div>
+        </div>
+
+      </div>
+    </div>
+    <div class="ob-dots" id="ob-dots">
+      <span class="ob-dot active" data-i="0"></span>
+      <span class="ob-dot" data-i="1"></span>
+      <span class="ob-dot" data-i="2"></span>
+    </div>
+    <div class="ob-footer">
+      <button class="ob-gotit" id="ob-gotit" onclick="obGotIt()">Got it</button>
+    </div>
+  </div>
+</div>
 
 <div id="auth-ov" class="auth-ov" style="display:none">
   <div class="auth-card">
@@ -358,7 +532,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 <header>
   <div class="hl">
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M9.5 14C9.5 7 22.5 7 22.5 14" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="1.9" stroke-linejoin="round"/><line x1="11" y1="14" x2="10" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="16" y1="14" x2="16" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="21" y1="14" x2="22" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="4.5" y1="19.5" x2="27.5" y2="19.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="5.5" y1="24.5" x2="26.5" y2="24.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/></svg>
-    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v4.17</div></div>
+    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v4.20</div></div>
   </div>
   <div class="hright"><div class="sync-ind"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Local</span></div><button class="tbtn" id="tbtn" onclick="cycleTheme()">Auto</button></div>
 </header>
@@ -484,6 +658,10 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
       <div><div class="set-key">Show Budget</div><div class="set-sub">Show the budget tracker on the list tab</div></div>
       <label class="tog"><input type="checkbox" id="budget-tog" onchange="saveBudgetToggle()"><span class="tog-sl"></span></label>
     </div>
+    <div class="set-item">
+      <div><div class="set-key">Always Show Onboarding</div><div class="set-sub">For testing — shows the intro slides every time you sign in</div></div>
+      <label class="tog"><input type="checkbox" id="ob-always-tog" onchange="saveObAlwaysToggle()"><span class="tog-sl"></span></label>
+    </div>
   </div>
   <div class="card">
     <div class="ct"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>AI Image Scanner</div>
@@ -506,10 +684,9 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
   <div class="modal-box">
     <div class="modal-head"><span class="modal-title" style="display:flex;align-items:center;gap:8px"><svg style="width:18px;height:18px;stroke:var(--gdk);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>Scan Image</span><button class="ib" onclick="closeScanModal()">&#x2715;</button></div>
     <div id="scan-s1"><div class="upload-area" onclick="document.getElementById('img-in').click()"><div class="upload-icon">&#128247;</div><div class="upload-txt">Tap to select a photo</div><div class="upload-sub">Handwritten list or recipe image</div><input type="file" id="img-in" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none" onchange="onImgSelected(event)"></div></div>
-    <div id="scan-s2" style="display:none"><img id="scan-preview" style="width:100%;max-height:220px;object-fit:contain;border-radius:10px;margin-bottom:12px;background:var(--surf2)"><button class="btn bp" style="width:100%;padding:12px" onclick="analyseImg()">&#10024; Analyse with AI</button><button class="btn bg sm" style="width:100%;margin-top:7px" onclick="resetScanner()">Choose different image</button></div>
+    <div id="scan-s2" style="display:none"><div id="scan-err" style="display:none;padding:12px 14px;background:var(--errbg);border-radius:10px;color:var(--err);font-size:.85rem;margin-bottom:12px;line-height:1.4"></div><img id="scan-preview" style="width:100%;max-height:220px;object-fit:contain;border-radius:10px;margin-bottom:12px;background:var(--surf2)"><button class="btn bp" style="width:100%;padding:12px" onclick="analyseImg()">&#10024; Analyse with AI</button><button class="btn bg sm" style="width:100%;margin-top:7px" onclick="resetScanner()">Choose different image</button></div>
     <div id="scan-s3" style="display:none;text-align:center;padding:32px 0"><div class="spinner"></div><div style="margin-top:14px;font-size:.92rem;color:var(--mid)">Analysing image&hellip;</div></div>
     <div id="scan-s4" style="display:none"><p style="font-size:.85rem;color:var(--mid);margin-bottom:10px">Untick any items you don&rsquo;t want to add</p><div id="scan-results"></div><button class="btn ba" style="width:100%;margin-top:12px;padding:12px" onclick="addScannedItems()">Add Selected to List</button><button class="btn bg sm" style="width:100%;margin-top:7px" onclick="resetScanner()">Scan another image</button></div>
-    <div id="scan-err" style="display:none;padding:16px;background:var(--errbg);border-radius:10px;color:var(--err);font-size:.87rem;margin-top:10px"></div>
   </div>
 </div>
 
@@ -886,16 +1063,20 @@ function compressImage(dataUrl,mimeType,callback){const img=new Image();img.onlo
 function openScanModal(){const key=localStorage.getItem('basket_api_key');if(!key){toast('Add your Claude API key in Settings first');switchToTab('settings');return;}document.getElementById('scan-modal').style.display='';resetScanner();}
 function closeScanModal(){document.getElementById('scan-modal').style.display='none';resetScanner();}
 function resetScanner(){scanImgData=null;scanImgType=null;scanResults=[];showScanStep(0);document.getElementById('img-in').value='';}
-function showScanStep(n){['scan-s1','scan-s2','scan-s3','scan-s4'].forEach((id,i)=>{document.getElementById(id).style.display=i===n?'':'none';});}
-function showScanErr(msg){document.getElementById('scan-s3').style.display='none';document.getElementById('scan-s4').style.display='none';document.getElementById('scan-s1').style.display=scanImgData?'none':'';document.getElementById('scan-s2').style.display=scanImgData?'':'none';const el=document.getElementById('scan-err');el.textContent=msg;el.style.display='';}
+function showScanStep(n){['scan-s1','scan-s2','scan-s3','scan-s4'].forEach((id,i)=>{document.getElementById(id).style.display=i===n?'':'none';});if(n!==1){const el=document.getElementById('scan-err');if(el)el.style.display='none';}}
+function showScanErr(msg){showScanStep(1);const el=document.getElementById('scan-err');el.textContent=msg;el.style.display='';}
 function onImgSelected(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const originalDataUrl=e.target.result;compressImage(originalDataUrl,file.type||'image/jpeg',(compressedData,compressedType)=>{scanImgData=compressedData;scanImgType=compressedType;document.getElementById('scan-preview').src=originalDataUrl;showScanStep(1);});};reader.readAsDataURL(file);}
 
 async function analyseImg(){
   const key=localStorage.getItem('basket_api_key');if(!key||!scanImgData){toast('No image or API key');return;}
-  document.getElementById('scan-err').style.display='none';showScanStep(2);
+  const errEl=document.getElementById('scan-err');if(errEl)errEl.style.display='none';
+  showScanStep(2);
+  const controller=new AbortController();
+  const timeoutId=setTimeout(()=>controller.abort(),30000);
   const prompt='Analyse this image carefully. It may be a handwritten or printed shopping list, or a recipe.\n\nIf it is a shopping list: extract all items.\nIf it is a recipe: extract only the ingredients (not instructions).\n\nReturn ONLY a valid JSON array. Do not include any explanation, commentary, preamble, or text before or after the JSON array. If you are uncertain about an item, include your best guess inside the array. Each element must have:\n- "name": string (item or ingredient name, clean and concise)\n- "qty": number (quantity, default 1)\n- "unit": string \u2014 use one of: "each","g","kg","ml","L","tsp","tbsp","cup","bunch","can","bag","pack","bottle","clove","pinch","slice","loaf","dozen" \u2014 or "" if not applicable\n- "cost": number (0 if not visible)\n\nExample: [{"name":"Milk","qty":2,"unit":"L","cost":0},{"name":"Eggs","qty":12,"unit":"each","cost":0}]';
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:scanImgType,data:scanImgData}},{type:'text',text:prompt}]}]})});
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:scanImgType,data:scanImgData}},{type:'text',text:prompt}]}]}),signal:controller.signal});
+    clearTimeout(timeoutId);
     if(!resp.ok){const err=await resp.json();console.error('Basket scan API error:',resp.status,err);throw new Error(err.error?.message||'API error '+resp.status);}
     const data=await resp.json();
     const raw=data.content?.find(c=>c.type==='text')?.text||'';
@@ -907,8 +1088,11 @@ async function analyseImg(){
     document.getElementById('scan-results').innerHTML=scanResults.map(i=>'<div class="scan-item"><input type="checkbox" class="scan-ck" id="sc-'+i.id+'" checked onchange="scanResults.find(r=>r.id===\''+i.id+'\').selected=this.checked"><label for="sc-'+i.id+'" style="flex:1;cursor:pointer"><div class="scan-nm">'+esc(i.name)+'</div></label><span class="scan-mt">'+ingQtyDisp(i)+'</span></div>').join('');
     showScanStep(3);
   }catch(err){
+    clearTimeout(timeoutId);
     console.error('Basket scan error:',err);
-    if(err.message==='NOTHING_FOUND'){
+    if(err.name==='AbortError'){
+      showScanErr('This is taking longer than expected. Check your connection and try again.');
+    } else if(err.message==='NOTHING_FOUND'){
       showScanErr('No shopping list or recipe ingredients were found in this image. Make sure the image contains a list or recipe and try again.');
     } else if(err.message&&(err.message.includes('401')||err.message.includes('403')||err.message.includes('invalid_api_key'))){
       showScanErr('API key error — please check your Claude API key in Settings.');
@@ -979,8 +1163,10 @@ td{padding:7px 5px;border-bottom:1px solid #f0f0f0;font-size:.91rem;vertical-ali
 .basket-rock{
   display:inline-block;
   transform-origin:50% 8%;
-  animation:rock 1.8s ease-in-out infinite;
   width:56px;height:56px;
+}
+@media(prefers-reduced-motion:no-preference){
+  .basket-rock{animation:rock 1.8s ease-in-out infinite}
 }
 </style>
 </head>
@@ -1013,8 +1199,109 @@ td{padding:7px 5px;border-bottom:1px solid #f0f0f0;font-size:.91rem;vertical-ali
 ['st-name','st-cost'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addStaple();}});});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const t=e.target;if(t&&t.id&&t.id.startsWith('ein-n-')){e.preventDefault();addEditIng(t.id.replace('ein-n-',''));}});
 
+
+/* ═══════════════════════════════════════════════
+   ONBOARDING
+   ═══════════════════════════════════════════════ */
+let obIndex=0,obMaxReached=0,obDragStartX=null,obDragDeltaX=0,obDragging=false;
+const OB_SLIDE_COUNT=3;
+
+function loadObAlwaysToggle(){const always=localStorage.getItem('basket_ob_always')==='1';const t=document.getElementById('ob-always-tog');if(t)t.checked=always;}
+function saveObAlwaysToggle(){const always=document.getElementById('ob-always-tog').checked;localStorage.setItem('basket_ob_always',always?'1':'0');}
+
+function shouldShowOnboarding(){
+  if(localStorage.getItem('basket_ob_always')==='1')return true;
+  return localStorage.getItem('basket_ob_seen')!=='1';
+}
+
+function showOnboarding(){
+  obIndex=0;obMaxReached=0;
+  document.getElementById('ob-ov').style.display='';
+  obRenderTrack(false);
+  obUpdateDots();
+  obUpdateGotIt();
+}
+
+function obGotIt(){
+  if(obMaxReached<OB_SLIDE_COUNT-1)return; // inert until last slide reached
+  localStorage.setItem('basket_ob_seen','1');
+  document.getElementById('ob-ov').style.display='none';
+  // Reveal whatever should be shown next (auth overlay or app) — already handled by initFirebase/normal flow
+}
+
+function obRenderTrack(animate){
+  const track=document.getElementById('ob-track');
+  track.style.transition=animate?'':'none';
+  track.style.transform='translateX(-'+(obIndex*100)+'%)';
+  if(!animate){
+    // force reflow then restore transition for next interaction
+    void track.offsetWidth;
+    track.style.transition='';
+  }
+}
+
+function obUpdateDots(){
+  document.querySelectorAll('.ob-dot').forEach((d,i)=>d.classList.toggle('active',i===obIndex));
+}
+
+function obUpdateGotIt(){
+  const btn=document.getElementById('ob-gotit');
+  const unlocked=obMaxReached>=OB_SLIDE_COUNT-1;
+  btn.classList.toggle('enabled',unlocked);
+}
+
+function obGoTo(i){
+  // Wraps: swiping left past the last slide loops back to the first,
+  // but does NOT reset obMaxReached (Got it stays unlocked once reached)
+  if(i<0)i=OB_SLIDE_COUNT-1;
+  if(i>=OB_SLIDE_COUNT)i=0;
+  obIndex=i;
+  if(obIndex>obMaxReached)obMaxReached=obIndex;
+  obRenderTrack(true);
+  obUpdateDots();
+  obUpdateGotIt();
+}
+
+// Touch / mouse drag handling for swipe navigation
+function obDragStart(x){obDragStartX=x;obDragDeltaX=0;obDragging=true;const track=document.getElementById('ob-track');track.style.transition='none';}
+function obDragMove(x){
+  if(!obDragging)return;
+  obDragDeltaX=x-obDragStartX;
+  const track=document.getElementById('ob-track');
+  const pct=(obDragDeltaX/track.parentElement.offsetWidth)*100;
+  track.style.transform='translateX(calc(-'+(obIndex*100)+'% + '+obDragDeltaX+'px))';
+}
+function obDragEnd(){
+  if(!obDragging)return;
+  obDragging=false;
+  const track=document.getElementById('ob-track');
+  track.style.transition='';
+  const threshold=50; // px
+  if(obDragDeltaX<-threshold){
+    obGoTo(obIndex+1); // swiped left -> next (or loop to start)
+  }else if(obDragDeltaX>threshold){
+    obGoTo(obIndex-1); // swiped right -> previous
+  }else{
+    obRenderTrack(true); // snap back
+  }
+  obDragStartX=null;obDragDeltaX=0;
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const viewport=document.querySelector('.ob-viewport');
+  if(!viewport)return;
+  viewport.addEventListener('touchstart',e=>obDragStart(e.touches[0].clientX),{passive:true});
+  viewport.addEventListener('touchmove',e=>obDragMove(e.touches[0].clientX),{passive:true});
+  viewport.addEventListener('touchend',obDragEnd);
+  viewport.addEventListener('mousedown',e=>{e.preventDefault();obDragStart(e.clientX);});
+  window.addEventListener('mousemove',e=>{if(obDragging)obDragMove(e.clientX);});
+  window.addEventListener('mouseup',obDragEnd);
+});
+
 function renderAll(){renderList();renderRecipes();renderStaples();renderHistory();renderSpend();renderSettings();loadBudgetToggle();}
-load();applyTheme();loadQuickEnter();loadBudgetToggle();
+load();applyTheme();loadQuickEnter();loadBudgetToggle();loadObAlwaysToggle();
+if(shouldShowOnboarding())showOnboarding();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('SW registration failed:',err));}
 if(S.budget)document.getElementById('bud-in').value=S.budget;
 renderAll();
 initFirebase();
