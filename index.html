@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Basket v4.20</title>
+<title>Basket v4.21</title>
 <!-- PWA manifest -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1E8E5A">
@@ -350,83 +350,118 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 .ob-gotit:not(.enabled){cursor:not-allowed}
 .ob-gotit.enabled:hover{filter:brightness(1.08)}
 
-/* Slide 1 stage — mini app mockup elements */
-.ob-mock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+/* Slide 1 stage — continuous single-timeline animation, no cuts
+   Cycle: 9s total
+   M1 camera alone         0.0-1.0s   (0-11.11%)
+   M2 note slides in       1.0-2.5s   (11.11-27.78%)
+   M3 flash on note        2.5-3.5s   (27.78-38.89%)
+   M4 note out / list in   3.5-5.5s   (38.89-61.11%)
+   M5 zoom+pan+type+add    5.5-8.0s   (61.11-88.89%)
+   M6 exit left / cam in   8.0-9.0s   (88.89-100%)
+*/
+.ob-mock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .ob-mock-inner{position:relative;width:280px;height:210px}
-.ob-frame{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;animation-duration:5s;animation-iteration-count:infinite;animation-timing-function:ease-in-out}
+.ob-stage-zoom{position:absolute;inset:0;animation:obStageZoom 9s ease-in-out infinite;transform-origin:50% 30%}
 
-/* Camera icon frame */
-.ob-f-camera{animation-name:obCamera}
-.ob-cam-icon{width:64px;height:64px;border-radius:16px;background:var(--add-bg);border:2px solid var(--add-bdr);display:flex;align-items:center;justify-content:center}
-.ob-cam-icon svg{width:32px;height:32px;stroke:var(--add-accent);fill:none;stroke-width:1.8}
+.ob-cam-icon{position:absolute;width:60px;height:60px;border-radius:15px;background:var(--add-bg);border:2px solid var(--add-bdr);display:flex;align-items:center;justify-content:center;left:14px;top:75px;animation:obCamPos 9s ease-in-out infinite}
+.ob-cam-icon svg{width:28px;height:28px;stroke:var(--add-accent);fill:none;stroke-width:1.8}
 
-/* Handwritten note frame */
-.ob-f-note{animation-name:obNote}
-.ob-note{width:150px;background:#FFFDF6;border:1.5px solid var(--bdr);border-radius:8px;padding:14px 12px;box-shadow:var(--sh);transform:rotate(-2deg)}
-.ob-note-line{height:9px;border-radius:2px;background:#3a3a3a;opacity:.55;margin-bottom:9px;font-family:'Outfit',sans-serif}
+.ob-note{position:absolute;width:130px;background:#FFFDF6;border:1.5px solid var(--bdr);border-radius:8px;padding:12px 11px;box-shadow:var(--sh);left:130px;top:60px;animation:obNotePos 9s ease-in-out infinite}
+.ob-note-flash{position:absolute;inset:0;background:#fff;border-radius:8px;opacity:0;animation:obFlash 9s ease-in-out infinite;pointer-events:none}
+.ob-note-line{height:8px;border-radius:2px;background:#3a3a3a;opacity:.55;margin-bottom:8px}
 .ob-note-line:nth-child(1){width:70%}
 .ob-note-line:nth-child(2){width:85%}
 .ob-note-line:nth-child(3){width:60%}
 
-/* List items appearing frame */
-.ob-f-list{animation-name:obList}
-.ob-mini-list{width:220px;display:flex;flex-direction:column;gap:6px}
-.ob-mini-item{background:var(--surf);border:1.5px solid var(--bdr);border-radius:9px;padding:8px 10px;display:flex;align-items:center;gap:7px;opacity:0;box-shadow:var(--sh);font-size:.78rem;font-weight:600;color:var(--tx)}
+.ob-mini-list{position:absolute;width:220px;left:30px;top:14px;display:flex;flex-direction:column;gap:6px;animation:obListPos 9s ease-in-out infinite}
+.ob-mini-item{background:var(--surf);border:1.5px solid var(--bdr);border-radius:9px;padding:8px 10px;display:flex;align-items:center;gap:7px;box-shadow:var(--sh);font-size:.78rem;font-weight:600;color:var(--tx);opacity:0}
 .ob-mini-ck{width:13px;height:13px;border:1.5px solid var(--bdr);border-radius:4px;flex-shrink:0}
-.ob-mini-item.i1{animation:obItemIn .4s ease forwards;animation-delay:.1s}
-.ob-mini-item.i2{animation:obItemIn .4s ease forwards;animation-delay:.35s}
-.ob-mini-item.i3{animation:obItemIn .4s ease forwards;animation-delay:.6s}
-.ob-mini-item.i4{animation:obItemIn .4s ease forwards;animation-delay:.15s}
+.ob-mini-item.i1{animation:obItem1 9s ease infinite}
+.ob-mini-item.i2{animation:obItem2 9s ease infinite}
+.ob-mini-item.i3{animation:obItem3 9s ease infinite}
+.ob-mini-item.i4{animation:obItem4 9s ease infinite}
 
-/* Add item card frame (manual entry) */
-.ob-f-add{animation-name:obAdd}
-.ob-add-card{width:220px;background:var(--add-bg);border:1.5px solid var(--add-bdr);border-radius:10px;padding:10px 12px;box-shadow:var(--sh)}
+.ob-add-card{position:absolute;width:220px;left:30px;top:150px;background:var(--add-bg);border:1.5px solid var(--add-bdr);border-radius:10px;padding:10px 12px;box-shadow:var(--sh);opacity:0;animation:obAddCardPos 9s ease-in-out infinite}
 .ob-add-input{background:rgba(255,255,255,.7);border:1.3px solid var(--add-bdr);border-radius:6px;height:26px;margin-bottom:8px;position:relative;overflow:hidden}
-.ob-add-input-txt{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.72rem;color:var(--tx);font-weight:600;white-space:nowrap;width:0;overflow:hidden;animation:obType 5s ease-in-out infinite}
-.ob-add-btn{background:var(--gdk);color:#fff;font-size:.72rem;font-weight:700;text-align:center;border-radius:6px;padding:5px 0;opacity:.4;animation:obBtnPulse 5s ease-in-out infinite}
+.ob-add-input-txt{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.72rem;color:var(--tx);font-weight:600;white-space:nowrap;width:0;overflow:hidden;animation:obType 9s ease-in-out infinite}
+.ob-add-btn{background:var(--gdk);color:#fff;font-size:.72rem;font-weight:700;text-align:center;border-radius:6px;padding:5px 0;opacity:.4;animation:obBtnPulse 9s ease-in-out infinite}
 
-@keyframes obItemIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+/* ── Zoom+pan for moment 5 (reveals Add card by scaling+shifting the whole inner stage) ── */
+@keyframes obStageZoom{
+  0%,61.1%{transform:scale(1) translateY(0)}
+  75%,86%{transform:scale(1.22) translateY(-38px)}
+  89%,100%{transform:scale(1) translateY(0)}
+}
+
+/* ── Camera icon: present at start, exits left as note arrives, re-enters from right at the very end ── */
+@keyframes obCamPos{
+  0%,9%{opacity:1;transform:translateX(0)}
+  20%{opacity:0;transform:translateX(-30px)}
+  88.9%{opacity:0;transform:translateX(60px)}
+  95%,100%{opacity:1;transform:translateX(0)}
+}
+
+/* ── Note: slides in from right (M2), flashes (M3), fades+moves up+left as it exits (M4) ── */
+@keyframes obNotePos{
+  0%,9%{opacity:0;transform:translateX(50px) rotate(-2deg)}
+  27.8%,37%{opacity:1;transform:translateX(0) rotate(-2deg)}
+  61.1%{opacity:0;transform:translateX(-20px) translateY(-30px) rotate(-2deg)}
+  100%{opacity:0;transform:translateX(-20px) translateY(-30px) rotate(-2deg)}
+}
+@keyframes obFlash{
+  0%,26%{opacity:0}
+  30%{opacity:.5}
+  36%,100%{opacity:0}
+}
+
+/* ── List: slides in from right as note fades out (M4), stays through zoom (M5), exits left (M6) ── */
+@keyframes obListPos{
+  0%,38.9%{opacity:0;transform:translateX(50px)}
+  55%,88.9%{opacity:1;transform:translateX(0)}
+  97%,100%{opacity:0;transform:translateX(-60px)}
+}
+@keyframes obItem1{
+  0%,40%{opacity:0;transform:translateX(-8px)}
+  46%,88.9%{opacity:1;transform:translateX(0)}
+  97%,100%{opacity:0}
+}
+@keyframes obItem2{
+  0%,44%{opacity:0;transform:translateX(-8px)}
+  50%,88.9%{opacity:1;transform:translateX(0)}
+  97%,100%{opacity:0}
+}
+@keyframes obItem3{
+  0%,48%{opacity:0;transform:translateX(-8px)}
+  54%,88.9%{opacity:1;transform:translateX(0)}
+  97%,100%{opacity:0}
+}
+/* Bananas — the 4th item, added during M5 typing/add sequence */
+@keyframes obItem4{
+  0%,79%{opacity:0;transform:translateX(-8px)}
+  83%,88.9%{opacity:1;transform:translateX(0)}
+  97%,100%{opacity:0}
+}
+
+/* ── Add Item card: revealed by the zoom+pan in M5, exits left with the list in M6 ── */
+@keyframes obAddCardPos{
+  0%,61.1%{opacity:0;transform:translateX(50px)}
+  67%,88.9%{opacity:1;transform:translateX(0)}
+  97%,100%{opacity:0;transform:translateX(-60px)}
+}
 @keyframes obType{
-  0%,68%{width:0}
-  78%,100%{width:66px}
+  0%,72%{width:0}
+  79%,100%{width:66px}
 }
 @keyframes obBtnPulse{
-  0%,78%{opacity:.4;transform:scale(1)}
-  81%{opacity:1;transform:scale(1.05)}
-  84%,100%{opacity:1;transform:scale(1)}
+  0%,79%{opacity:.4;transform:scale(1)}
+  82%{opacity:1;transform:scale(1.05)}
+  85%,100%{opacity:1;transform:scale(1)}
 }
 
-/* Timeline: camera(0-15%) -> note(15-35%) -> list(35-60%) -> add(60-85%) -> pan back to camera(85-100%) */
-@keyframes obCamera{
-  0%,4%{opacity:1;transform:translateX(0) scale(1)}
-  15%{opacity:1;transform:translateX(0) scale(1)}
-  20%{opacity:0;transform:translateX(-40px) scale(.92)}
-  84%{opacity:0;transform:translateX(40px) scale(.92)}
-  90%,96%{opacity:1;transform:translateX(0) scale(1)}
-  100%{opacity:1;transform:translateX(0) scale(1)}
-}
-@keyframes obNote{
-  0%,17%{opacity:0;transform:translateX(40px) scale(.92)}
-  24%,33%{opacity:1;transform:translateX(0) scale(1)}
-  40%{opacity:0;transform:translateX(-40px) scale(.92)}
-  100%{opacity:0}
-}
-@keyframes obList{
-  0%,37%{opacity:0;transform:translateX(40px) scale(.92)}
-  44%,58%{opacity:1;transform:translateX(0) scale(1)}
-  65%{opacity:0;transform:translateX(-40px) scale(.92)}
-  100%{opacity:0}
-}
-@keyframes obAdd{
-  0%,62%{opacity:0;transform:translateX(40px) scale(.92)}
-  68%,82%{opacity:1;transform:translateX(0) scale(1)}
-  88%{opacity:0;transform:translateX(-40px) scale(.92)}
-  100%{opacity:0}
-}
 @media(prefers-reduced-motion:reduce){
-  .ob-frame{animation:none!important;opacity:0}
-  .ob-f-camera{opacity:1}
-  .ob-mini-item,.ob-add-input-txt,.ob-add-btn{animation:none!important;opacity:1;width:auto}
+  .ob-stage-zoom,.ob-cam-icon,.ob-note,.ob-note-flash,.ob-mini-list,.ob-mini-item,.ob-add-card,.ob-add-input-txt,.ob-add-btn{animation:none!important}
+  .ob-cam-icon{opacity:1;transform:none}
+  .ob-note,.ob-note-flash,.ob-mini-list,.ob-mini-item,.ob-add-card,.ob-add-input-txt,.ob-add-btn{opacity:0}
 }
 
 
@@ -459,26 +494,19 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
           <div class="ob-stage">
             <div class="ob-mock">
               <div class="ob-mock-inner">
-                <div class="ob-frame ob-f-camera">
+                <div class="ob-stage-zoom">
                   <div class="ob-cam-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-                </div>
-                <div class="ob-frame ob-f-note">
                   <div class="ob-note">
                     <div class="ob-note-line"></div>
                     <div class="ob-note-line"></div>
                     <div class="ob-note-line"></div>
+                    <div class="ob-note-flash"></div>
                   </div>
-                </div>
-                <div class="ob-frame ob-f-list">
                   <div class="ob-mini-list">
                     <div class="ob-mini-item i1"><span class="ob-mini-ck"></span>Milk</div>
                     <div class="ob-mini-item i2"><span class="ob-mini-ck"></span>Eggs</div>
                     <div class="ob-mini-item i3"><span class="ob-mini-ck"></span>Bread</div>
-                  </div>
-                </div>
-                <div class="ob-frame ob-f-add">
-                  <div class="ob-mini-list" style="margin-bottom:8px">
-                    <div class="ob-mini-item i4" style="opacity:1"><span class="ob-mini-ck"></span>Milk</div>
+                    <div class="ob-mini-item i4"><span class="ob-mini-ck"></span>Bananas</div>
                   </div>
                   <div class="ob-add-card">
                     <div class="ob-add-input"><span class="ob-add-input-txt">Bananas</span></div>
@@ -532,7 +560,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 <header>
   <div class="hl">
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M9.5 14C9.5 7 22.5 7 22.5 14" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="1.9" stroke-linejoin="round"/><line x1="11" y1="14" x2="10" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="16" y1="14" x2="16" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="21" y1="14" x2="22" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="4.5" y1="19.5" x2="27.5" y2="19.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="5.5" y1="24.5" x2="26.5" y2="24.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/></svg>
-    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v4.20</div></div>
+    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v4.21</div></div>
   </div>
   <div class="hright"><div class="sync-ind"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Local</span></div><button class="tbtn" id="tbtn" onclick="cycleTheme()">Auto</button></div>
 </header>
