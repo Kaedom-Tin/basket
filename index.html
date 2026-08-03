@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Basket v4.21</title>
+<title>Basket v4.50</title>
 <!-- PWA manifest -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1E8E5A">
@@ -131,10 +131,12 @@ main{max-width:760px;margin:0 auto;padding:20px 13px 80px}
 .card.add-card{background:var(--add-bg);border-color:var(--add-bdr)}
 .card.add-card .ct{color:var(--add-accent)}
 .card.add-card .ct svg{stroke:var(--add-accent)}
-.card.add-card input,.card.add-card select.isel{background:rgba(255,255,255,.55);border-color:var(--add-bdr)}
-html[data-theme=dark] .card.add-card input,html[data-theme=dark] .card.add-card select.isel{background:rgba(255,255,255,.06)}
-@media(prefers-color-scheme:dark){html:not([data-theme=light]) .card.add-card input,html:not([data-theme=light]) .card.add-card select.isel{background:rgba(255,255,255,.06)}}
-.ct{font-size:1rem;font-weight:700;color:var(--gdk);margin-bottom:13px;display:flex;align-items:center;gap:8px}
+.card.add-card input,.card.add-card select.isel{background:#FFFFFF;border-color:var(--add-bdr);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+html[data-theme=dark] .card.add-card input,html[data-theme=dark] .card.add-card select.isel{background:#325A48;border-color:#4CD99B;color:#F5FBF7}
+html[data-theme=dark] .card.add-card input::placeholder{color:#B8D0C2}
+@media(prefers-color-scheme:dark){html:not([data-theme=light]) .card.add-card input,html:not([data-theme=light]) .card.add-card select.isel{background:#325A48;border-color:#4CD99B;color:#F5FBF7}}
+@media(prefers-color-scheme:dark){html:not([data-theme=light]) .card.add-card input::placeholder{color:#B8D0C2}}
+.ct{font-size:1rem;font-weight:700;color:var(--gdk);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .ct svg{width:18px;height:18px;stroke:var(--gdk);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 /* Forms — no labels, ghost text only */
 .add-form-row{display:flex;gap:7px;align-items:stretch;flex-wrap:nowrap}
@@ -148,13 +150,27 @@ input[type=text],input[type=number],input[type=password],select.isel{width:100%;
 input:focus,select.isel:focus{outline:none;border-color:var(--g);background:var(--surf);box-shadow:0 0 0 3px rgba(30,142,90,.2)}
 input::placeholder{color:var(--lgt);font-size:.85rem}
 select.isel{padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236e6e6e'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;cursor:pointer}
+.isel-narrow{padding-left:8px!important;padding-right:26px!important}
 .btn{padding:9px 15px;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap}
+/* Matches input field height (9px padding + 1.5px border = 10.5px equivalent) for buttons
+   sitting directly below a row of inputs, so they appear the same height */
+.btn-input-h{padding:10.5px 15px;border:1.5px solid transparent}
 .btn:active{transform:scale(.97)}
 .bp{background:var(--gdk);color:#fff}.bp:hover{background:var(--gmd)}
 .bs{background:var(--glt);color:var(--gdk)}.bs:hover{filter:brightness(.94)}
-.bd{background:var(--errbg);color:var(--err);border:1px solid rgba(176,53,53,.2)}.bd:hover{filter:brightness(1.1)}
+.scan-btn{background:linear-gradient(135deg,#EEF9F1,#C8EDD4);color:var(--add-accent);border:1.5px solid var(--add-bdr);box-shadow:0 0 0 1px rgba(30,142,90,.08),0 3px 10px rgba(30,142,90,.16);position:relative;display:flex;align-items:center;justify-content:center;gap:6px}
+.scan-btn:hover{filter:brightness(1.03);box-shadow:0 0 0 1px rgba(30,142,90,.1),0 4px 14px rgba(30,142,90,.2)}
+.scan-sparkle{font-size:.85rem;line-height:1;flex-shrink:0}
+/* Dark mode: --glt and --add-bg are too close in value for a visible gradient,
+   and low-opacity green glow disappears against a dark surface — use brighter,
+   more separated stops and a stronger glow tuned for dark backgrounds. */
+html[data-theme=dark] .scan-btn{background:linear-gradient(135deg,#1D3A28,#215040);border-color:#3A6B52;box-shadow:0 0 0 1px rgba(76,217,155,.18),0 3px 12px rgba(76,217,155,.22)}
+@media(prefers-color-scheme:dark){html:not([data-theme=light]) .scan-btn{background:linear-gradient(135deg,#1D3A28,#215040);border-color:#3A6B52;box-shadow:0 0 0 1px rgba(76,217,155,.18),0 3px 12px rgba(76,217,155,.22)}}
+.bd{background:var(--errbg);color:var(--err);border:1.5px solid rgba(176,53,53,.45)}.bd:hover{filter:brightness(1.1)}
+.bd.bd-inactive{background:var(--bdr);border-color:var(--bdr);color:var(--lgt)}.bd.bd-inactive:hover{filter:none}
 .ba{background:linear-gradient(135deg,var(--complete-start),var(--complete-end));border:3px solid var(--complete-border);color:var(--complete-text)}.ba:hover{filter:brightness(1.08)}
 .bc{background:linear-gradient(135deg,var(--complete-start),var(--complete-end));border:3px solid var(--complete-border);color:var(--complete-text)}.bc:hover{filter:brightness(1.08)}
+.bc.bc-inactive{background:var(--bdr);border-color:var(--bdr);color:var(--lgt);cursor:pointer}.bc.bc-inactive:hover{filter:none}
 .bg{background:none;border:1.5px solid var(--bdr);color:var(--mid)}.bg:hover{background:var(--glt);border-color:var(--g);color:var(--gdk)}
 .sm{padding:6px 11px;font-size:.8rem}
 .ib{background:none;border:none;cursor:pointer;padding:5px 7px;border-radius:7px;color:var(--mid);font-size:.9rem;line-height:1;transition:background .15s,color .15s}
@@ -178,7 +194,7 @@ select.isel{padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg x
 .si-drop-meta{display:flex;align-items:center;justify-content:space-between;width:100%;padding:0 0 8px;border-bottom:1px solid var(--bdr);margin-bottom:4px}
 .si-drop-cost{font-size:.95rem;font-weight:700;color:var(--tx);font-variant-numeric:tabular-nums}
 /* shopping item — source badge fixed 64px */
-.si{background:var(--surf);border:1.5px solid var(--bdr);border-radius:12px;margin-bottom:8px;box-shadow:var(--sh);transition:opacity .2s,background .2s,box-shadow .2s;overflow:hidden}
+.si{background:var(--surf);border:1.5px solid var(--bdr);border-radius:12px;margin-bottom:7px;box-shadow:var(--sh);transition:opacity .2s,background .2s,box-shadow .2s;overflow:hidden}
 .si:hover{box-shadow:var(--sh2)}
 .si.ticked{opacity:.42;background:var(--glt);box-shadow:none}
 .si.ticked .iln{text-decoration:line-through}
@@ -201,7 +217,7 @@ select.isel{padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg x
 .si-edit-row .fg-unit{width:88px;flex-shrink:0}
 .si-edit-row .fg-cost{flex:1;min-width:72px}
 .si-edit-btns{display:flex;gap:6px;margin-top:9px}
-.shop-actions{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.shop-actions{display:flex;flex-direction:column;gap:12px;margin-top:12px}
 .shop-actions-row{display:flex;gap:7px}
 .shop-actions .btn-complete{width:100%;padding:13px;font-size:.95rem}
 .shop-actions .btn-ticked{flex:1;padding:9px 10px;font-size:.82rem}
@@ -209,7 +225,7 @@ select.isel{padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg x
 /* recipe card */
 .rc{background:var(--surf);border:1.5px solid var(--bdr);border-radius:12px;overflow:hidden;margin-bottom:11px;box-shadow:var(--sh);transition:box-shadow .2s,background .3s,border-color .3s}
 .rc:hover{box-shadow:var(--sh2)}
-.rc.stale{background:var(--elevated-bg);border:2px solid var(--complete-border)}
+.rc.stale{background:var(--elevated-bg);border:1.5px solid var(--complete-border)}
 .rh-r1{padding:13px 15px 4px;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
 .rh-r1:hover{background:rgba(30,142,90,.07)}
 .rname{font-size:1.08rem;font-weight:700;flex:1;min-width:0}
@@ -317,10 +333,14 @@ select.isel{padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg x
 .spinner{width:36px;height:36px;border:3px solid var(--bdr);border-top-color:var(--gdk);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 .scan-item{display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--surf2);border:1px solid var(--bdr);border-radius:9px;margin-bottom:7px}
+.scan-recipe-name{padding:10px 13px;background:var(--add-bg);border:1.5px solid var(--add-bdr);border-radius:9px;margin-bottom:10px}
+.scan-recipe-name label{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mid);margin-bottom:4px;display:block}
+.scan-recipe-name input{width:100%;background:#FFFFFF}
 .scan-ck{width:18px;height:18px;accent-color:var(--gdk);flex-shrink:0;cursor:pointer}
 .scan-nm{flex:1;font-size:.92rem;font-weight:500}
 .scan-mt{font-size:.78rem;color:var(--mid);text-align:right;white-space:nowrap}
 .empty{text-align:center;padding:40px 20px;color:var(--lgt)}
+.empty-list{padding-top:12px;padding-bottom:36px}
 .ei{font-size:2.5rem;margin-bottom:9px}
 .et{font-size:.88rem;line-height:1.7}
 .toast{position:fixed;bottom:22px;right:15px;background:var(--tx);color:var(--bg);padding:11px 17px;border-radius:10px;font-size:.85rem;font-weight:500;opacity:0;transform:translateY(5px);transition:all .25s;z-index:999;pointer-events:none;max-width:300px;box-shadow:0 4px 14px rgba(0,0,0,.22);display:flex;align-items:center;gap:10px}
@@ -351,117 +371,115 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 .ob-gotit.enabled:hover{filter:brightness(1.08)}
 
 /* Slide 1 stage — continuous single-timeline animation, no cuts
-   Cycle: 9s total
-   M1 camera alone         0.0-1.0s   (0-11.11%)
-   M2 note slides in       1.0-2.5s   (11.11-27.78%)
-   M3 flash on note        2.5-3.5s   (27.78-38.89%)
-   M4 note out / list in   3.5-5.5s   (38.89-61.11%)
-   M5 zoom+pan+type+add    5.5-8.0s   (61.11-88.89%)
-   M6 exit left / cam in   8.0-9.0s   (88.89-100%)
+   Cycle: 8.5s total
+   M1 camera alone           0.00-1.00s  (0.00-11.76%)
+   M2 note slides in         1.00-2.50s  (11.76-29.41%)
+   M3 flash on note          2.50-3.50s  (29.41-41.18%)
+   M4 note fades / list in   3.50-5.50s  (41.18-64.71%)
+   M5 zoom+pan+type+add      5.50-8.00s  (64.71-94.12%)
+   M6 exit left / cam in     8.00-8.50s  (94.12-100%)
+
+   Rule: every element is 100% opacity the instant any part is on-screen,
+   and stays 100% opacity while sliding fully off-screen — NO fade in/out
+   on slide transitions. Only 3 exceptions animate opacity:
+   the handwritten note (fades out in M4), the flash overlay, and the Add button pulse.
 */
 .ob-mock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .ob-mock-inner{position:relative;width:280px;height:210px}
-.ob-stage-zoom{position:absolute;inset:0;animation:obStageZoom 9s ease-in-out infinite;transform-origin:50% 30%}
+.ob-stage-zoom{position:absolute;inset:0;animation:obStageZoom 8.5s ease-in-out infinite;transform-origin:30% 15%}
 
-.ob-cam-icon{position:absolute;width:60px;height:60px;border-radius:15px;background:var(--add-bg);border:2px solid var(--add-bdr);display:flex;align-items:center;justify-content:center;left:14px;top:75px;animation:obCamPos 9s ease-in-out infinite}
+/* Camera: visible M1-M4 (fully opaque, no fade), the zoom+pan itself carries it off in M5, re-enters M6 */
+.ob-cam-icon{position:absolute;width:60px;height:60px;border-radius:15px;background:var(--add-bg);border:2px solid var(--add-bdr);display:flex;align-items:center;justify-content:center;left:14px;top:75px;animation:obCamPos 8.5s ease-in-out infinite}
 .ob-cam-icon svg{width:28px;height:28px;stroke:var(--add-accent);fill:none;stroke-width:1.8}
 
-.ob-note{position:absolute;width:130px;background:#FFFDF6;border:1.5px solid var(--bdr);border-radius:8px;padding:12px 11px;box-shadow:var(--sh);left:130px;top:60px;animation:obNotePos 9s ease-in-out infinite}
-.ob-note-flash{position:absolute;inset:0;background:#fff;border-radius:8px;opacity:0;animation:obFlash 9s ease-in-out infinite;pointer-events:none}
-.ob-note-line{height:8px;border-radius:2px;background:#3a3a3a;opacity:.55;margin-bottom:8px}
-.ob-note-line:nth-child(1){width:70%}
-.ob-note-line:nth-child(2){width:85%}
-.ob-note-line:nth-child(3){width:60%}
+/* Handwritten note — the ONE element allowed to fade (M4 exit) */
+.ob-note{position:absolute;width:130px;background:#FFFDF6;border:1.5px solid var(--bdr);border-radius:8px;padding:12px 11px;box-shadow:var(--sh);left:130px;top:52px;animation:obNotePos 8.5s ease-in-out infinite}
+.ob-note-flash{position:absolute;inset:-4px;background:#F2F2F2;border-radius:10px;opacity:0;animation:obFlash 8.5s ease-in-out infinite;pointer-events:none}
+.ob-note-line{font-family:'Segoe Script','Brush Script MT',cursive;font-size:1.05rem;color:#2a2a2a;line-height:1.3;opacity:.85;white-space:nowrap}
 
-.ob-mini-list{position:absolute;width:220px;left:30px;top:14px;display:flex;flex-direction:column;gap:6px;animation:obListPos 9s ease-in-out infinite}
-.ob-mini-item{background:var(--surf);border:1.5px solid var(--bdr);border-radius:9px;padding:8px 10px;display:flex;align-items:center;gap:7px;box-shadow:var(--sh);font-size:.78rem;font-weight:600;color:var(--tx);opacity:0}
+/* List viewport — fixed-height crop window so items visually scroll off the top */
+.ob-list-viewport{position:absolute;width:220px;left:30px;top:10px;height:130px;overflow:hidden}
+.ob-mini-list{position:absolute;width:220px;left:0;top:0;display:flex;flex-direction:column;gap:6px;animation:obListSlideIn 8.5s ease-in-out infinite}
+.ob-mini-list-scroll{display:flex;flex-direction:column;gap:6px;animation:obListScroll 8.5s ease-in-out infinite}
+.ob-mini-item{background:var(--surf);border:1.5px solid var(--bdr);border-radius:9px;padding:8px 10px;display:flex;align-items:center;gap:7px;box-shadow:var(--sh);font-size:.78rem;font-weight:600;color:var(--tx);flex-shrink:0}
 .ob-mini-ck{width:13px;height:13px;border:1.5px solid var(--bdr);border-radius:4px;flex-shrink:0}
-.ob-mini-item.i1{animation:obItem1 9s ease infinite}
-.ob-mini-item.i2{animation:obItem2 9s ease infinite}
-.ob-mini-item.i3{animation:obItem3 9s ease infinite}
-.ob-mini-item.i4{animation:obItem4 9s ease infinite}
+.ob-mini-item.i4{animation:obItem4 8.5s ease infinite}
 
-.ob-add-card{position:absolute;width:220px;left:30px;top:150px;background:var(--add-bg);border:1.5px solid var(--add-bdr);border-radius:10px;padding:10px 12px;box-shadow:var(--sh);opacity:0;animation:obAddCardPos 9s ease-in-out infinite}
+.ob-add-card{position:absolute;width:220px;left:30px;top:150px;background:var(--add-bg);border:1.5px solid var(--add-bdr);border-radius:10px;padding:10px 12px;box-shadow:var(--sh);animation:obAddCardPos 8.5s ease-in-out infinite}
 .ob-add-input{background:rgba(255,255,255,.7);border:1.3px solid var(--add-bdr);border-radius:6px;height:26px;margin-bottom:8px;position:relative;overflow:hidden}
-.ob-add-input-txt{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.72rem;color:var(--tx);font-weight:600;white-space:nowrap;width:0;overflow:hidden;animation:obType 9s ease-in-out infinite}
-.ob-add-btn{background:var(--gdk);color:#fff;font-size:.72rem;font-weight:700;text-align:center;border-radius:6px;padding:5px 0;opacity:.4;animation:obBtnPulse 9s ease-in-out infinite}
+.ob-add-input-txt{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.72rem;color:var(--tx);font-weight:600;white-space:nowrap;width:0;overflow:hidden;animation:obType 8.5s ease-in-out infinite}
+.ob-add-btn{background:var(--gdk);color:#fff;font-size:.72rem;font-weight:700;text-align:center;border-radius:6px;padding:5px 0;opacity:.4;animation:obBtnPulse 8.5s ease-in-out infinite}
 
-/* ── Zoom+pan for moment 5 (reveals Add card by scaling+shifting the whole inner stage) ── */
+/* ── Zoom+pan for M5: scales+shifts the whole stage down-right, carrying the camera off-frame
+   and revealing the Add card beneath the list ── */
 @keyframes obStageZoom{
-  0%,61.1%{transform:scale(1) translateY(0)}
-  75%,86%{transform:scale(1.22) translateY(-38px)}
-  89%,100%{transform:scale(1) translateY(0)}
+  0%,64.71%{transform:scale(1) translate(0,0)}
+  80%,90%{transform:scale(1.55) translate(-38px,-58px)}
+  94.12%,100%{transform:scale(1) translate(0,0)}
 }
 
-/* ── Camera icon: present at start, exits left as note arrives, re-enters from right at the very end ── */
+/* Camera: fully opaque and static M1-M4 (no fade). Carried off-frame by the stage zoom in M5.
+   Re-appears (opacity flip, no slide) only once M6 begins, already back in position. */
 @keyframes obCamPos{
-  0%,9%{opacity:1;transform:translateX(0)}
-  20%{opacity:0;transform:translateX(-30px)}
-  88.9%{opacity:0;transform:translateX(60px)}
-  95%,100%{opacity:1;transform:translateX(0)}
+  0%,64.71%{opacity:1}
+  64.72%,94.11%{opacity:0}
+  94.12%,100%{opacity:1}
 }
 
-/* ── Note: slides in from right (M2), flashes (M3), fades+moves up+left as it exits (M4) ── */
+/* Note: slides in fully opaque from the right (M2), sits still through flash (M3),
+   THEN fades out in place as list arrives (M4) — this is the one permitted fade */
 @keyframes obNotePos{
-  0%,9%{opacity:0;transform:translateX(50px) rotate(-2deg)}
-  27.8%,37%{opacity:1;transform:translateX(0) rotate(-2deg)}
-  61.1%{opacity:0;transform:translateX(-20px) translateY(-30px) rotate(-2deg)}
-  100%{opacity:0;transform:translateX(-20px) translateY(-30px) rotate(-2deg)}
+  0%,11.76%{opacity:1;transform:translateX(60px) rotate(-2deg)}
+  20%,41.18%{opacity:1;transform:translateX(0) rotate(-2deg)}
+  58%,64.71%{opacity:0;transform:translateX(0) rotate(-2deg)}
+  100%{opacity:0;transform:translateX(0) rotate(-2deg)}
 }
 @keyframes obFlash{
-  0%,26%{opacity:0}
-  30%{opacity:.5}
-  36%,100%{opacity:0}
+  0%,28%{opacity:0}
+  33%{opacity:.85}
+  38%,100%{opacity:0}
 }
 
-/* ── List: slides in from right as note fades out (M4), stays through zoom (M5), exits left (M6) ── */
-@keyframes obListPos{
-  0%,38.9%{opacity:0;transform:translateX(50px)}
-  55%,88.9%{opacity:1;transform:translateX(0)}
-  97%,100%{opacity:0;transform:translateX(-60px)}
+/* List (outer slide-in wrapper): fully opaque, slides in from right in M4, slides fully off-screen left in M6 */
+@keyframes obListSlideIn{
+  0%,41.18%{transform:translateX(60px)}
+  50%,94.11%{transform:translateX(0)}
+  100%{transform:translateX(-60px)}
 }
-@keyframes obItem1{
-  0%,40%{opacity:0;transform:translateX(-8px)}
-  46%,88.9%{opacity:1;transform:translateX(0)}
-  97%,100%{opacity:0}
+/* Inner scroll: shifts the item stack UP inside the cropped viewport during M5,
+   so Milk/Eggs visually scroll off the top and only Bread (+ new Bananas) remain visible */
+@keyframes obListScroll{
+  0%,64.71%{transform:translateY(0)}
+  82%,94.11%{transform:translateY(-76px)}
+  100%{transform:translateY(0)}
 }
-@keyframes obItem2{
-  0%,44%{opacity:0;transform:translateX(-8px)}
-  50%,88.9%{opacity:1;transform:translateX(0)}
-  97%,100%{opacity:0}
-}
-@keyframes obItem3{
-  0%,48%{opacity:0;transform:translateX(-8px)}
-  54%,88.9%{opacity:1;transform:translateX(0)}
-  97%,100%{opacity:0}
-}
-/* Bananas — the 4th item, added during M5 typing/add sequence */
+/* Bananas — 4th item, does not exist until M5 typing completes, then opaque immediately (no fade) */
 @keyframes obItem4{
-  0%,79%{opacity:0;transform:translateX(-8px)}
-  83%,88.9%{opacity:1;transform:translateX(0)}
-  97%,100%{opacity:0}
+  0%,85%{opacity:0}
+  85.1%,100%{opacity:1}
 }
 
-/* ── Add Item card: revealed by the zoom+pan in M5, exits left with the list in M6 ── */
+/* Add card: fully opaque throughout, sits below the fold until the scroll+zoom reveals it,
+   slides fully off-screen left together with the list in M6 */
 @keyframes obAddCardPos{
-  0%,61.1%{opacity:0;transform:translateX(50px)}
-  67%,88.9%{opacity:1;transform:translateX(0)}
-  97%,100%{opacity:0;transform:translateX(-60px)}
+  0%,94.11%{transform:translateX(0)}
+  100%{transform:translateX(-60px)}
 }
 @keyframes obType{
-  0%,72%{width:0}
-  79%,100%{width:66px}
+  0%,74%{width:0}
+  81%,100%{width:66px}
 }
 @keyframes obBtnPulse{
-  0%,79%{opacity:.4;transform:scale(1)}
-  82%{opacity:1;transform:scale(1.05)}
-  85%,100%{opacity:1;transform:scale(1)}
+  0%,81%{opacity:.4;transform:scale(1)}
+  83.5%{opacity:1;transform:scale(1.05)}
+  86%,100%{opacity:1;transform:scale(1)}
 }
 
 @media(prefers-reduced-motion:reduce){
-  .ob-stage-zoom,.ob-cam-icon,.ob-note,.ob-note-flash,.ob-mini-list,.ob-mini-item,.ob-add-card,.ob-add-input-txt,.ob-add-btn{animation:none!important}
-  .ob-cam-icon{opacity:1;transform:none}
-  .ob-note,.ob-note-flash,.ob-mini-list,.ob-mini-item,.ob-add-card,.ob-add-input-txt,.ob-add-btn{opacity:0}
+  .ob-stage-zoom,.ob-cam-icon,.ob-note,.ob-note-flash,.ob-mini-list,.ob-mini-list-scroll,.ob-mini-item,.ob-add-card,.ob-add-input-txt,.ob-add-btn{animation:none!important}
+  .ob-cam-icon{opacity:1}
+  .ob-note,.ob-mini-list,.ob-add-card{opacity:0}
+  .ob-note-flash{opacity:0}
 }
 
 
@@ -497,16 +515,20 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
                 <div class="ob-stage-zoom">
                   <div class="ob-cam-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
                   <div class="ob-note">
-                    <div class="ob-note-line"></div>
-                    <div class="ob-note-line"></div>
-                    <div class="ob-note-line"></div>
+                    <div class="ob-note-line">Milk</div>
+                    <div class="ob-note-line">Eggs</div>
+                    <div class="ob-note-line">Bread</div>
                     <div class="ob-note-flash"></div>
                   </div>
-                  <div class="ob-mini-list">
-                    <div class="ob-mini-item i1"><span class="ob-mini-ck"></span>Milk</div>
-                    <div class="ob-mini-item i2"><span class="ob-mini-ck"></span>Eggs</div>
-                    <div class="ob-mini-item i3"><span class="ob-mini-ck"></span>Bread</div>
-                    <div class="ob-mini-item i4"><span class="ob-mini-ck"></span>Bananas</div>
+                  <div class="ob-list-viewport">
+                    <div class="ob-mini-list">
+                      <div class="ob-mini-list-scroll">
+                        <div class="ob-mini-item i1"><span class="ob-mini-ck"></span>Milk</div>
+                        <div class="ob-mini-item i2"><span class="ob-mini-ck"></span>Eggs</div>
+                        <div class="ob-mini-item i3"><span class="ob-mini-ck"></span>Bread</div>
+                        <div class="ob-mini-item i4"><span class="ob-mini-ck"></span>Bananas</div>
+                      </div>
+                    </div>
                   </div>
                   <div class="ob-add-card">
                     <div class="ob-add-input"><span class="ob-add-input-txt">Bananas</span></div>
@@ -560,7 +582,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 <header>
   <div class="hl">
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M9.5 14C9.5 7 22.5 7 22.5 14" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="1.9" stroke-linejoin="round"/><line x1="11" y1="14" x2="10" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="16" y1="14" x2="16" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="21" y1="14" x2="22" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="4.5" y1="19.5" x2="27.5" y2="19.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="5.5" y1="24.5" x2="26.5" y2="24.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/></svg>
-    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v4.21</div></div>
+    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v4.50</div></div>
   </div>
   <div class="hright"><div class="sync-ind"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Local</span></div><button class="tbtn" id="tbtn" onclick="cycleTheme()">Auto</button></div>
 </header>
@@ -569,9 +591,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
   <div class="nav-inner">
     <button class="nb active" data-tab="shopping"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>List <span class="nbd" id="lbadge" style="display:none">0</span></button>
     <button class="nb" data-tab="recipes"><svg viewBox="0 0 24 24"><path d="M6 13.87A4 4 0 017.41 6a5.11 5.11 0 019.18 0A4 4 0 0118 13.87V21H6z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>Recipes</button>
-    <button class="nb" data-tab="staples"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>Staples</button>
     <button class="nb" data-tab="spend"><svg viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/><line x1="3" y1="20" x2="21" y2="20"/></svg>Spend</button>
-    <button class="nb" data-tab="history"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>History</button>
     <button class="nb" data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</button>
   </div>
 </nav>
@@ -580,98 +600,66 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 
 <!-- SHOPPING TAB -->
 <div id="tab-shopping" class="tab active">
-  <div class="sh-row">
-    <h2>Shopping List</h2>
-    <div class="sh-row-btns">
-      <button class="btn bg sm" onclick="sortByCategory()">Aisle Sort ↕</button>
-      <button class="btn bs sm" onclick="openScanModal()"><svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;margin-right:3px" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>Scan</button>
-    </div>
-  </div>
   <div class="card add-card">
-    <div class="ct"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Add Item</div>
-    <!-- name full width, then qty/unit/cost on same row, no labels -->
-    <div style="margin-bottom:8px"><input type="text" id="m-name" placeholder="Name" autocomplete="off"></div>
+    <div class="ct"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Add to your list</div>
+    <!-- name full width, then qty/cost/unit on same row, no labels -->
+    <div style="margin-bottom:7px"><input type="text" id="m-name" placeholder="Name" autocomplete="off"></div>
     <div class="add-form-row">
-      <div class="fg-qty"><input type="number" id="m-qty" min="0" step="0.1" placeholder="Qty"></div>
-      <div class="fg-unit"><select id="m-unit" class="isel"></select></div>
-      <div class="fg-cost"><input type="number" id="m-cost" placeholder="$ / Unit" min="0" step="0.01"></div>
-      <button class="btn bp" onclick="addManual()">Add</button>
+      <div class="fg-qty" style="flex:1"><input type="number" id="m-qty" min="0" step="0.1" placeholder="Qty"></div>
+      <div class="fg-cost" style="flex:1"><input type="number" id="m-cost" placeholder="$ / Unit" min="0" step="0.01"></div>
+      <div class="fg-unit" id="m-unit-wrap" style="flex:0 0 76px;display:none"><select id="m-unit" class="isel isel-narrow"></select></div>
     </div>
+    <button class="btn bp btn-input-h" onclick="addManual()" style="width:100%;margin-top:7px">Add</button>
   </div>
+  <button class="btn scan-btn" onclick="openScanModal('list')" style="width:100%;margin-bottom:12px;padding:12px"><svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg><span class="scan-sparkle">&#10024;</span>Scan your shopping list</button>
+  <button class="btn bg" onclick="sortByCategory()" style="width:100%;margin-bottom:12px;padding:12px">Sort</button>
   <div id="shopitems"></div>
   <div id="shopfoot" style="display:none">
-    <div id="budget-section" class="card" style="margin-top:4px">
+    <div id="budget-section" class="card">
       <div class="ct"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/><circle cx="17" cy="15" r="1" fill="var(--gdk)"/></svg>Budget</div>
-      <div style="display:flex;gap:8px;align-items:flex-end">
-        <div style="flex:1"><input type="number" id="bud-in" placeholder="Target" min="0" step="0.01" oninput="saveBudget()"></div>
-        <button class="btn bg sm" onclick="clearBudget()">Clear</button>
-      </div>
+      <div><input type="number" id="bud-in" placeholder="Target" min="0" step="0.01" oninput="saveBudget()" style="width:100%"></div>
       <div id="budwrap" style="display:none"><div class="bbg"><div class="bbf" id="budfill"></div></div><div class="binfo"><span id="budspent">$0.00 spent</span><span id="budleft"></span></div></div>
     </div>
-    <div class="totbar"><div><div class="tl">Estimated Total</div></div><div class="ta" id="totdisp">$0.00</div></div>
     <div class="shop-actions">
-      <div class="shop-actions-row">
-        <button class="btn bg btn-ticked" onclick="clearTicked()">Remove Ticked</button>
-        <button class="btn bd btn-clear" onclick="clearAll()">Clear All</button>
-      </div>
-      <button class="btn bc btn-complete" onclick="completeShop()">Shop Complete</button>
+      <button class="btn bd btn-clear" id="clear-all-btn" onclick="clearAll()" style="width:100%">Clear All</button>
+      <button class="btn bc btn-complete" id="shop-complete-btn" onclick="completeShop()">Shop Complete</button>
     </div>
   </div>
 </div>
 
 <!-- RECIPES TAB -->
 <div id="tab-recipes" class="tab">
-  <div class="sh"><h2>Recipes</h2></div>
-  <div class="card">
-    <div class="ct"><svg viewBox="0 0 24 24"><path d="M6 13.87A4 4 0 017.41 6a5.11 5.11 0 019.18 0A4 4 0 0118 13.87V21H6z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>New Recipe</div>
-    <div style="margin-bottom:10px"><input type="text" id="r-name" placeholder="Name"></div>
-    <div id="r-ing-list"></div>
-    <div style="margin-top:9px">
+  <div class="card add-card">
+    <div class="ct"><svg viewBox="0 0 24 24"><path d="M6 13.87A4 4 0 017.41 6a5.11 5.11 0 019.18 0A4 4 0 0118 13.87V21H6z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>Save a recipe</div>
+    <div style="margin-bottom:7px"><input type="text" id="r-name" placeholder="Recipe name"></div>
+    <div>
       <div style="margin-bottom:7px"><input type="text" id="r-ing-name" placeholder="Ingredient name" autocomplete="off" style="width:100%"></div>
       <div class="air-row">
-        <div class="air-qty"><input type="number" id="r-ing-qty" placeholder="Qty" min="0.1" step="0.1"></div>
-        <div class="air-unit"><select id="r-ing-unit" class="isel"></select></div>
-        <div class="air-cost"><input type="number" id="r-ing-cost" placeholder="$ / Unit" min="0" step="0.01"></div>
-        <button class="btn bs sm" onclick="addIngToForm()">Add</button>
+        <div class="air-qty" style="width:auto;flex:1"><input type="number" id="r-ing-qty" placeholder="Qty" min="0.1" step="0.1"></div>
+        <div class="air-cost" style="flex:1"><input type="number" id="r-ing-cost" placeholder="$ / Unit" min="0" step="0.01"></div>
+        <div class="air-unit" style="width:auto;flex:0 0 76px"><select id="r-ing-unit" class="isel isel-narrow"></select></div>
       </div>
+      <button class="btn bp btn-input-h" onclick="addIngToForm()" style="width:100%;margin-top:7px">Add</button>
     </div>
-    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:13px"><button class="btn bp" onclick="saveRecipe()">Save Recipe</button><button class="btn bg" onclick="clearRecipeForm()">Clear</button></div>
+    <div id="r-ing-list" style="margin-top:9px"></div>
+    <button class="btn bc bc-inactive" id="save-recipe-btn" onclick="saveRecipe()" style="width:100%;margin-top:13px">Save Recipe</button>
   </div>
+  <button class="btn scan-btn" onclick="openScanModal('recipe')" style="width:100%;margin-bottom:12px;padding:12px"><svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg><span class="scan-sparkle">&#10024;</span>Scan your recipe</button>
   <div id="recipes-cont"></div>
-</div>
-
-<!-- STAPLES TAB -->
-<div id="tab-staples" class="tab">
-  <div class="sh"><h2>Staples</h2></div>
-  <div class="card">
-    <div class="ct"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>New Staple</div>
-    <div style="margin-bottom:8px"><input type="text" id="st-name" placeholder="Name" autocomplete="off"></div>
-    <div class="add-form-row">
-      <div class="fg-cost" style="flex:1"><input type="number" id="st-cost" placeholder="$ / Unit" min="0" step="0.01"></div>
-      <button class="btn bp" onclick="addStaple()" style="margin-left:auto">Save Staple</button>
-    </div>
-  </div>
-  <div class="sg" id="staples-cont"></div>
 </div>
 
 <!-- SPEND TAB -->
 <div id="tab-spend" class="tab">
-  <div class="sh"><h2>Spend Overview</h2></div>
   <div class="time-filter"><button class="tfbtn" data-f="month" onclick="setSpendFilter('month')">Last Month</button><button class="tfbtn" data-f="3months" onclick="setSpendFilter('3months')">3 Months</button><button class="tfbtn" data-f="6months" onclick="setSpendFilter('6months')">6 Months</button><button class="tfbtn active" data-f="all" onclick="setSpendFilter('all')">All Time</button></div>
   <div class="srow" id="spend-stats"></div>
   <div class="cwrap"><div class="ct2">Spend per Shop</div><div class="cs">Dashed line = average</div><div id="spend-chart"></div></div>
   <div class="cwrap"><div class="ct2">Spend by Category</div><div class="cs" id="cat-period-lbl">All time</div><div id="cat-chart"></div></div>
-</div>
-
-<!-- HISTORY TAB -->
-<div id="tab-history" class="tab">
-  <div class="sh"><h2>History</h2></div>
+  <div class="sh" style="margin-top:22px;margin-bottom:12px;padding-left:15px"><h2 style="font-size:1.25rem">History</h2></div>
   <div id="history-cont"></div>
 </div>
 
 <!-- SETTINGS TAB -->
 <div id="tab-settings" class="tab">
-  <div class="sh"><h2>Settings</h2></div>
   <div class="card" id="set-account-card">
     <div class="ct"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account</div>
     <div id="set-account-body"></div>
@@ -685,6 +673,10 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
     <div class="set-item">
       <div><div class="set-key">Show Budget</div><div class="set-sub">Show the budget tracker on the list tab</div></div>
       <label class="tog"><input type="checkbox" id="budget-tog" onchange="saveBudgetToggle()"><span class="tog-sl"></span></label>
+    </div>
+    <div class="set-item">
+      <div><div class="set-key">Show Unit</div><div class="set-sub">Show the unit field on the Add Item card</div></div>
+      <label class="tog"><input type="checkbox" id="unit-tog" onchange="saveUnitToggle()"><span class="tog-sl"></span></label>
     </div>
     <div class="set-item">
       <div><div class="set-key">Always Show Onboarding</div><div class="set-sub">For testing — shows the intro slides every time you sign in</div></div>
@@ -714,7 +706,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
     <div id="scan-s1"><div class="upload-area" onclick="document.getElementById('img-in').click()"><div class="upload-icon">&#128247;</div><div class="upload-txt">Tap to select a photo</div><div class="upload-sub">Handwritten list or recipe image</div><input type="file" id="img-in" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none" onchange="onImgSelected(event)"></div></div>
     <div id="scan-s2" style="display:none"><div id="scan-err" style="display:none;padding:12px 14px;background:var(--errbg);border-radius:10px;color:var(--err);font-size:.85rem;margin-bottom:12px;line-height:1.4"></div><img id="scan-preview" style="width:100%;max-height:220px;object-fit:contain;border-radius:10px;margin-bottom:12px;background:var(--surf2)"><button class="btn bp" style="width:100%;padding:12px" onclick="analyseImg()">&#10024; Analyse with AI</button><button class="btn bg sm" style="width:100%;margin-top:7px" onclick="resetScanner()">Choose different image</button></div>
     <div id="scan-s3" style="display:none;text-align:center;padding:32px 0"><div class="spinner"></div><div style="margin-top:14px;font-size:.92rem;color:var(--mid)">Analysing image&hellip;</div></div>
-    <div id="scan-s4" style="display:none"><p style="font-size:.85rem;color:var(--mid);margin-bottom:10px">Untick any items you don&rsquo;t want to add</p><div id="scan-results"></div><button class="btn ba" style="width:100%;margin-top:12px;padding:12px" onclick="addScannedItems()">Add Selected to List</button><button class="btn bg sm" style="width:100%;margin-top:7px" onclick="resetScanner()">Scan another image</button></div>
+    <div id="scan-s4" style="display:none"><p id="scan-s4-hint" style="font-size:.85rem;color:var(--mid);margin-bottom:10px">Untick any items you don&rsquo;t want to add</p><div id="scan-results"></div><button class="btn ba" id="scan-confirm-btn" style="width:100%;margin-top:12px;padding:12px" onclick="addScannedItems()">Add Selected to List</button><button class="btn bg sm" style="width:100%;margin-top:7px" onclick="resetScanner()">Scan another image</button></div>
   </div>
 </div>
 
@@ -741,16 +733,27 @@ const SCI_THRESHOLD=1e13;
 let S={recipes:[],staples:[],list:[],history:[],budget:null,darkMode:'auto',lastUpdatedBy:null};
 let currentUser=null,editId=null,editTmpName='',formIngs=[],recipeScalers={};
 let dragId=null,dragType=null,undoData=null,toastT,fbPushTimer,lastPush=0,spendFilter='all';
-let scanImgData=null,scanImgType=null,scanResults=[];
-let ingDragRid=null,ingDragIdx=null,stDragId=null;
-let openItemId=null,openStapleId=null,openRecipeId=null,openHistId=null;
+let scanImgData=null,scanImgType=null,scanResults=[],scanContext='list',scanRecipeName='';
+let ingDragRid=null,ingDragIdx=null;
+let openItemId=null,openRecipeId=null,openHistId=null;
 let quickEnter=false;
 
 function unitOptions(sel){return UNITS.map(u=>'<option value="'+u+'"'+(u===(sel||'')?' selected':'')+'>'+( u||'\u2014' )+'</option>').join('');}
 function buildUnitSel(id,sel){const el=document.getElementById(id);if(!el)return;el.innerHTML=unitOptions(sel);}
-['m-unit','r-ing-unit'].forEach(id=>buildUnitSel(id,''));
+buildUnitSel('m-unit','each');buildUnitSel('r-ing-unit','each');
 function save(){localStorage.setItem(KEY,JSON.stringify(S));clearTimeout(fbPushTimer);fbPushTimer=setTimeout(pushToFirebase,900);}
-function load(){try{const r=localStorage.getItem(KEY);if(r)S={...S,...JSON.parse(r)};}catch(e){}}
+function load(){
+  try{const r=localStorage.getItem(KEY);if(r)S={...S,...JSON.parse(r)};}catch(e){}
+  migrateStaplesToRecipes();
+}
+function migrateStaplesToRecipes(){
+  if(!S.staples||!S.staples.length)return;
+  S.staples.forEach(s=>{
+    S.recipes.push({id:s.id,name:s.name,ingredients:[{name:s.name,qty:1,unit:'',cost:s.cost||0}],lastSavedToShop:null});
+  });
+  S.staples=[];
+  save();
+}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
@@ -798,6 +801,8 @@ function badgeLabel(source){
 function loadQuickEnter(){quickEnter=localStorage.getItem('basket_quick_enter')==='1';const t=document.getElementById('quick-enter-tog');if(t)t.checked=quickEnter;}
 function loadBudgetToggle(){const show=localStorage.getItem('basket_show_budget')!=='0';const t=document.getElementById('budget-tog');if(t)t.checked=show;const s=document.getElementById('budget-section');if(s)s.classList.toggle('hidden',!show);}
 function saveBudgetToggle(){const show=document.getElementById('budget-tog').checked;localStorage.setItem('basket_show_budget',show?'1':'0');const s=document.getElementById('budget-section');if(s)s.classList.toggle('hidden',!show);}
+function loadUnitToggle(){const show=localStorage.getItem('basket_show_unit')==='1';const t=document.getElementById('unit-tog');if(t)t.checked=show;const w=document.getElementById('m-unit-wrap');if(w)w.style.display=show?'':'none';}
+function saveUnitToggle(){const show=document.getElementById('unit-tog').checked;localStorage.setItem('basket_show_unit',show?'1':'0');const w=document.getElementById('m-unit-wrap');if(w)w.style.display=show?'':'none';}
 function saveQuickEnter(){quickEnter=document.getElementById('quick-enter-tog').checked;localStorage.setItem('basket_quick_enter',quickEnter?'1':'0');}
 function focusItemName(){const el=document.getElementById('m-name');if(el)el.focus();}
 
@@ -824,16 +829,30 @@ function doUndo(){if(!undoData)return;S.list=undoData;undoData=null;clearTimeout
 function getPriceFromHistory(name){if(!name||name.length<2)return null;const nl=name.toLowerCase().trim();for(const entry of S.history){const found=entry.items.find(i=>i.name.toLowerCase()===nl);if(found&&found.cost>0)return found.cost;}return null;}
 function findMerge(name,cost){return S.list.find(i=>i.name.toLowerCase()===name.toLowerCase()&&(i.cost||0)===(cost||0)&&!i.ticked);}
 /* mergeOrPush: merges qty into existing unticked item with same name+cost, or pushes new. Returns true if merged. */
-function mergeOrPush(item,addQty){const ex=findMerge(item.name,item.cost);if(ex){ex.qty=Math.round(((ex.qty||0)+(addQty||item.qty||1))*100)/100;return true;}S.list.push(item);return false;}
+function mergeOrPush(item,addQty){const ex=findMerge(item.name,item.cost);if(ex){ex.qty=Math.round(((ex.qty||0)+(addQty||item.qty||1))*100)/100;return true;}S.list.unshift(item);return false;}
 
 function saveBudget(){S.budget=parseFloat(document.getElementById('bud-in').value)||null;save();renderBudget();}
-function clearBudget(){S.budget=null;document.getElementById('bud-in').value='';save();renderBudget();}
 function renderBudget(){const wrap=document.getElementById('budwrap');if(!wrap)return;const total=S.list.reduce((s,i)=>s+lt(i),0);if(!S.budget){wrap.style.display='none';return;}wrap.style.display='block';const pct=Math.min((total/S.budget)*100,100),fill=document.getElementById('budfill');fill.style.width=pct+'%';fill.style.background=pct<70?'var(--gmd)':pct<100?'var(--amb)':'var(--err)';document.getElementById('budspent').textContent=fmt(total)+' spent';const rem=S.budget-total,el=document.getElementById('budleft');el.textContent=rem>=0?fmt(rem)+' remaining':fmt(Math.abs(rem))+' over budget';el.style.color=rem<0?'var(--err)':'var(--mid)';}
 
 let pmTimer;
+
+/* Scroll the parent card into view when a field is focused, so the mobile
+   keyboard doesn't cover the card or the space where a new item/ingredient appears. */
+function scrollCardIntoView(fieldId){
+  const el=document.getElementById(fieldId);
+  if(!el)return;
+  el.addEventListener('focus',()=>{
+    setTimeout(()=>{
+      const card=el.closest('.card');
+      if(card)card.scrollIntoView({behavior:'smooth',block:'start'});
+    },320);
+  });
+}
+['m-name','m-qty','m-cost','m-unit','r-name','r-ing-name','r-ing-qty','r-ing-cost','r-ing-unit'].forEach(scrollCardIntoView);
+
 document.addEventListener('DOMContentLoaded',()=>{const mn=document.getElementById('m-name');if(mn)mn.addEventListener('input',function(){clearTimeout(pmTimer);pmTimer=setTimeout(()=>{if(document.getElementById('m-cost').value)return;const p=getPriceFromHistory(this.value);if(p!==null)document.getElementById('m-cost').value=p.toFixed(2);},350);});});
 
-function addManual(){const name=document.getElementById('m-name').value.trim();const qty=clampQty(parseFloat(document.getElementById('m-qty').value)||0);const unit=document.getElementById('m-unit').value;const cost=parseFloat(document.getElementById('m-cost').value)||0;if(!name){toast('Enter an item name');return;}S.list.push({id:uid(),name,qty,unit,cost,ticked:false,source:'manual'});document.getElementById('m-name').value='';document.getElementById('m-qty').value='';document.getElementById('m-cost').value='';buildUnitSel('m-unit','');save();renderList();toast('"'+name+'" added');if(quickEnter)setTimeout(focusItemName,50);else document.getElementById('m-name').focus();}
+function addManual(){const name=document.getElementById('m-name').value.trim();const qty=clampQty(parseFloat(document.getElementById('m-qty').value)||0);const unit=document.getElementById('m-unit').value||'each';const cost=parseFloat(document.getElementById('m-cost').value)||0;if(!name){toast('Enter an item name');return;}S.list.unshift({id:uid(),name,qty,unit,cost,ticked:false,source:'manual'});document.getElementById('m-name').value='';document.getElementById('m-qty').value='';document.getElementById('m-cost').value='';buildUnitSel('m-unit','each');save();renderList();toast('"'+name+'" added');if(quickEnter)setTimeout(focusItemName,50);else document.getElementById('m-name').focus();}
 function removeItem(id){saveForUndo();S.list=S.list.filter(i=>i.id!==id);openItemId=null;save();renderList();toast('Item removed',true);}
 function tickItem(id){const it=S.list.find(i=>i.id===id);if(it)it.ticked=!it.ticked;save();renderList();}
 function chgQty(id,d){const it=S.list.find(i=>i.id===id);if(it){const nq=Math.round(((it.qty||0)+d)*10)/10;it.qty=clampQty(nq);save();renderList();}}
@@ -841,10 +860,12 @@ function togItem(id,e){if(e)e.stopPropagation();openItemId=openItemId===id?null:
 function saveEditItem(id){const item=S.list.find(i=>i.id===id);if(!item)return;const name=document.getElementById('ei-n-'+id).value.trim();const qty=clampQty(parseFloat(document.getElementById('ei-q-'+id).value)||0);const unit=document.getElementById('ei-u-'+id).value;const cost=parseFloat(document.getElementById('ei-c-'+id).value)||0;if(!name){toast('Enter a name');return;}item.name=name;item.qty=qty;item.unit=unit;item.cost=cost;openItemId=null;save();renderList();toast('Item updated');}
 function clearTicked(){const n=S.list.filter(i=>i.ticked).length;if(!n){toast('No ticked items');return;}saveForUndo();S.list=S.list.filter(i=>!i.ticked);save();renderList();toast(n+' item'+(n>1?'s':'')+' removed',true);}
 function clearAll(){if(!S.list.length)return;if(!confirm('Clear the entire list? This cannot be undone.'))return;saveForUndo();S.list=[];openItemId=null;save();renderList();toast('List cleared',true);}
+function nudgeAddItem(){toast('Add an item to your list first');}
 function sortByCategory(){if(!S.list.length){toast('List is empty');return;}saveForUndo();const order={};CATS.forEach((c,i)=>order[c.name]=i);S.list.sort((a,b)=>{const ia=order[getCatName(a.name)]??CATS.length,ib=order[getCatName(b.name)]??CATS.length;return ia-ib||a.name.localeCompare(b.name);});save();renderList();toast('Sorted by supermarket aisle',true);}
 function getCatName(n){const nl=n.toLowerCase();for(const cat of CATS){if(cat.kw.some(kw=>nl.includes(kw)))return cat.name;}return 'Other';}
 function completeShop(){
   if(!S.list.length)return;
+  if(!confirm('Have you finished your shop?'))return;
   const now=new Date().toISOString();
   [...new Set(S.list.map(i=>i.recipeId).filter(Boolean))].forEach(rid=>{const r=S.recipes.find(r=>r.id===rid);if(r)r.lastSavedToShop=now;});
   const itemsToSave=S.list.filter(i=>i.qty>0);
@@ -856,19 +877,31 @@ function completeShop(){
 function renderList(){
   const cont=document.getElementById('shopitems'),foot=document.getElementById('shopfoot'),badge=document.getElementById('lbadge');
   const all=[...S.list.filter(i=>!i.ticked),...S.list.filter(i=>i.ticked)];
-  if(!all.length){cont.innerHTML='<div class="empty"><div class="ei"><svg class=\"basket-rock\" viewBox=\"0 0 32 32\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M9.5 14C9.5 7 22.5 7 22.5 14\" stroke=\"#1E8E5A\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><path d=\"M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z\" fill=\"rgba(30,142,90,.15)\" stroke=\"#1E8E5A\" stroke-width=\"1.9\" stroke-linejoin=\"round\"/><line x1=\"11\" y1=\"14\" x2=\"10\" y2=\"28\" stroke=\"#1E8E5A\" stroke-width=\"1.2\" stroke-opacity=\".5\"/><line x1=\"16\" y1=\"14\" x2=\"16\" y2=\"28\" stroke=\"#1E8E5A\" stroke-width=\"1.2\" stroke-opacity=\".5\"/><line x1=\"21\" y1=\"14\" x2=\"22\" y2=\"28\" stroke=\"#1E8E5A\" stroke-width=\"1.2\" stroke-opacity=\".5\"/><line x1=\"4.5\" y1=\"19.5\" x2=\"27.5\" y2=\"19.5\" stroke=\"#1E8E5A\" stroke-width=\"1.2\" stroke-opacity=\".5\"/><line x1=\"5.5\" y1=\"24.5\" x2=\"26.5\" y2=\"24.5\" stroke=\"#1E8E5A\" stroke-width=\"1.2\" stroke-opacity=\".5\"/></svg></div><div class="et">Your basket is empty.<br>Add from recipes, staples, or manually above.</div></div>';foot.style.display='none';badge.style.display='none';return;}
-  const total=S.list.reduce((s,i)=>s+lt(i),0);document.getElementById('totdisp').textContent=fmt(total);foot.style.display='block';badge.style.display='';badge.textContent=S.list.filter(i=>!i.ticked).length||'\u2713';if(S.budget)document.getElementById('bud-in').value=S.budget;
+  const clearBtn=document.getElementById('clear-all-btn'),completeBtn=document.getElementById('shop-complete-btn');
+  if(!all.length){
+    cont.innerHTML='<div class="empty empty-list"><div class="ei"><svg class=\"basket-rock\" viewBox=\"0 0 32 32\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M9.5 14C9.5 7 22.5 7 22.5 14\" stroke=\"#1E8E5A\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><path d=\"M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z\" fill=\"rgba(30,142,90,.15)\" stroke=\"#1E8E5A\" stroke-width=\"1.9\" stroke-linejoin=\"round\"/><line x1=\"11\" y1=\"14\" x2=\"10\" y2=\"28\" stroke=\"#1E8E5A\" stroke-width=\"1.2\" stroke-opacity=\".5\"/><line x1=\"16\" y1=\"14\" x2=\"16\" y2=\"28\" stroke=\"#1E8E5A\" stroke-width=\"1.2\" stroke-opacity=\".5\"/><line x1=\"21\" y1=\"14\" x2=\"22\" y2=\"28\" stroke=\"#1E8E5A\" stroke-width=\"1.2\" stroke-opacity=\".5\"/><line x1=\"4.5\" y1=\"19.5\" x2=\"27.5\" y2=\"19.5\" stroke=\"#1E8E5A\" stroke-width=\"1.2\" stroke-opacity=\".5\"/><line x1=\"5.5\" y1=\"24.5\" x2=\"26.5\" y2=\"24.5\" stroke=\"#1E8E5A\" stroke-width=\"1.2\" stroke-opacity=\".5\"/></svg></div><div class="et">Your basket is empty.<br>Add from recipes, staples, or manually above.</div></div>';
+    foot.style.display='block';
+    badge.style.display='none';
+    if(S.budget)document.getElementById('bud-in').value=S.budget;
+    const totEl0=document.getElementById('totdisp');if(totEl0)totEl0.textContent=fmt(0);
+    clearBtn.classList.add('bd-inactive');clearBtn.setAttribute('onclick','nudgeAddItem()');
+    completeBtn.classList.add('bc-inactive');completeBtn.setAttribute('onclick','nudgeAddItem()');
+    renderBudget();
+    return;
+  }
+  clearBtn.classList.remove('bd-inactive');clearBtn.setAttribute('onclick','clearAll()');
+  completeBtn.classList.remove('bc-inactive');completeBtn.setAttribute('onclick','completeShop()');
+  const total=S.list.reduce((s,i)=>s+lt(i),0);const totEl=document.getElementById('totdisp');if(totEl)totEl.textContent=fmt(total);foot.style.display='block';badge.style.display='';badge.textContent=S.list.filter(i=>!i.ticked).length||'\u2713';if(S.budget)document.getElementById('bud-in').value=S.budget;
   cont.innerHTML=all.map(item=>{
     const bc=badgeClass(item.source);
     const bl=badgeLabel(item.source);
     const isOpen=openItemId===item.id;
     const uSel=unitOptions(item.unit||'');
     return `<div class="si${item.ticked?' ticked':''}" id="si-${item.id}" draggable="true" ondragstart="ds(event,'${item.id}','list')" ondragend="de()" ondragover="dov(event,'${item.id}','list')" ondragleave="dlv(event)" ondrop="drp(event,'${item.id}','list')">
-      <div class="si-head">
-        <input type="checkbox" class="sck" ${item.ticked?'checked':''} onchange="tickItem('${item.id}')">
+      <div class="si-head" onclick="togItem('${item.id}',event)">
+        <input type="checkbox" class="sck" ${item.ticked?'checked':''} onchange="tickItem('${item.id}')" onclick="event.stopPropagation()">
         <span class="iln">${esc(item.name)}</span>
-        <div class="qc"><button class="qb" onclick="chgQty('${item.id}',-1)">&minus;</button><span class="qn">${qtyDisp(item.qty)}</span><button class="qb" onclick="chgQty('${item.id}',1)">+</button></div>
-        <button class="card-arr" onclick="togItem('${item.id}',event)">${isOpen?'\u25b2':'\u25bc'}</button>
+        <div class="qc" onclick="event.stopPropagation()"><button class="qb" onclick="chgQty('${item.id}',-1)">&minus;</button><span class="qn">${qtyDisp(item.qty)}</span><button class="qb" onclick="chgQty('${item.id}',1)">+</button></div>
       </div>
       ${isOpen?`<div class="si-edit">
         <div class="si-drop-meta"><span class="sp ${bc}">${bl}</span><span class="si-drop-cost">${fmt(lt(item))}</span></div>
@@ -901,21 +934,14 @@ function ingDov(e,rid,idx){if(ingDragRid!==rid||ingDragIdx===idx)return;e.preven
 function ingDlv(e){e.currentTarget.classList.remove('drag-over');}
 function ingDrp(e,rid,tIdx){e.preventDefault();e.stopPropagation();e.currentTarget.classList.remove('drag-over');if(ingDragRid!==rid||ingDragIdx===tIdx)return;const r=S.recipes.find(r=>r.id===rid);if(!r)return;const[ing]=r.ingredients.splice(ingDragIdx,1);r.ingredients.splice(tIdx,0,ing);ingDragRid=null;ingDragIdx=null;save();renderRecipes();}
 
-function stDs(e,id){stDragId=id;e.dataTransfer.effectAllowed='move';e.stopPropagation();setTimeout(()=>{const el=document.getElementById('sc-'+id);if(el)el.classList.add('dragging');},0);}
-function stDe(){stDragId=null;document.querySelectorAll('.sc.dragging,.sc.drag-over').forEach(el=>el.classList.remove('dragging','drag-over'));}
-function stDov(e,id){if(!stDragId||stDragId===id)return;e.preventDefault();e.currentTarget.classList.add('drag-over');}
-function stDlv(e){e.currentTarget.classList.remove('drag-over');}
-function stDrp(e,tid){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(!stDragId||stDragId===tid)return;const si=S.staples.findIndex(s=>s.id===stDragId),ti=S.staples.findIndex(s=>s.id===tid);if(si<0||ti<0)return;const[s]=S.staples.splice(si,1);S.staples.splice(ti,0,s);stDragId=null;save();renderStaples();}
-
-function togStaple(id,e){e.stopPropagation();openStapleId=openStapleId===id?null:id;renderStaples();}
 function togRecipe(id,e){e.stopPropagation();openRecipeId=openRecipeId===id?null:id;renderRecipes();}
 function togHist(id){openHistId=openHistId===id?null:id;renderHistory();}
 
 let pmRTimer;
-function addIngToForm(){const name=document.getElementById('r-ing-name').value.trim();const qty=clampIngQty(parseFloat(document.getElementById('r-ing-qty').value)||1);const unit=document.getElementById('r-ing-unit').value;const cost=parseFloat(document.getElementById('r-ing-cost').value)||0;if(!name)return;formIngs.push({id:uid(),name,qty,unit,cost});document.getElementById('r-ing-name').value='';document.getElementById('r-ing-qty').value='1';document.getElementById('r-ing-cost').value='';buildUnitSel('r-ing-unit','');document.getElementById('r-ing-name').focus();renderFormIngs();}
+function addIngToForm(){const name=document.getElementById('r-ing-name').value.trim();const qty=clampIngQty(parseFloat(document.getElementById('r-ing-qty').value)||1);const unit=document.getElementById('r-ing-unit').value;const cost=parseFloat(document.getElementById('r-ing-cost').value)||0;if(!name)return;formIngs.unshift({id:uid(),name,qty,unit,cost});document.getElementById('r-ing-name').value='';document.getElementById('r-ing-qty').value='1';document.getElementById('r-ing-cost').value='';buildUnitSel('r-ing-unit','each');document.getElementById('r-ing-name').focus();renderFormIngs();}
 function removeFormIng(id){formIngs=formIngs.filter(i=>i.id!==id);renderFormIngs();}
-function renderFormIngs(){document.getElementById('r-ing-list').innerHTML=formIngs.map(i=>'<div class="ir"><span class="in">'+esc(i.name)+'</span><span class="ic">'+ingQtyDisp(i)+' '+fmt(i.cost)+'</span><button class="ib" onclick="removeFormIng(\''+i.id+'\')">&times;</button></div>').join('');}
-function saveRecipe(){const name=document.getElementById('r-name').value.trim();if(!name){toast('Enter a recipe name');return;}if(!formIngs.length){toast('Add at least one ingredient');return;}S.recipes.push({id:uid(),name,ingredients:formIngs.map(i=>({name:i.name,qty:i.qty||1,unit:i.unit||'',cost:i.cost})),lastSavedToShop:null});save();clearRecipeForm();renderRecipes();toast('"'+name+'" saved!');}
+function renderFormIngs(){document.getElementById('r-ing-list').innerHTML=formIngs.map(i=>'<div class="ir"><span class="in">'+esc(i.name)+'</span><span class="ic">'+ingQtyDisp(i)+' '+fmt(i.cost)+'</span><button class="ib" onclick="removeFormIng(\''+i.id+'\')">&times;</button></div>').join('');const sb=document.getElementById('save-recipe-btn');if(sb)sb.classList.toggle('bc-inactive',!formIngs.length);}
+function saveRecipe(){const name=document.getElementById('r-name').value.trim();if(!name){toast('Enter a recipe name');return;}if(!formIngs.length){toast('Add at least one ingredient');return;}S.recipes.unshift({id:uid(),name,ingredients:formIngs.map(i=>({name:i.name,qty:i.qty||1,unit:i.unit||'',cost:i.cost})),lastSavedToShop:null});save();clearRecipeForm();renderRecipes();toast('"'+name+'" saved!');}
 function clearRecipeForm(){document.getElementById('r-name').value='';formIngs=[];renderFormIngs();}
 function deleteRecipe(id){if(!confirm('Delete this recipe?'))return;S.recipes=S.recipes.filter(r=>r.id!==id);openRecipeId=null;save();renderRecipes();toast('Recipe deleted');}
 function setScaler(id,val){recipeScalers[id]=val;renderRecipes();}
@@ -987,20 +1013,20 @@ function renderRecipes(){
       </div>`;
     }
     const ingRows=r.ingredients.map((ing,i)=>`<div class="ir" id="ir-${r.id}-${i}" draggable="true" ondragstart="ingDs(event,'${r.id}',${i})" ondragend="ingDe()" ondragover="ingDov(event,'${r.id}',${i})" ondragleave="ingDlv(event)" ondrop="ingDrp(event,'${r.id}',${i})"><span class="in">${esc(ing.name)}</span><span class="ic">${ingQtyDisp(ing)} ${fmt(ing.cost)}</span></div>`).join('');
-    return `<div class="rc${stale?' stale':''}" id="rc-${r.id}" draggable="true" ondragstart="ds(event,'${r.id}','recipe')" ondragend="de()" ondragover="dov(event,'${r.id}','recipe')" ondragleave="dlv(event)" ondrop="drp(event,'${r.id}','recipe')">
-      <div class="rh-r1" onclick="addRecipeToList('${r.id}')">
+    return `<div class="rc${stale?' stale':''}" id="rc-${r.id}" draggable="true" ondragstart="ds(event,'${r.id}','recipe')" ondragend="de()" ondragover="dov(event,'${r.id}','recipe')" ondragleave="dlv(event)" ondrop="drp(event,'${r.id}','recipe')" onclick="togRecipe('${r.id}',event)">
+      <div class="rh-r1">
         <span class="rname">${esc(r.name)}</span>
-        <button class="card-arr" onclick="togRecipe('${r.id}',event)">${isOpen?'\u25b2':'\u25bc'}</button>
+        <button class="btn bs sm" onclick="addRecipeToList('${r.id}');event.stopPropagation()">Add to List</button>
       </div>
       ${stale?`<div class="rh-stale"><span class="slbl">Not used in 2+ wks</span></div>`:''}
       <div class="rh-r2"><span class="rmeta">${r.ingredients.length} ingredient${r.ingredients.length!==1?'s':''} &middot; ${fmt(tot)}</span></div>
       <div class="card-drop${isOpen?' open':''}">
-        <div class="card-drop-inner">
+        <div class="card-drop-inner" onclick="event.stopPropagation()">
           <button class="btn bg sm" onclick="startEdit('${r.id}')">Edit Recipe</button>
           <button class="btn bd sm" onclick="deleteRecipe('${r.id}')">Delete</button>
         </div>
       </div>
-      <div class="rb${isOpen?' open':''}">
+      <div class="rb${isOpen?' open':''}" onclick="event.stopPropagation()">
         <div class="scaler-wrap"><span class="scaler-lbl">Servings:</span><div style="display:flex;gap:5px">${scalerBtns}</div></div>
         ${ingRows}
       </div>
@@ -1009,16 +1035,6 @@ function renderRecipes(){
 }
 
 document.addEventListener('DOMContentLoaded',()=>{const ri=document.getElementById('r-ing-name');if(ri)ri.addEventListener('input',function(){clearTimeout(pmRTimer);pmRTimer=setTimeout(()=>{if(document.getElementById('r-ing-cost').value)return;const p=getPriceFromHistory(this.value);if(p!==null)document.getElementById('r-ing-cost').value=p.toFixed(2);},350);});});
-
-function addStaple(){const name=document.getElementById('st-name').value.trim();const cost=parseFloat(document.getElementById('st-cost').value)||0;if(!name){toast('Enter an item name');return;}S.staples.push({id:uid(),name,cost});document.getElementById('st-name').value='';document.getElementById('st-cost').value='';document.getElementById('st-name').focus();save();renderStaples();toast('"'+name+'" added to staples');}
-function addStapleToList(id){const s=S.staples.find(x=>x.id===id);if(!s)return;const merged_=mergeOrPush({id:uid(),name:s.name,qty:1,unit:'',cost:s.cost,ticked:false,source:'staple'});save();renderList();toast(merged_?'"'+s.name+'" merged into list':'"'+s.name+'" added to list');}
-function deleteStaple(id){if(!confirm('Delete this staple?'))return;S.staples=S.staples.filter(s=>s.id!==id);openStapleId=null;save();renderStaples();toast('Staple deleted');}
-function saveStaple(id){const s=S.staples.find(x=>x.id===id);if(!s)return;const nameEl=document.getElementById('se-n-'+id),costEl=document.getElementById('se-c-'+id);const name=(nameEl?.value||'').trim();const cost=parseFloat(costEl?.value)||0;if(!name){toast('Enter a name');return;}s.name=name;s.cost=cost;openStapleId=null;save();renderStaples();toast('Staple updated');}
-function renderStaples(){
-  const c=document.getElementById('staples-cont');
-  if(!S.staples.length){c.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ei">\uD83D\uDCCB</div><div class="et">No staples yet.<br>Add items you buy regularly.</div></div>';return;}
-  c.innerHTML=S.staples.map(s=>{const isOpen=openStapleId===s.id;return `<div class="sc" id="sc-${s.id}" draggable="true" ondragstart="stDs(event,'${s.id}')" ondragend="stDe()" ondragover="stDov(event,'${s.id}')" ondragleave="stDlv(event)" ondrop="stDrp(event,'${s.id}')"><div class="sc-head" onclick="addStapleToList('${s.id}')"><span class="scn">${esc(s.name)}</span><button class="card-arr" onclick="togStaple('${s.id}',event)">${isOpen?'\u25b2':'\u25bc'}</button></div><div class="scc">${fmt(s.cost)}</div>${isOpen?`<div class="sc-edit"><label style="font-size:.68rem">Name</label><input type="text" id="se-n-${s.id}" value="${esc(s.name)}"><label style="font-size:.68rem">$ / Unit</label><input type="number" id="se-c-${s.id}" value="${Number(s.cost||0).toFixed(2)}" min="0" step="0.01"><div class="sc-edit-btns"><button class="btn bp sm" onclick="saveStaple('${s.id}')">Save</button><button class="btn bd sm" onclick="deleteStaple('${s.id}')">Delete</button></div></div>`:''}</div>`;}).join('');
-}
 
 const CATS=[
   {name:'Fruit & Veg',kw:['apple','banana','orange','tomato','lettuce','carrot','potato','onion','garlic','lemon','lime','avocado','spinach','broccoli','cucumber','capsicum','pepper','mushroom','celery','ginger','herb','salad','vegetable','fruit','berry','mango','grape','pear','peach','zucchini','courgette','eggplant','aubergine','corn','pea','kale','cabbage','cauliflower','chilli','chili','leek','asparagus','pumpkin','squash','sweet potato','parsnip','rocket','bok choy','spring onion','shallot','fennel','beetroot','radish','coriander','parsley','basil','mint','thyme','rosemary']},
@@ -1070,7 +1086,7 @@ function renderHistory(){
     const ds=d.toLocaleDateString('en-AU',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
     const ts=d.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
     const isOpen=openHistId===e.id;
-    return `<div class="hc"><div class="hh" onclick="togHist('${e.id}')"><div><div class="hdate">${esc(ds)}</div><div class="hmeta">${ts} &middot; ${e.items.length} item${e.items.length!==1?'s':''}</div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0" onclick="event.stopPropagation()"><span class="htot">${fmt(e.total)}</span><button class="btn bs sm" onclick="reloadShop('${e.id}')">&#8635; Reload</button><button class="card-arr" onclick="togHist('${e.id}')">${isOpen?'\u25b2':'\u25bc'}</button></div></div><div class="hb${isOpen?' open':''}"><div>${e.items.map(i=>'<div class="hrow"><span>'+esc(i.name)+(i.qty>1?' \xd7'+qtyDisp(i.qty):'')+(i.unit?' '+i.unit:'')+' <span class="hsrc">('+esc(i.source)+')</span></span><span>'+fmt(lt(i))+'</span></div>').join('')}</div><div class="htr"><span>Total</span><span>${fmt(e.total)}</span></div><div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr);display:flex;gap:8px"><button class="btn bg sm" onclick="printHist('${e.id}')">Print</button><button class="btn bd sm" onclick="deleteHist('${e.id}')">Delete</button></div></div></div>`;
+    return `<div class="hc"><div class="hh" onclick="togHist('${e.id}')"><div><div class="hdate">${esc(ds)}</div><div class="hmeta">${ts} &middot; ${e.items.length} item${e.items.length!==1?'s':''}</div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0" onclick="event.stopPropagation()"><span class="htot">${fmt(e.total)}</span><button class="btn bs sm" onclick="reloadShop('${e.id}')">&#8635; Reload</button></div></div><div class="hb${isOpen?' open':''}"><div>${e.items.map(i=>'<div class="hrow"><span>'+esc(i.name)+(i.qty>1?' \xd7'+qtyDisp(i.qty):'')+(i.unit?' '+i.unit:'')+' <span class="hsrc">('+esc(i.source)+')</span></span><span>'+fmt(lt(i))+'</span></div>').join('')}</div><div class="htr"><span>Total</span><span>${fmt(e.total)}</span></div><div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr);display:flex;gap:8px"><button class="btn bg sm" onclick="printHist('${e.id}')">Print</button><button class="btn bd sm" onclick="deleteHist('${e.id}')">Delete</button></div></div></div>`;
   }).join('');
 }
 
@@ -1088,9 +1104,9 @@ function exportData(){const blob=new Blob([JSON.stringify(S,null,2)],{type:'appl
 function importData(event){const file=event.target.files[0];if(!file)return;if(!confirm('This will replace ALL current data. Are you sure?')){event.target.value='';return;}const reader=new FileReader();reader.onload=e=>{try{const data=JSON.parse(e.target.result);if(!data.recipes&&!data.staples&&!data.history){toast('Invalid file \u2014 not a Basket export');return;}const dm=S.darkMode;S={...S,...data,darkMode:dm};save();renderAll();toast('Data imported successfully');}catch(err){toast('Failed to read file \u2014 is it a valid JSON export?');}};reader.readAsText(file);event.target.value='';}
 
 function compressImage(dataUrl,mimeType,callback){const img=new Image();img.onload=function(){const MAX=1600;let w=img.width,h=img.height;if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);const compressed=canvas.toDataURL('image/jpeg',0.82);callback(compressed.split(',')[1],'image/jpeg');};img.src=dataUrl;}
-function openScanModal(){const key=localStorage.getItem('basket_api_key');if(!key){toast('Add your Claude API key in Settings first');switchToTab('settings');return;}document.getElementById('scan-modal').style.display='';resetScanner();}
+function openScanModal(context){scanContext=context||'list';const key=localStorage.getItem('basket_api_key');if(!key){toast('Add your Claude API key in Settings first');switchToTab('settings');return;}document.getElementById('scan-modal').style.display='';resetScanner();}
 function closeScanModal(){document.getElementById('scan-modal').style.display='none';resetScanner();}
-function resetScanner(){scanImgData=null;scanImgType=null;scanResults=[];showScanStep(0);document.getElementById('img-in').value='';}
+function resetScanner(){scanImgData=null;scanImgType=null;scanResults=[];scanRecipeName='';showScanStep(0);document.getElementById('img-in').value='';}
 function showScanStep(n){['scan-s1','scan-s2','scan-s3','scan-s4'].forEach((id,i)=>{document.getElementById(id).style.display=i===n?'':'none';});if(n!==1){const el=document.getElementById('scan-err');if(el)el.style.display='none';}}
 function showScanErr(msg){showScanStep(1);const el=document.getElementById('scan-err');el.textContent=msg;el.style.display='';}
 function onImgSelected(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const originalDataUrl=e.target.result;compressImage(originalDataUrl,file.type||'image/jpeg',(compressedData,compressedType)=>{scanImgData=compressedData;scanImgType=compressedType;document.getElementById('scan-preview').src=originalDataUrl;showScanStep(1);});};reader.readAsDataURL(file);}
@@ -1101,20 +1117,46 @@ async function analyseImg(){
   showScanStep(2);
   const controller=new AbortController();
   const timeoutId=setTimeout(()=>controller.abort(),30000);
-  const prompt='Analyse this image carefully. It may be a handwritten or printed shopping list, or a recipe.\n\nIf it is a shopping list: extract all items.\nIf it is a recipe: extract only the ingredients (not instructions).\n\nReturn ONLY a valid JSON array. Do not include any explanation, commentary, preamble, or text before or after the JSON array. If you are uncertain about an item, include your best guess inside the array. Each element must have:\n- "name": string (item or ingredient name, clean and concise)\n- "qty": number (quantity, default 1)\n- "unit": string \u2014 use one of: "each","g","kg","ml","L","tsp","tbsp","cup","bunch","can","bag","pack","bottle","clove","pinch","slice","loaf","dozen" \u2014 or "" if not applicable\n- "cost": number (0 if not visible)\n\nExample: [{"name":"Milk","qty":2,"unit":"L","cost":0},{"name":"Eggs","qty":12,"unit":"each","cost":0}]';
+  const isRecipeMode=scanContext==='recipe';
+  const prompt=isRecipeMode?
+    'Analyse this image carefully. It is a recipe (handwritten or printed) \u2014 extract only the ingredients (not instructions or method steps). Also try to identify the recipe\'s name/title if one is visible in the image (e.g. a heading or title at the top).\n\nReturn ONLY a valid JSON object. Do not include any explanation, commentary, preamble, or text before or after the JSON object. The object must have exactly two keys:\n- "recipeName": string \u2014 the recipe\'s title if visible, or "" if no name is visible\n- "ingredients": array of ingredient objects, each with:\n  - "name": string (ingredient name, clean and concise)\n  - "qty": number (quantity, default 1)\n  - "unit": string \u2014 use one of: "each","g","kg","ml","L","tsp","tbsp","cup","bunch","can","bag","pack","bottle","clove","pinch","slice","loaf","dozen" \u2014 or "" if not applicable\n  - "cost": number (0, cost is rarely visible on a recipe)\n\nExample: {"recipeName":"Spaghetti Bolognese","ingredients":[{"name":"Mince beef","qty":500,"unit":"g","cost":0},{"name":"Onion","qty":1,"unit":"each","cost":0}]}'
+    :
+    'Analyse this image carefully. It may be a handwritten or printed shopping list, or a recipe.\n\nIf it is a shopping list: extract all items.\nIf it is a recipe: extract only the ingredients (not instructions).\n\nReturn ONLY a valid JSON array. Do not include any explanation, commentary, preamble, or text before or after the JSON array. If you are uncertain about an item, include your best guess inside the array. Each element must have:\n- "name": string (item or ingredient name, clean and concise)\n- "qty": number (quantity, default 1)\n- "unit": string \u2014 use one of: "each","g","kg","ml","L","tsp","tbsp","cup","bunch","can","bag","pack","bottle","clove","pinch","slice","loaf","dozen" \u2014 or "" if not applicable\n- "cost": number (0 if not visible)\n\nExample: [{"name":"Milk","qty":2,"unit":"L","cost":0},{"name":"Eggs","qty":12,"unit":"each","cost":0}]';
   try{
     const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:scanImgType,data:scanImgData}},{type:'text',text:prompt}]}]}),signal:controller.signal});
     clearTimeout(timeoutId);
     if(!resp.ok){const err=await resp.json();console.error('Basket scan API error:',resp.status,err);throw new Error(err.error?.message||'API error '+resp.status);}
     const data=await resp.json();
     const raw=data.content?.find(c=>c.type==='text')?.text||'';
-    const firstBracket=raw.indexOf('['),lastBracket=raw.lastIndexOf(']');
-    if(firstBracket===-1||lastBracket===-1||lastBracket<=firstBracket)throw new Error('NOTHING_FOUND');
-    const items=JSON.parse(raw.slice(firstBracket,lastBracket+1));
-    if(!Array.isArray(items)||!items.length)throw new Error('NOTHING_FOUND');
+    let items;
+    if(isRecipeMode){
+      const firstBrace=raw.indexOf('{'),lastBrace=raw.lastIndexOf('}');
+      if(firstBrace===-1||lastBrace===-1||lastBrace<=firstBrace)throw new Error('NOTHING_FOUND');
+      const parsed=JSON.parse(raw.slice(firstBrace,lastBrace+1));
+      items=Array.isArray(parsed.ingredients)?parsed.ingredients:[];
+      scanRecipeName=(parsed.recipeName||'').trim();
+      if(!items.length)throw new Error('NOTHING_FOUND');
+    } else {
+      const firstBracket=raw.indexOf('['),lastBracket=raw.lastIndexOf(']');
+      if(firstBracket===-1||lastBracket===-1||lastBracket<=firstBracket)throw new Error('NOTHING_FOUND');
+      items=JSON.parse(raw.slice(firstBracket,lastBracket+1));
+      if(!Array.isArray(items)||!items.length)throw new Error('NOTHING_FOUND');
+    }
     scanResults=items.map(i=>({...i,selected:true,id:uid()}));
-    document.getElementById('scan-results').innerHTML=scanResults.map(i=>'<div class="scan-item"><input type="checkbox" class="scan-ck" id="sc-'+i.id+'" checked onchange="scanResults.find(r=>r.id===\''+i.id+'\').selected=this.checked"><label for="sc-'+i.id+'" style="flex:1;cursor:pointer"><div class="scan-nm">'+esc(i.name)+'</div></label><span class="scan-mt">'+ingQtyDisp(i)+'</span></div>').join('');
+    const nameRow=isRecipeMode?'<div class="scan-recipe-name"><label style="font-size:.68rem">Recipe Name</label><input type="text" id="scan-recipe-name-in" value="'+esc(scanRecipeName)+'" placeholder="Recipe name (not detected)"></div>':'';
+    document.getElementById('scan-results').innerHTML=nameRow+scanResults.map(i=>'<div class="scan-item"><input type="checkbox" class="scan-ck" id="sc-'+i.id+'" checked onchange="scanResults.find(r=>r.id===\''+i.id+'\').selected=this.checked"><label for="sc-'+i.id+'" style="flex:1;cursor:pointer"><div class="scan-nm">'+esc(i.name)+'</div></label><span class="scan-mt">'+ingQtyDisp(i)+'</span></div>').join('');
     showScanStep(3);
+    const confirmBtn=document.getElementById('scan-confirm-btn');
+    const hintEl=document.getElementById('scan-s4-hint');
+    if(isRecipeMode){
+      confirmBtn.textContent='Add to Recipe';
+      confirmBtn.setAttribute('onclick','addScannedIngredients()');
+      hintEl.textContent='Untick any ingredients you don\'t want to add. This will replace the current recipe form.';
+    } else {
+      confirmBtn.textContent='Add Selected to List';
+      confirmBtn.setAttribute('onclick','addScannedItems()');
+      hintEl.textContent='Untick any items you don\'t want to add';
+    }
   }catch(err){
     clearTimeout(timeoutId);
     console.error('Basket scan error:',err);
@@ -1133,6 +1175,20 @@ async function analyseImg(){
 }
 
 function addScannedItems(){const toAdd=scanResults.filter(i=>i.selected);if(!toAdd.length){toast('No items selected');return;}toAdd.forEach(i=>{const price=getPriceFromHistory(i.name)||0;mergeOrPush({id:uid(),name:i.name,qty:i.qty||1,unit:i.unit||'',cost:i.cost||price,ticked:false,source:'scan'},i.qty||1);});save();closeScanModal();switchToTab('shopping');toast('Added '+toAdd.length+' item'+(toAdd.length>1?'s':'')+' from image');}
+function addScannedIngredients(){
+  const toAdd=scanResults.filter(i=>i.selected);
+  if(!toAdd.length){toast('No ingredients selected');return;}
+  const nameInput=document.getElementById('scan-recipe-name-in');
+  const finalName=nameInput?nameInput.value.trim():scanRecipeName;
+  formIngs=toAdd.map(i=>({id:uid(),name:i.name,qty:i.qty||1,unit:i.unit||'',cost:i.cost||0}));
+  closeScanModal();
+  switchToTab('recipes');
+  setTimeout(()=>{
+    document.getElementById('r-name').value=finalName||'';
+    renderFormIngs();
+    toast('Recipe form filled from image \u2014 review and save');
+  },100);
+}
 
 const BSVG='<svg width="38" height="38" viewBox="0 0 32 32" fill="none"><path d="M9.5 14C9.5 7 22.5 7 22.5 14" stroke="#1E8E5A" stroke-width="2.2" stroke-linecap="round"/><path d="M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z" fill="rgba(30,142,90,.18)" stroke="#1E8E5A" stroke-width="1.9" stroke-linejoin="round"/><line x1="11" y1="14" x2="10" y2="28" stroke="#1E8E5A" stroke-width="1.2" stroke-opacity=".5"/><line x1="16" y1="14" x2="16" y2="28" stroke="#1E8E5A" stroke-width="1.2" stroke-opacity=".5"/><line x1="21" y1="14" x2="22" y2="28" stroke="#1E8E5A" stroke-width="1.2" stroke-opacity=".5"/><line x1="4.5" y1="19.5" x2="27.5" y2="19.5" stroke="#1E8E5A" stroke-width="1.2" stroke-opacity=".5"/><line x1="5.5" y1="24.5" x2="26.5" y2="24.5" stroke="#1E8E5A" stroke-width="1.2" stroke-opacity=".5"/></svg>';
 function downloadShopHTML(items,dateISO,total){
@@ -1224,7 +1280,6 @@ td{padding:7px 5px;border-bottom:1px solid #f0f0f0;font-size:.91rem;vertical-ali
 
 ['r-ing-name','r-ing-cost','r-ing-qty'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addIngToForm();}});});
 ['m-name','m-cost','m-qty'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addManual();}});});
-['st-name','st-cost'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addStaple();}});});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const t=e.target;if(t&&t.id&&t.id.startsWith('ein-n-')){e.preventDefault();addEditIng(t.id.replace('ein-n-',''));}});
 
 
@@ -1326,8 +1381,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.addEventListener('mouseup',obDragEnd);
 });
 
-function renderAll(){renderList();renderRecipes();renderStaples();renderHistory();renderSpend();renderSettings();loadBudgetToggle();}
-load();applyTheme();loadQuickEnter();loadBudgetToggle();loadObAlwaysToggle();
+function renderAll(){renderList();renderRecipes();renderHistory();renderSpend();renderSettings();loadBudgetToggle();loadUnitToggle();}
+load();applyTheme();loadQuickEnter();loadBudgetToggle();loadUnitToggle();loadObAlwaysToggle();
 if(shouldShowOnboarding())showOnboarding();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('SW registration failed:',err));}
 if(S.budget)document.getElementById('bud-in').value=S.budget;
