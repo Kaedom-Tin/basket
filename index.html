@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Basket v5.5.2</title>
+<title>Basket v5.5.3</title>
 <!-- PWA manifest -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1E8E5A">
@@ -907,7 +907,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 <header>
   <div class="hl">
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M9.5 14C9.5 7 22.5 7 22.5 14" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="1.9" stroke-linejoin="round"/><line x1="11" y1="14" x2="10" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="16" y1="14" x2="16" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="21" y1="14" x2="22" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="4.5" y1="19.5" x2="27.5" y2="19.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="5.5" y1="24.5" x2="26.5" y2="24.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/></svg>
-    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v5.5.2</div></div>
+    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v5.5.3</div></div>
   </div>
   <div class="hright"><div class="sync-ind"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Local</span></div><button class="tbtn" id="tbtn" onclick="cycleTheme()">Auto</button></div>
 </header>
@@ -1126,7 +1126,8 @@ function fbOK(){return FIREBASE_CONFIG.apiKey&&!FIREBASE_CONFIG.apiKey.includes(
 function isAllowed(user){if(!ALLOWED_EMAILS.length)return true;return ALLOWED_EMAILS.map(e=>e.toLowerCase()).includes((user.email||'').toLowerCase());}
 function setSyncUI(status,who){const dot=document.getElementById('sync-dot'),txt=document.getElementById('sync-txt');if(!dot)return;dot.className='sync-dot'+(status==='synced'?' synced':status==='syncing'?' syncing':status==='error'?' error':'');if(status==='synced'&&who){txt.textContent=who.name.split(' ')[0]+' \xb7 '+(who.time?timeAgo(who.time):'');}else{const l={local:'Local',syncing:'Syncing\u2026',synced:'Synced',error:'Sync error'};txt.textContent=l[status]||'Local';}}
 function pushToFirebase(){if(!fbOK()||!currentUser)return;setSyncUI('syncing');const{darkMode,...toSync}=S;if(currentUser)toSync.lastUpdatedBy={name:currentUser.displayName||currentUser.email,time:new Date().toISOString()};firebase.database().ref('basket').set(toSync).then(()=>{setSyncUI('synced');lastPush=Date.now();}).catch(()=>setSyncUI('error'));}
-function startDbListener(){setSyncUI('syncing');firebase.database().ref('basket').once('value').then(snap=>{const data=snap.val();if(data&&typeof data==='object'){const dm=S.darkMode;S={...S,...data,darkMode:dm};localStorage.setItem(KEY,JSON.stringify(S));renderAll();}setSyncUI('synced');}).catch(()=>setSyncUI('error'));firebase.database().ref('basket').on('value',snap=>{if(Date.now()-lastPush<2000)return;const data=snap.val();if(data&&typeof data==='object'){const dm=S.darkMode;S={...S,...data,darkMode:dm};localStorage.setItem(KEY,JSON.stringify(S));renderAll();setSyncUI('synced',data.lastUpdatedBy&&data.lastUpdatedBy.name!==currentUser?.displayName?data.lastUpdatedBy:null);}});}
+function sanitizeSync(data){['recipes','staples','list','history'].forEach(k=>{if(Array.isArray(data[k]))data[k]=data[k].filter(Boolean);});return data;}
+function startDbListener(){setSyncUI('syncing');firebase.database().ref('basket').once('value').then(snap=>{const data=snap.val();if(data&&typeof data==='object'){sanitizeSync(data);const dm=S.darkMode;S={...S,...data,darkMode:dm};localStorage.setItem(KEY,JSON.stringify(S));renderAll();}setSyncUI('synced');}).catch(()=>setSyncUI('error'));firebase.database().ref('basket').on('value',snap=>{if(Date.now()-lastPush<2000)return;const data=snap.val();if(data&&typeof data==='object'){sanitizeSync(data);const dm=S.darkMode;S={...S,...data,darkMode:dm};localStorage.setItem(KEY,JSON.stringify(S));renderAll();setSyncUI('synced',data.lastUpdatedBy&&data.lastUpdatedBy.name!==currentUser?.displayName?data.lastUpdatedBy:null);}});}
 function initFirebase(){if(!fbOK()){setSyncUI('local');setTimeout(focusItemName,300);return;}firebase.initializeApp(FIREBASE_CONFIG);firebase.auth().onAuthStateChanged(user=>{if(user){if(!isAllowed(user)){document.getElementById('auth-err').textContent=user.email+' is not authorised. Contact the app owner.';firebase.auth().signOut();return;}currentUser=user;document.getElementById('auth-ov').style.display='none';startDbListener();renderSettings();if(quickEnter)setTimeout(focusItemName,300);}else{currentUser=null;try{firebase.database().ref('basket').off();}catch(e){}setSyncUI('local');if(fbOK()){document.getElementById('auth-ov').style.display='';}renderSettings();}});}
 function signIn(){const p=new firebase.auth.GoogleAuthProvider();firebase.auth().signInWithPopup(p).catch(err=>{document.getElementById('auth-err').textContent='Sign-in failed: '+err.message;});}
 function signOut(){firebase.auth().signOut().then(()=>{document.getElementById('auth-ov').style.display='';});}
