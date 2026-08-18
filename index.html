@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Basket v5.5.3</title>
+<title>Basket v5.5.5</title>
 <!-- PWA manifest -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1E8E5A">
@@ -907,7 +907,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 <header>
   <div class="hl">
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M9.5 14C9.5 7 22.5 7 22.5 14" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="1.9" stroke-linejoin="round"/><line x1="11" y1="14" x2="10" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="16" y1="14" x2="16" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="21" y1="14" x2="22" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="4.5" y1="19.5" x2="27.5" y2="19.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="5.5" y1="24.5" x2="26.5" y2="24.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/></svg>
-    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v5.5.3</div></div>
+    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v5.5.5</div></div>
   </div>
   <div class="hright"><div class="sync-ind"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Local</span></div><button class="tbtn" id="tbtn" onclick="cycleTheme()">Auto</button></div>
 </header>
@@ -1144,9 +1144,9 @@ function saveForUndo(){undoData=JSON.parse(JSON.stringify(S.list));}
 function doUndo(){if(!undoData)return;S.list=undoData;undoData=null;clearTimeout(toastT);document.getElementById('toast').classList.remove('show');save();renderList();toast('Undone \u2713');}
 
 function getPriceFromHistory(name){if(!name||name.length<2)return null;const nl=name.toLowerCase().trim();for(const entry of S.history){const found=entry.items.find(i=>i.name.toLowerCase()===nl);if(found&&found.cost>0)return found.cost;}return null;}
-function findMerge(name,cost){return S.list.find(i=>i.name.toLowerCase()===name.toLowerCase()&&(i.cost||0)===(cost||0)&&!i.ticked);}
+function findMerge(name,cost,unit){return S.list.find(i=>i.name.toLowerCase()===name.toLowerCase()&&(i.cost||0)===(cost||0)&&(i.unit||'')===(unit||'')&&!i.ticked);}
 /* mergeOrPush: merges qty into existing unticked item with same name+cost, or pushes new. Returns true if merged. */
-function mergeOrPush(item,addQty){const ex=findMerge(item.name,item.cost);if(ex){ex.qty=Math.round(((ex.qty||0)+(addQty||item.qty||1))*100)/100;return true;}S.list.unshift(item);return false;}
+function mergeOrPush(item,addQty){const ex=findMerge(item.name,item.cost,item.unit);if(ex){ex.qty=Math.round(((ex.qty||0)+(addQty||item.qty||1))*100)/100;return true;}S.list.unshift(item);return false;}
 
 function saveBudget(){S.budget=parseFloat(document.getElementById('bud-in').value)||null;save();renderBudget();}
 function renderBudget(){const wrap=document.getElementById('budwrap');if(!wrap)return;const total=S.list.reduce((s,i)=>s+lt(i),0);if(!S.budget){wrap.style.display='none';return;}wrap.style.display='block';const pct=Math.min((total/S.budget)*100,100),fill=document.getElementById('budfill');fill.style.width=pct+'%';fill.style.background=pct<70?'var(--gmd)':pct<100?'var(--amb)':'var(--err)';document.getElementById('budspent').textContent=fmt(total)+' spent';const rem=S.budget-total,el=document.getElementById('budleft');el.textContent=rem>=0?fmt(rem)+' remaining':fmt(Math.abs(rem))+' over budget';el.style.color=rem<0?'var(--err)':'var(--mid)';}
@@ -1169,7 +1169,7 @@ function scrollCardIntoView(fieldId){
 
 document.addEventListener('DOMContentLoaded',()=>{const mn=document.getElementById('m-name');if(mn)mn.addEventListener('input',function(){clearTimeout(pmTimer);pmTimer=setTimeout(()=>{if(document.getElementById('m-cost').value)return;const p=getPriceFromHistory(this.value);if(p!==null)document.getElementById('m-cost').value=p.toFixed(2);},350);});});
 
-function addManual(){const name=document.getElementById('m-name').value.trim();const qty=clampQty(parseFloat(document.getElementById('m-qty').value)||0);const unit=document.getElementById('m-unit').value||'each';const cost=parseFloat(document.getElementById('m-cost').value)||0;if(!name){toast('Enter an item name');return;}S.list.unshift({id:uid(),name,qty,unit,cost,ticked:false,source:'manual'});document.getElementById('m-name').value='';document.getElementById('m-qty').value='';document.getElementById('m-cost').value='';buildUnitSel('m-unit','each');save();renderList();toast('"'+name+'" added');if(quickEnter)setTimeout(focusItemName,50);else document.getElementById('m-name').focus();}
+function addManual(){const name=document.getElementById('m-name').value.trim();const qty=clampQty(parseFloat(document.getElementById('m-qty').value)||0);const unit=document.getElementById('m-unit').value||'each';const cost=parseFloat(document.getElementById('m-cost').value)||0;if(!name){toast('Enter an item name');return;}mergeOrPush({id:uid(),name,qty,unit,cost,ticked:false,source:'manual'},qty);document.getElementById('m-name').value='';document.getElementById('m-qty').value='';document.getElementById('m-cost').value='';buildUnitSel('m-unit','each');save();renderList();toast('"'+name+'" added');if(quickEnter)setTimeout(focusItemName,50);else document.getElementById('m-name').focus();}
 function removeItem(id){saveForUndo();S.list=S.list.filter(i=>i.id!==id);openItemId=null;save();renderList();toast('Item removed',true);}
 function tickItem(id){const it=S.list.find(i=>i.id===id);if(it)it.ticked=!it.ticked;save();renderList();}
 function chgQty(id,d){const it=S.list.find(i=>i.id===id);if(it){const nq=Math.round(((it.qty||0)+d)*10)/10;it.qty=clampQty(nq);save();renderList();}}
@@ -1185,7 +1185,7 @@ function completeShop(){
   if(!confirm('Have you finished your shop?'))return;
   const now=new Date().toISOString();
   [...new Set(S.list.map(i=>i.recipeId).filter(Boolean))].forEach(rid=>{const r=S.recipes.find(r=>r.id===rid);if(r)r.lastSavedToShop=now;});
-  const itemsToSave=S.list.filter(i=>i.qty>0);
+  const itemsToSave=S.list;
   const total=itemsToSave.reduce((s,i)=>s+lt(i),0);
   S.history.unshift({id:uid(),date:now,items:itemsToSave.map(i=>({...i})),total});
   S.list=[];openItemId=null;save();renderList();renderHistory();renderSpend();toast('Shop saved & downloaded! \uD83C\uDF89');
@@ -1394,7 +1394,7 @@ function printHist(id){
   downloadShopHTML(entry.items,entry.date,entry.total);
 }
 function deleteHist(id){if(!confirm('Delete this history entry?'))return;S.history=S.history.filter(h=>h.id!==id);openHistId=null;save();renderHistory();renderSpend();toast('History entry deleted');}
-function reloadShop(id){const entry=S.history.find(h=>h.id===id);if(!entry||!entry.items||!entry.items.length)return;if(!confirm('Add '+entry.items.length+' items from this shop to your current list?'))return;saveForUndo();let added=0,merged=0;entry.items.forEach(item=>{const merged_=mergeOrPush({id:uid(),name:item.name,qty:item.qty||1,unit:item.unit||'',cost:item.cost||0,ticked:false,source:item.source||'manual',recipeId:item.recipeId||null},item.qty||1);if(merged_)merged++;else added++;});save();switchToTab('shopping');toast('Loaded '+(added+merged)+' items from past shop',true);}
+function reloadShop(id){const entry=S.history.find(h=>h.id===id);if(!entry)return;if(!entry.items||!entry.items.length){toast('No items recorded in this shop');return;}if(!confirm('Add '+entry.items.length+' items from this shop to your current list?'))return;saveForUndo();let added=0,merged=0;entry.items.forEach(item=>{const merged_=mergeOrPush({id:uid(),name:item.name,qty:item.qty||1,unit:item.unit||'',cost:item.cost||0,ticked:false,source:item.source||'manual',recipeId:item.recipeId||null},item.qty||1);if(merged_)merged++;else added++;});save();switchToTab('shopping');toast('Loaded '+(added+merged)+' items from past shop',true);}
 function renderHistory(){
   const c=document.getElementById('history-cont');
   if(!S.history.length){c.innerHTML='<div class="empty"><div class="ei">\uD83D\uDCC5</div><div class="et">No history yet.<br>Complete a shop to save it here.</div></div>';return;}
