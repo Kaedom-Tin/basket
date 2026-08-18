@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Basket v4.50</title>
+<title>Basket v5.5.2</title>
 <!-- PWA manifest -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1E8E5A">
@@ -117,7 +117,7 @@ nav::-webkit-scrollbar{display:none}
 .nb{padding:10px 13px;border:none;background:none;font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:500;color:var(--mid);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:color .2s,background .2s,border-color .2s;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:56px;flex:1}
 .nb svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .nb.active{color:var(--gdk);border-bottom-color:var(--gdk)}
-.nb:hover:not(.active){color:var(--tx);background:var(--glt)}
+@media (hover:hover) and (pointer:fine){.nb:hover:not(.active){color:var(--tx);background:var(--glt)}}
 .nbd{display:inline-flex;align-items:center;justify-content:center;background:var(--amb);color:#fff;font-size:.62rem;font-weight:700;min-width:16px;height:16px;padding:0 4px;border-radius:20px;margin-left:2px}
 main{max-width:760px;margin:0 auto;padding:20px 13px 80px}
 .tab{display:none;animation:fu .22s ease}.tab.active{display:block}
@@ -370,116 +370,159 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 .ob-gotit:not(.enabled){cursor:not-allowed}
 .ob-gotit.enabled:hover{filter:brightness(1.08)}
 
-/* Slide 1 stage — continuous single-timeline animation, no cuts
-   Cycle: 8.5s total
-   M1 camera alone           0.00-1.00s  (0.00-11.76%)
-   M2 note slides in         1.00-2.50s  (11.76-29.41%)
-   M3 flash on note          2.50-3.50s  (29.41-41.18%)
-   M4 note fades / list in   3.50-5.50s  (41.18-64.71%)
-   M5 zoom+pan+type+add      5.50-8.00s  (64.71-94.12%)
-   M6 exit left / cam in     8.00-8.50s  (94.12-100%)
+/* Slide 1 stage — positioned on a 3x3 grid (Top/Mid/Bot x Left/Center/Right)
+   over a 280x210 stage. Grid centers: cols L=47 C=140 R=233, rows T=35 M=105 B=175.
+   Timeline: 13.1s total across 6 moments.
+   M1 0.00-0.50s (0-3.83%)      Camera alone, mid-left
+   M2 0.50-1.25s (3.83-9.57%)   Note slides in from off-right to mid-right
+   M3 1.25-2.25s (9.57-17.22%)  Flash on note; list pre-staged off-bottom-right
+   M4 2.25-4.25s (17.22-32.52%) Note fades in place; list slides vertically from
+                                 off-bottom-right up to mid-right, arriving early
+                                 (~24.9%) for a settled pause before M5; add card staged
+   M5 4.25-12.57s (32.52-96.17%) Restructured to be fully SEQUENTIAL rather than
+                                 overlapping: zoom+scroll travels for 4s and completes
+                                 fully (list settled on Bread) BEFORE typing begins.
+                                 Sub-sequence: scroll completes at 63.14% -> brief pause
+                                 -> typing begins 65.43% -> Banana appears, button pulses, and text clears simultaneously at 83.45% ->
+                                 button pulses ~83-84% -> settle buffer -> M5 ends 96.17%.
+                                 Add card arrival (matched to list's M4 speed) also
+                                 completes before typing starts.
+   M6 12.57-13.1s (96.17-100%)  List+Add card exit left together; camera re-enters from
+                                 right to its exact M1 starting position (mid-left)
 
-   Rule: every element is 100% opacity the instant any part is on-screen,
-   and stays 100% opacity while sliding fully off-screen — NO fade in/out
-   on slide transitions. Only 3 exceptions animate opacity:
-   the handwritten note (fades out in M4), the flash overlay, and the Add button pulse.
+   Opacity rule: every element is 100% opaque the instant any part is on-screen, and
+   stays 100% while sliding off-screen. Only 3 exceptions animate opacity: the note's
+   fade in M4, the flash overlay, and the Add button pulse.
 */
 .ob-mock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .ob-mock-inner{position:relative;width:280px;height:210px}
-.ob-stage-zoom{position:absolute;inset:0;animation:obStageZoom 8.5s ease-in-out infinite;transform-origin:30% 15%}
+.ob-stage-zoom{position:absolute;inset:0;animation:obStageZoom 12.1s ease-in-out infinite;transform-origin:30% 15%}
 
-/* Camera: visible M1-M4 (fully opaque, no fade), the zoom+pan itself carries it off in M5, re-enters M6 */
-.ob-cam-icon{position:absolute;width:60px;height:60px;border-radius:15px;background:var(--add-bg);border:2px solid var(--add-bdr);display:flex;align-items:center;justify-content:center;left:14px;top:75px;animation:obCamPos 8.5s ease-in-out infinite}
-.ob-cam-icon svg{width:28px;height:28px;stroke:var(--add-accent);fill:none;stroke-width:1.8}
+/* Camera: 60x60. Mid-left center (47,105) -> left:17px top:75px */
+.ob-cam-icon{position:absolute;width:93.6px;height:93.6px;left:.2px;top:58.2px;border-radius:20px;background:var(--add-bg);border:2px solid var(--add-bdr);display:flex;align-items:center;justify-content:center;animation:obCamPos 12.1s ease-in-out infinite}
+.ob-cam-icon svg{width:42.9px;height:42.9px;stroke:var(--add-accent);fill:none;stroke-width:1.8}
 
-/* Handwritten note — the ONE element allowed to fade (M4 exit) */
-.ob-note{position:absolute;width:130px;background:#FFFDF6;border:1.5px solid var(--bdr);border-radius:8px;padding:12px 11px;box-shadow:var(--sh);left:130px;top:52px;animation:obNotePos 8.5s ease-in-out infinite}
-.ob-note-flash{position:absolute;inset:-4px;background:#F2F2F2;border-radius:10px;opacity:0;animation:obFlash 8.5s ease-in-out infinite;pointer-events:none}
+/* Note: 130 wide, ~90 tall. Mid-right center (233,105) -> left:168px top:60px.
+   Off-screen-right staging position: left:290px (fully clear of 280px stage) */
+.ob-note{position:absolute;width:97.5px;left:172.5px;top:58.2px;background:#FFFDF6;border:1.5px solid var(--bdr);border-radius:8px;padding:10px 9px;box-shadow:var(--sh);animation:obNotePos 12.1s ease-in-out infinite}
+.ob-note-flash{position:absolute;inset:-4px;background:#FFFFFF;border-radius:10px;opacity:0;animation:obFlash 12.1s ease-in-out infinite;pointer-events:none}
+.ob-scan-beam{position:absolute;left:-4px;right:-4px;height:3px;background:#E0453D;box-shadow:0 0 8px 2px rgba(224,69,61,.7),0 0 2px rgba(224,69,61,.9);opacity:0;animation:obScanBeam 12.1s ease-in-out infinite;pointer-events:none}
 .ob-note-line{font-family:'Segoe Script','Brush Script MT',cursive;font-size:1.05rem;color:#2a2a2a;line-height:1.3;opacity:.85;white-space:nowrap}
 
-/* List viewport — fixed-height crop window so items visually scroll off the top */
-.ob-list-viewport{position:absolute;width:220px;left:30px;top:10px;height:130px;overflow:hidden}
-.ob-mini-list{position:absolute;width:220px;left:0;top:0;display:flex;flex-direction:column;gap:6px;animation:obListSlideIn 8.5s ease-in-out infinite}
-.ob-mini-list-scroll{display:flex;flex-direction:column;gap:6px;animation:obListScroll 8.5s ease-in-out infinite}
+/* List viewport: 220 wide, 130 tall crop window. Mid-right center (233,105) -> left:78px top:40px.
+   Off-bottom-right staging: same left:78px (pure vertical travel, no horizontal),
+   top pushed below the stage (top:230px) so it enters climbing straight up. */
+.ob-list-viewport{position:absolute;width:110px;left:165px;animation:obListPos 12.1s ease-in-out infinite}
+.ob-list-crop{width:110px;overflow:hidden;animation:obListHeight 12.1s ease-in-out infinite}
+.ob-mini-list{position:absolute;width:110px;left:0;top:0;display:flex;flex-direction:column;gap:6px;animation:obListScroll 12.1s ease-in-out infinite}
 .ob-mini-item{background:var(--surf);border:1.5px solid var(--bdr);border-radius:9px;padding:8px 10px;display:flex;align-items:center;gap:7px;box-shadow:var(--sh);font-size:.78rem;font-weight:600;color:var(--tx);flex-shrink:0}
 .ob-mini-ck{width:13px;height:13px;border:1.5px solid var(--bdr);border-radius:4px;flex-shrink:0}
-.ob-mini-item.i4{animation:obItem4 8.5s ease infinite}
+.ob-mini-item.i4{animation:obItem4 12.1s ease infinite}
 
-.ob-add-card{position:absolute;width:220px;left:30px;top:150px;background:var(--add-bg);border:1.5px solid var(--add-bdr);border-radius:10px;padding:10px 12px;box-shadow:var(--sh);animation:obAddCardPos 8.5s ease-in-out infinite}
-.ob-add-input{background:rgba(255,255,255,.7);border:1.3px solid var(--add-bdr);border-radius:6px;height:26px;margin-bottom:8px;position:relative;overflow:hidden}
-.ob-add-input-txt{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.72rem;color:var(--tx);font-weight:600;white-space:nowrap;width:0;overflow:hidden;animation:obType 8.5s ease-in-out infinite}
-.ob-add-btn{background:var(--gdk);color:#fff;font-size:.72rem;font-weight:700;text-align:center;border-radius:6px;padding:5px 0;opacity:.4;animation:obBtnPulse 8.5s ease-in-out infinite}
+/* Add card: 220 wide. Sits directly below the list viewport once revealed;
+   staged off-bottom during M1-M4 (top pushed below stage). */
+.ob-add-card{position:absolute;width:110px;left:165px;top:340px;background:var(--add-bg);border:1.5px solid var(--add-bdr);border-radius:8px;padding:8px 10px;box-shadow:var(--sh);animation:obAddCardPos 12.1s ease-in-out infinite}
+.ob-add-input{background:rgba(255,255,255,.7);border:1.3px solid var(--add-bdr);border-radius:5px;height:21px;margin-bottom:6px;position:relative;overflow:hidden}
+.ob-add-input-txt{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.72rem;color:var(--tx);font-weight:600;white-space:nowrap;width:0;overflow:hidden;animation:obType 12.1s ease-in-out infinite}
+.ob-add-btn{background:var(--gdk);color:#fff;font-size:.72rem;font-weight:700;text-align:center;border-radius:6px;padding:5px 0;opacity:.4;animation:obBtnPulse 12.1s ease-in-out infinite}
 
-/* ── Zoom+pan for M5: scales+shifts the whole stage down-right, carrying the camera off-frame
-   and revealing the Add card beneath the list ── */
+/* ── Stage zoom+pan (M5 only): scales and shifts the whole stage to reveal
+   the Add card below the list, while carrying the camera off-frame top-left ── */
 @keyframes obStageZoom{
-  0%,64.71%{transform:scale(1) translate(0,0)}
-  80%,90%{transform:scale(1.55) translate(-38px,-58px)}
-  94.12%,100%{transform:scale(1) translate(0,0)}
+  0%,35.21%{transform:scale(1) translate(0,0)}
+  43.31%,60.09%{transform:scale(1.4) translate(-80px,-72px)}
+  95.85%,100%{transform:scale(1) translate(0,0)}
 }
 
-/* Camera: fully opaque and static M1-M4 (no fade). Carried off-frame by the stage zoom in M5.
-   Re-appears (opacity flip, no slide) only once M6 begins, already back in position. */
+/* ── Camera: ON at mid-left for M1-M4 (static, no fade). During M5 the camera
+   travels via its OWN position keyframe to off-top-left, simultaneously with
+   the stage zoom (both effects compound). Re-enters from the right in M6,
+   sliding back to the exact M1 resting position (17,75) for a seamless loop. ── */
 @keyframes obCamPos{
-  0%,64.71%{opacity:1}
-  64.72%,94.11%{opacity:0}
-  94.12%,100%{opacity:1}
+  0%,32.48%{opacity:1;left:.2px;top:58.2px}
+  35.21%{opacity:1;left:.2px;top:-103.6px}
+  35.22%,60.09%{opacity:0;left:.2px;top:-103.6px}
+  95.84%{opacity:0;left:310px;top:58.2px}
+  95.85%{opacity:1;left:310px;top:58.2px}
+  100%{opacity:1;left:.2px;top:58.2px}
 }
 
-/* Note: slides in fully opaque from the right (M2), sits still through flash (M3),
-   THEN fades out in place as list arrives (M4) — this is the one permitted fade */
+/* ── Note: stages off-right (M1), slides horizontally to mid-right (M2),
+   holds through the flash (M3), then FADES OUT IN PLACE during M4
+   (opacity only — this is the one permitted fade transition) ── */
 @keyframes obNotePos{
-  0%,11.76%{opacity:1;transform:translateX(60px) rotate(-2deg)}
-  20%,41.18%{opacity:1;transform:translateX(0) rotate(-2deg)}
-  58%,64.71%{opacity:0;transform:translateX(0) rotate(-2deg)}
-  100%{opacity:0;transform:translateX(0) rotate(-2deg)}
+  0%,3.17%{opacity:1;left:290px}
+  7.04%,18.64%{opacity:1;left:172.5px}
+  26.94%,35.21%{opacity:0;left:172.5px}
+  100%{opacity:0;left:172.5px}
 }
 @keyframes obFlash{
-  0%,28%{opacity:0}
-  33%{opacity:.85}
-  38%,100%{opacity:0}
+  0%,11.5%{opacity:0}
+  12.5%{opacity:.95}
+  18%,100%{opacity:0}
+}
+@keyframes obScanBeam{
+  0%,12.49%{opacity:0;top:-4px}
+  12.5%{opacity:1;top:-4px}
+  17.5%{opacity:1;top:90px}
+  18.5%,100%{opacity:0;top:90px}
 }
 
-/* List (outer slide-in wrapper): fully opaque, slides in from right in M4, slides fully off-screen left in M6 */
-@keyframes obListSlideIn{
-  0%,41.18%{transform:translateX(60px)}
-  50%,94.11%{transform:translateX(0)}
-  100%{transform:translateX(-60px)}
+/* ── List viewport: pre-staged off-bottom-right during M1-M3 (top:230px,
+   same left:78px throughout — pure vertical travel, no horizontal motion).
+   Slides straight up to mid-right during M4. Holds through M5's internal
+   scroll (handled by obListScroll on the child). Exits left together with
+   the Add card in M6. ── */
+@keyframes obListPos{
+  0%,18.64%{opacity:1;left:165px;top:340px}
+  26.94%,95.85%{opacity:1;left:165px;top:53px}
+  98%,100%{opacity:1;left:-140px;top:53px}
 }
-/* Inner scroll: shifts the item stack UP inside the cropped viewport during M5,
-   so Milk/Eggs visually scroll off the top and only Bread (+ new Bananas) remain visible */
+/* Inner scroll: shifts the item stack UP inside the cropped viewport during
+   M5, so Milk/Eggs scroll off the top and only Bread (+ new Banana) remain */
 @keyframes obListScroll{
-  0%,64.71%{transform:translateY(0)}
-  82%,94.11%{transform:translateY(-76px)}
-  100%{transform:translateY(0)}
+  0%,35.21%{transform:translateY(0)}
+  51.65%,93.99%{transform:translateY(-76px)}
+  94%,100%{transform:translateY(0)}
 }
-/* Bananas — 4th item, does not exist until M5 typing completes, then opaque immediately (no fade) */
+@keyframes obListHeight{
+  0%,93.99%{height:120px}
+  94%,100%{height:154px}
+}
+/* Banana — 4th item, appears simultaneously with the button tap and text-clear at 83.45% */
 @keyframes obItem4{
-  0%,85%{opacity:0}
-  85.1%,100%{opacity:1}
+  0%,82.07%{opacity:0}
+  82.08%,100%{opacity:1}
 }
 
-/* Add card: fully opaque throughout, sits below the fold until the scroll+zoom reveals it,
-   slides fully off-screen left together with the list in M6 */
+/* ── Add card: staged off-bottom (top:230px) through M4. Revealed by the
+   zoom+scroll in M5 (rises into view below the list). Exits left together
+   with the list in M6. ── */
 @keyframes obAddCardPos{
-  0%,94.11%{transform:translateX(0)}
-  100%{transform:translateX(-60px)}
+  0%,35.21%{opacity:1;left:165px;top:340px}
+  57.61%,95.85%{opacity:1;left:165px;top:137px}
+  98%,100%{opacity:1;left:-140px;top:137px}
 }
 @keyframes obType{
-  0%,74%{width:0}
-  81%,100%{width:66px}
+  0%,62.57%{width:0}
+  74.84%,82.07%{width:66px}
+  82.08%,100%{width:0}
 }
 @keyframes obBtnPulse{
-  0%,81%{opacity:.4;transform:scale(1)}
-  83.5%{opacity:1;transform:scale(1.05)}
-  86%,100%{opacity:1;transform:scale(1)}
+  0%,82.07%{opacity:.4;transform:scale(1)}
+  82.08%{opacity:1;transform:scale(1.05)}
+  82.68%,83.76%{opacity:1;transform:scale(1)}
+  84.84%,100%{opacity:.4;transform:scale(1)}
 }
 
 @media(prefers-reduced-motion:reduce){
-  .ob-stage-zoom,.ob-cam-icon,.ob-note,.ob-note-flash,.ob-mini-list,.ob-mini-list-scroll,.ob-mini-item,.ob-add-card,.ob-add-input-txt,.ob-add-btn{animation:none!important}
-  .ob-cam-icon{opacity:1}
-  .ob-note,.ob-mini-list,.ob-add-card{opacity:0}
+  .ob-stage-zoom,.ob-cam-icon,.ob-note,.ob-note-flash,.ob-scan-beam,.ob-list-viewport,.ob-list-crop,.ob-mini-list,.ob-mini-item,.ob-add-card,.ob-add-input-txt,.ob-add-btn{animation:none!important}
+  .ob-cam-icon{left:17px;top:75px;opacity:1}
+  .ob-note,.ob-list-viewport,.ob-add-card,.ob-scan-beam{opacity:0}
   .ob-note-flash{opacity:0}
+  .ob2-recipe-card,.ob2-recipe-btn,.ob2-chip{animation:none!important}
+  .ob2-recipe-card,.ob2-recipe-btn{opacity:1}
+  .ob2-chip{opacity:0}
 }
 
 
@@ -496,6 +539,244 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 @media(prefers-reduced-motion:no-preference){
   .basket-rock{animation:rock 1.8s ease-in-out infinite}
 }
+
+/* ═══════════════════════════════════════════════
+   SLIDE 3 — Two phones, live sync (Milk added left/pink, Eggs added right/blue)
+   Stage: 280x210. Timeline: 7.1s total.
+   Left phone: left=10,top=6,w=124,h=198 | Right phone: left=146,top=6,w=124,h=198
+   M1 0.00-0.80s (0-11.27%)     Both phones at rest, empty list
+   M2 0.80-1.80s (11.27-25.35%) Left: Milk typed + added, pink tag
+   M3 1.80-2.50s (25.35-35.21%) Milk syncs to right phone, pink pulse on arrival
+   M4 2.50-3.50s (35.21-49.30%) Right: Eggs typed + added, blue tag
+   M5 3.50-4.20s (49.30-59.15%) Eggs syncs to left phone, blue pulse on arrival
+   M6 4.20-5.00s (59.15-70.42%) Both items ticked on left phone
+   M7 5.00-5.70s (70.42-80.28%) Complete tapped on left, left list clears
+   M8 5.70-6.30s (80.28-88.73%) Right list clears too (completion syncs)
+   M9 6.30-7.10s (88.73-100%)   Hold on empty synced state, resets to M1
+   ═══════════════════════════════════════════════ */
+.ob3-mock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ob3-mock-inner{position:relative;width:280px;height:210px}
+
+.ob3-phone{position:absolute;top:6px;width:124px;height:198px;border:2px solid var(--bdr);border-radius:14px;background:var(--surf);box-shadow:var(--sh);padding:8px}
+.ob3-phone.left{left:10px}
+.ob3-phone.right{left:146px}
+
+.ob3-add{position:absolute;left:8px;width:104px;height:18px;background:var(--surf2);border:1.3px solid var(--bdr);border-radius:5px}
+
+.ob3-item{position:absolute;left:8px;width:104px;height:20px;background:var(--surf);border:1.5px solid var(--bdr);border-radius:6px;display:flex;align-items:center;padding:0 7px;gap:5px;font-size:.62rem;font-weight:600;color:var(--tx);opacity:0}
+.ob3-item-ck{width:10px;height:10px;border:1.3px solid var(--bdr);border-radius:3px;flex-shrink:0;background:var(--surf)}
+.ob3-item-ck.checked{background:var(--gdk);border-color:var(--gdk)}
+
+.ob3-add-btn{position:absolute;left:8px;top:85px;width:104px;height:18px;background:linear-gradient(135deg,var(--complete-start),var(--complete-end));color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:700}
+.ob3-complete{position:absolute;left:8px;top:108px;width:104px;height:20px;background:var(--bdr);border:2px solid var(--bdr);color:var(--lgt);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700}
+.ob3-complete.active{background:linear-gradient(135deg,var(--complete-start),var(--complete-end));border-color:var(--complete-border);color:#fff}
+
+/* Pink/blue pulse ring shown briefly on sync arrival */
+.ob3-item.tag-pink{border-color:#E85D96;background:rgba(232,93,150,.08)}
+.ob3-item.tag-blue{border-color:#4A90E2;background:rgba(74,144,226,.08)}
+
+/* All Slide 3 animated elements only start once .ob3-active is added */
+.ob3-active .ob3-milk-left{animation:ob3MilkLeft 9.5s ease-in-out infinite}
+.ob3-active .ob3-milk-right{animation:ob3MilkRight 9.5s ease-in-out infinite}
+.ob3-active .ob3-eggs-right{animation:ob3EggsRight 9.5s ease-in-out infinite}
+.ob3-active .ob3-eggs-left{animation:ob3EggsLeft 9.5s ease-in-out infinite}
+.ob3-active .ob3-complete-left{animation:ob3CompleteLeftBtn 9.5s ease-in-out infinite,ob3CompleteActiveLeft 9.5s ease-in-out infinite}
+.ob3-active .ob3-complete-right{animation:ob3CompleteActiveRight 9.5s ease-in-out infinite}
+.ob3-active .ob3-check1{animation:ob3Check1 9.5s ease-in-out infinite}
+.ob3-active .ob3-check2{animation:ob3Check2 9.5s ease-in-out infinite}
+.ob3-active .ob3-add-type-left{animation:ob3TypeLeft 9.5s ease-in-out infinite}
+.ob3-active .ob3-add-type-right{animation:ob3TypeRight 9.5s ease-in-out infinite}
+.ob3-active .ob3-addbtn-left{animation:ob3AddBtnLeft 9.5s ease-in-out infinite}
+.ob3-active .ob3-addbtn-right{animation:ob3AddBtnRight 9.5s ease-in-out infinite}
+
+/* Typed text preview inside the add field (shows "Milk"/"Eggs" briefly while typing) */
+.ob3-add-txt{position:absolute;left:6px;top:2px;font-size:.6rem;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;width:0}
+
+/* ── Left phone: Milk item (appears M2, stays through M7 clear) ── */
+@keyframes ob3MilkLeft{
+  0%,19.99%{opacity:0;top:36px;transform:scale(.85)}
+  22.5%,74.5%{opacity:1;top:36px;transform:scale(1)}
+  75.5%{opacity:1;top:36px;transform:scale(1.06)}
+  77%,87.36%{opacity:1;top:36px;transform:scale(1)}
+  87.37%,100%{opacity:0;top:36px;transform:scale(1)}
+}
+/* ── Right phone: Milk item (syncs in at M3, stays through M8 clear) ── */
+@keyframes ob3MilkRight{
+  0%,29.46%{opacity:0;top:36px;transform:translateX(-136px) scale(.8)}
+  32%,95.78%{opacity:1;top:36px;transform:translateX(0) scale(1)}
+  95.79%,100%{opacity:0;top:36px;transform:translateX(0) scale(1)}
+}
+/* ── Right phone: Eggs item (appears M4, stays through M8 clear) ── */
+@keyframes ob3EggsRight{
+  0%,53.67%{opacity:0;top:61px;transform:scale(.85)}
+  56.18%,95.78%{opacity:1;top:61px;transform:scale(1)}
+  95.79%,100%{opacity:0;top:61px;transform:scale(1)}
+}
+/* ── Left phone: Eggs item (syncs in at M5, stays through M7 clear) ── */
+@keyframes ob3EggsLeft{
+  0%,63.15%{opacity:0;top:61px;transform:translateX(136px) scale(.8)}
+  65.66%,80.76%{opacity:1;top:61px;transform:translateX(0) scale(1)}
+  81.76%{opacity:1;top:61px;transform:translateX(0) scale(1.06)}
+  83.26%,87.36%{opacity:1;top:61px;transform:translateX(0) scale(1)}
+  87.37%,100%{opacity:0;top:61px;transform:translateX(0) scale(1)}
+}
+
+/* ── Checkboxes tick during M6 ── */
+@keyframes ob3Check1{
+  0%,74.73%{background:var(--surf);border-color:var(--bdr)}
+  74.74%,87.36%{background:var(--gdk);border-color:var(--gdk)}
+  87.37%,100%{background:var(--surf);border-color:var(--bdr)}
+}
+@keyframes ob3Check2{
+  0%,79.99%{background:var(--surf);border-color:var(--bdr)}
+  80.0%,87.36%{background:var(--gdk);border-color:var(--gdk)}
+  87.37%,100%{background:var(--surf);border-color:var(--bdr)}
+}
+
+
+/* ── Complete button tap pulse on left phone (M7) ── */
+@keyframes ob3CompleteLeftBtn{
+  0%,85.25%{transform:scale(1)}
+  87.37%{transform:scale(.95)}
+  89.47%,100%{transform:scale(1)}
+}
+
+/* ── Typed-text preview: brief flash of "Milk"/"Eggs" width in the add field ── */
+@keyframes ob3TypeLeft{
+  0%,3.15%{width:0}
+  15.79%,19.99%{width:22px}
+  20.0%,100%{width:0}
+}
+@keyframes ob3TypeRight{
+  0%,34.73%{width:0}
+  49.47%,53.67%{width:22px}
+  53.68%,100%{width:0}
+}
+/* ── Add button tap pulses — fire right after the typed text clears, just before the item appears ── */
+@keyframes ob3AddBtnLeft{
+  0%,17.88%{transform:scale(1);opacity:.85}
+  20.0%{transform:scale(.93);opacity:1}
+  22.11%,100%{transform:scale(1);opacity:.85}
+}
+@keyframes ob3AddBtnRight{
+  0%,51.57%{transform:scale(1);opacity:.85}
+  53.68%{transform:scale(.93);opacity:1}
+  55.79%,100%{transform:scale(1);opacity:.85}
+}
+
+/* ── Shop Complete grey/active toggle — active only from when Eggs syncs to
+   the left phone (both items now present) until right after the tap completes,
+   then greys out again for the rest of the loop ── */
+@keyframes ob3CompleteActiveLeft{
+  0%,69.46%{background:var(--bdr);border:2px solid var(--bdr);color:var(--lgt)}
+  69.47%,90.52%{background:linear-gradient(135deg,var(--complete-start),var(--complete-end));border:2px solid var(--complete-border);color:#fff}
+  90.53%,100%{background:var(--bdr);border:2px solid var(--bdr);color:var(--lgt)}
+}
+@keyframes ob3CompleteActiveRight{
+  0%,69.46%{background:var(--bdr);border:2px solid var(--bdr);color:var(--lgt)}
+  69.47%,95.78%{background:linear-gradient(135deg,var(--complete-start),var(--complete-end));border:2px solid var(--complete-border);color:#fff}
+  95.79%,100%{background:var(--bdr);border:2px solid var(--bdr);color:var(--lgt)}
+}
+
+
+
+/* ═══════════════════════════════════════════════
+   SLIDE 2 — Recipe card (left) + ingredients flying to list (right)
+   Stage: 280x210. Timeline: 5.9s total.
+   Card: left=8,top=41.5,w=130,h=127 (max half stage width)
+   List: left=162,top=40,w=110,h=130 (halved width, right side)
+   M1 0.00-1.00s (0-16.95%)    Recipe card at rest, 5 ingredients listed
+   M2 1.00-1.40s (16.95-23.73%) Add to List button tap/pulse
+   M3 1.40-2.90s (23.73-49.15%) 5 ingredient chips launch from button, staggered
+   M4 2.90-4.40s (49.15-74.58%) Chips land in list on right, staggered; card dims
+   M5 4.40-5.40s (74.58-91.53%) Hold — full state visible
+   M6 5.40-5.90s (91.53-100%)  Fade/reset to M1
+   ═══════════════════════════════════════════════ */
+.ob2-mock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ob2-mock-inner{position:relative;width:280px;height:210px}
+
+.ob2-recipe-card{position:absolute;left:8px;top:41.5px;width:130px;background:var(--surf);border:1.5px solid var(--bdr);border-radius:10px;padding:8px 10px;box-shadow:var(--sh)}
+.ob2-active .ob2-recipe-card{animation:ob2CardDim 4.9s ease-in-out infinite}
+.ob2-recipe-name{font-size:.82rem;font-weight:700;color:var(--tx);margin-bottom:4px}
+.ob2-recipe-ing{font-size:.66rem;color:var(--mid);line-height:1.5}
+.ob2-recipe-btn{background:var(--gdk);color:#fff;font-size:.66rem;font-weight:700;text-align:center;border-radius:6px;padding:4px 0;margin-top:6px}
+.ob2-active .ob2-recipe-btn{animation:ob2BtnPulse 4.9s ease-in-out infinite}
+
+.ob2-list-area{position:absolute;left:162px;top:40px;width:110px;height:130px}
+.ob2-chip{position:absolute;left:0;width:110px;height:22px;background:var(--surf);border:1.5px solid var(--bdr);border-radius:9px;box-shadow:var(--sh);display:flex;align-items:center;padding:0 8px;font-size:.68rem;font-weight:600;color:var(--tx);opacity:0}
+.ob2-active .ob2-chip.c1{animation:ob2Chip1 4.9s ease-in-out infinite}
+.ob2-active .ob2-chip.c2{animation:ob2Chip2 4.9s ease-in-out infinite}
+.ob2-active .ob2-chip.c3{animation:ob2Chip3 4.9s ease-in-out infinite}
+.ob2-active .ob2-chip.c4{animation:ob2Chip4 4.9s ease-in-out infinite}
+.ob2-active .ob2-chip.c5{animation:ob2Chip5 4.9s ease-in-out infinite}
+
+/* Each chip's launch (from button, left side) + landing (in list, right side) position, staggered */
+
+
+@keyframes ob2CardDim{
+  0%,69.39%{opacity:1}
+  75.92%,100%{opacity:.55}
+}
+@keyframes ob2BtnPulse{
+  0%,20.41%{opacity:1;transform:scale(1)}
+  24.08%{opacity:.7;transform:scale(.95)}
+  28.57%,100%{opacity:1;transform:scale(1)}
+}
+
+/* Launch origin: button sits near left:18px,top:99px inside the card (bottom area).
+   Landing positions: right list area, left:0 relative to .ob2-list-area (which is
+   already positioned at left:162px on the stage), stacked top to bottom. */
+
+/* Chip 1 (Pasta) */
+@keyframes ob2Chip1{
+  0%,28.57%{opacity:0;top:37.25px;left:-144px}
+  33.71%{opacity:1;top:37.25px;left:-144px}
+  43.35%{opacity:1;top:0px;left:0px}
+  48.16%,100%{opacity:1;top:0px;left:0px}
+}
+/* Chip 2 (Mince) */
+@keyframes ob2Chip2{
+  0%,33.71%{opacity:0;top:52.95px;left:-144px}
+  38.53%{opacity:1;top:52.95px;left:-144px}
+  48.16%{opacity:1;top:27px;left:0px}
+  52.98%,100%{opacity:1;top:27px;left:0px}
+}
+/* Chip 3 (Tomato) */
+@keyframes ob2Chip3{
+  0%,39.73%{opacity:0;top:68.75px;left:-144px}
+  44.55%{opacity:1;top:68.75px;left:-144px}
+  54.18%{opacity:1;top:54px;left:0px}
+  59.0%,100%{opacity:1;top:54px;left:0px}
+}
+/* Chip 4 (Onion) */
+@keyframes ob2Chip4{
+  0%,45.76%{opacity:0;top:84.55px;left:-144px}
+  50.57%{opacity:1;top:84.55px;left:-144px}
+  60.2%{opacity:1;top:81px;left:0px}
+  65.02%,100%{opacity:1;top:81px;left:0px}
+}
+/* Chip 5 (Garlic) */
+@keyframes ob2Chip5{
+  0%,51.78%{opacity:0;top:100.25px;left:-144px}
+  56.59%{opacity:1;top:100.25px;left:-144px}
+  66.22%{opacity:1;top:108px;left:0px}
+  71.04%,100%{opacity:1;top:108px;left:0px}
+}
+
+/* Rocking basket animation for empty list state */
+@keyframes rock{
+  0%,100%{transform:rotate(-12deg)}
+  50%{transform:rotate(12deg)}
+}
+.basket-rock{
+  display:inline-block;
+  transform-origin:50% 8%;
+  width:56px;height:56px;
+}
+@media(prefers-reduced-motion:no-preference){
+  .basket-rock{animation:rock 1.8s ease-in-out infinite}
+}
+
 </style>
 </head>
 <body>
@@ -519,41 +800,85 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
                     <div class="ob-note-line">Eggs</div>
                     <div class="ob-note-line">Bread</div>
                     <div class="ob-note-flash"></div>
+                    <div class="ob-scan-beam"></div>
                   </div>
                   <div class="ob-list-viewport">
-                    <div class="ob-mini-list">
-                      <div class="ob-mini-list-scroll">
+                    <div class="ob-list-crop">
+                      <div class="ob-mini-list">
                         <div class="ob-mini-item i1"><span class="ob-mini-ck"></span>Milk</div>
                         <div class="ob-mini-item i2"><span class="ob-mini-ck"></span>Eggs</div>
                         <div class="ob-mini-item i3"><span class="ob-mini-ck"></span>Bread</div>
-                        <div class="ob-mini-item i4"><span class="ob-mini-ck"></span>Bananas</div>
+                        <div class="ob-mini-item i4"><span class="ob-mini-ck"></span>Banana</div>
                       </div>
                     </div>
                   </div>
                   <div class="ob-add-card">
-                    <div class="ob-add-input"><span class="ob-add-input-txt">Bananas</span></div>
+                    <div class="ob-add-input"><span class="ob-add-input-txt">Banana</span></div>
                     <div class="ob-add-btn">Add</div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="ob-title">Snap or type — your list either way</div>
-          <div class="ob-desc">Take a photo of a handwritten list or recipe and Basket adds the items for you. Or type items in manually — whatever's fastest.</div>
+          <div class="ob-title">Snap or Type</div>
+          <div class="ob-desc">Take a photo of a list or type it</div>
         </div>
 
-        <!-- Slide 2: Recipe Entry (Phase 2 placeholder) -->
+        <!-- Slide 2: Recipe card + ingredients flying to list -->
         <div class="ob-slide">
-          <div class="ob-stage"></div>
+          <div class="ob-stage">
+            <div class="ob2-mock" id="ob2-mock">
+              <div class="ob2-mock-inner">
+                <div class="ob2-recipe-card">
+                  <div class="ob2-recipe-name">Spaghetti Bolognese</div>
+                  <div class="ob2-recipe-ing">Pasta</div>
+                  <div class="ob2-recipe-ing">Mince</div>
+                  <div class="ob2-recipe-ing">Tomato</div>
+                  <div class="ob2-recipe-ing">Onion</div>
+                  <div class="ob2-recipe-ing">Garlic</div>
+                  <div class="ob2-recipe-btn">Add to List</div>
+                </div>
+                <div class="ob2-list-area">
+                  <div class="ob2-chip c1">Pasta</div>
+                  <div class="ob2-chip c2">Mince</div>
+                  <div class="ob2-chip c3">Tomato</div>
+                  <div class="ob2-chip c4">Onion</div>
+                  <div class="ob2-chip c5">Garlic</div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="ob-title">Save recipes, shop in one tap</div>
-          <div class="ob-desc">Build a recipe once. Next time you need it, tap it and every ingredient jumps onto your list.</div>
+          <div class="ob-desc">Save once, tap to add everything</div>
         </div>
 
-        <!-- Slide 3: Multi-person sync (Phase 3 placeholder) -->
+        <!-- Slide 3: Two phones, live sync -->
         <div class="ob-slide">
-          <div class="ob-stage"></div>
+          <div class="ob-stage">
+            <div class="ob3-mock" id="ob3-mock">
+              <div class="ob3-mock-inner">
+
+                <div class="ob3-phone left">
+                  <div class="ob3-add"><span class="ob3-add-txt ob3-add-type-left">Milk</span></div>
+                  <div class="ob3-item ob3-milk-left tag-pink"><span class="ob3-item-ck ob3-check1"></span>Milk</div>
+                  <div class="ob3-item ob3-eggs-left tag-blue"><span class="ob3-item-ck ob3-check2"></span>Eggs</div>
+                  <div class="ob3-add-btn ob3-addbtn-left">Add</div>
+                  <div class="ob3-complete ob3-complete-left">Shop Complete</div>
+                </div>
+
+                <div class="ob3-phone right">
+                  <div class="ob3-add"><span class="ob3-add-txt ob3-add-type-right">Eggs</span></div>
+                  <div class="ob3-item ob3-milk-right tag-pink"><span class="ob3-item-ck"></span>Milk</div>
+                  <div class="ob3-item ob3-eggs-right tag-blue"><span class="ob3-item-ck"></span>Eggs</div>
+                  <div class="ob3-add-btn ob3-addbtn-right">Add</div>
+                  <div class="ob3-complete ob3-complete-right">Shop Complete</div>
+                </div>
+
+              </div>
+            </div>
+          </div>
           <div class="ob-title">One list, whole household</div>
-          <div class="ob-desc">Everyone adds items from their own phone — the list stays in sync for everyone, instantly.</div>
+          <div class="ob-desc">Everyone adds items from their own phone</div>
         </div>
 
       </div>
@@ -582,7 +907,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 <header>
   <div class="hl">
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M9.5 14C9.5 7 22.5 7 22.5 14" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="1.9" stroke-linejoin="round"/><line x1="11" y1="14" x2="10" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="16" y1="14" x2="16" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="21" y1="14" x2="22" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="4.5" y1="19.5" x2="27.5" y2="19.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="5.5" y1="24.5" x2="26.5" y2="24.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/></svg>
-    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v4.50</div></div>
+    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v5.5.2</div></div>
   </div>
   <div class="hright"><div class="sync-ind"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Local</span></div><button class="tbtn" id="tbtn" onclick="cycleTheme()">Auto</button></div>
 </header>
@@ -596,7 +921,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
   </div>
 </nav>
 
-<main>
+<main id="main-content">
 
 <!-- SHOPPING TAB -->
 <div id="tab-shopping" class="tab active">
@@ -785,18 +1110,9 @@ function ingQtyDisp(ing){if(ing.unit)return qtyDisp(ing.qty)+' '+ing.unit;return
 function timeAgo(iso){const d=Math.floor((Date.now()-new Date(iso).getTime())/1000);if(d<10)return 'just now';if(d<60)return d+'s ago';if(d<3600)return Math.floor(d/60)+'m ago';return Math.floor(d/3600)+'h ago';}
 
 /* badge class helper */
-function badgeClass(source){
-  if(source==='manual')return 'manual';
-  if(source==='staple')return 'staple';
-  if(source==='scan')return 'scan';
-  return 'recipe';
-}
-function badgeLabel(source){
-  if(source==='manual')return 'Manual';
-  if(source==='staple')return 'Staple';
-  if(source==='scan')return 'Scan';
-  return 'Recipe';
-}
+const BADGE_MAP={manual:['manual','Manual'],staple:['staple','Staple'],scan:['scan','Scan']};
+function badgeClass(source){return (BADGE_MAP[source]||['recipe'])[0];}
+function badgeLabel(source){return (BADGE_MAP[source]||[,'Recipe'])[1];}
 
 function loadQuickEnter(){quickEnter=localStorage.getItem('basket_quick_enter')==='1';const t=document.getElementById('quick-enter-tog');if(t)t.checked=quickEnter;}
 function loadBudgetToggle(){const show=localStorage.getItem('basket_show_budget')!=='0';const t=document.getElementById('budget-tog');if(t)t.checked=show;const s=document.getElementById('budget-section');if(s)s.classList.toggle('hidden',!show);}
@@ -1252,6 +1568,8 @@ td{padding:7px 5px;border-bottom:1px solid #f0f0f0;font-size:.91rem;vertical-ali
 @media(prefers-reduced-motion:no-preference){
   .basket-rock{animation:rock 1.8s ease-in-out infinite}
 }
+
+
 </style>
 </head>
 <body>
@@ -1340,6 +1658,17 @@ function obGoTo(i){
   if(i>=OB_SLIDE_COUNT)i=0;
   obIndex=i;
   if(obIndex>obMaxReached)obMaxReached=obIndex;
+  // Slide 2's animation only starts playing the first time it's actually
+  // viewed (not before) — once triggered, it keeps running even if the
+  // user swipes away and back, since the class is never removed.
+  if(obIndex===1){
+    const ob2Mock=document.getElementById('ob2-mock');
+    if(ob2Mock)ob2Mock.classList.add('ob2-active');
+  }
+  if(obIndex===2){
+    const ob3Mock=document.getElementById('ob3-mock');
+    if(ob3Mock)ob3Mock.classList.add('ob3-active');
+  }
   obRenderTrack(true);
   obUpdateDots();
   obUpdateGotIt();
@@ -1383,6 +1712,33 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 function renderAll(){renderList();renderRecipes();renderHistory();renderSpend();renderSettings();loadBudgetToggle();loadUnitToggle();}
 load();applyTheme();loadQuickEnter();loadBudgetToggle();loadUnitToggle();loadObAlwaysToggle();
+
+/* Swipe left/right on the main content area to move between tabs.
+   TAB_ORDER matches the nav bar's left-to-right order. A mostly-horizontal
+   gesture past the distance threshold switches tabs; anything more vertical
+   (or too short) is treated as a normal scroll and ignored. */
+const TAB_ORDER=['shopping','recipes','spend','settings'];
+let swipeStartX=null,swipeStartY=null,swipeTracking=false;
+function swipeStart(x,y){swipeStartX=x;swipeStartY=y;swipeTracking=true;}
+function swipeEnd(x,y){
+  if(!swipeTracking||swipeStartX===null)return;
+  swipeTracking=false;
+  const dx=x-swipeStartX,dy=y-swipeStartY;
+  swipeStartX=null;swipeStartY=null;
+  const distThreshold=60,vertTolerance=50;
+  if(Math.abs(dx)<distThreshold||Math.abs(dy)>vertTolerance)return;
+  const curTab=document.querySelector('.nb.active')?.getAttribute('data-tab');
+  const curIdx=TAB_ORDER.indexOf(curTab);
+  if(curIdx===-1)return;
+  if(dx<0&&curIdx<TAB_ORDER.length-1)switchToTab(TAB_ORDER[curIdx+1]);
+  else if(dx>0&&curIdx>0)switchToTab(TAB_ORDER[curIdx-1]);
+}
+(function(){
+  const main=document.getElementById('main-content');
+  if(!main)return;
+  main.addEventListener('touchstart',e=>swipeStart(e.touches[0].clientX,e.touches[0].clientY),{passive:true});
+  main.addEventListener('touchend',e=>swipeEnd(e.changedTouches[0].clientX,e.changedTouches[0].clientY),{passive:true});
+})();
 if(shouldShowOnboarding())showOnboarding();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('SW registration failed:',err));}
 if(S.budget)document.getElementById('bud-in').value=S.budget;
