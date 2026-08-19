@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Basket v5.5.5</title>
+<title>Basket v5.5.7</title>
 <!-- PWA manifest -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1E8E5A">
@@ -907,7 +907,7 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 <header>
   <div class="hl">
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M9.5 14C9.5 7 22.5 7 22.5 14" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="1.9" stroke-linejoin="round"/><line x1="11" y1="14" x2="10" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="16" y1="14" x2="16" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="21" y1="14" x2="22" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="4.5" y1="19.5" x2="27.5" y2="19.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="5.5" y1="24.5" x2="26.5" y2="24.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/></svg>
-    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v5.5.5</div></div>
+    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v5.5.7</div></div>
   </div>
   <div class="hright"><div class="sync-ind"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Local</span></div><button class="tbtn" id="tbtn" onclick="cycleTheme()">Auto</button></div>
 </header>
@@ -1169,7 +1169,7 @@ function scrollCardIntoView(fieldId){
 
 document.addEventListener('DOMContentLoaded',()=>{const mn=document.getElementById('m-name');if(mn)mn.addEventListener('input',function(){clearTimeout(pmTimer);pmTimer=setTimeout(()=>{if(document.getElementById('m-cost').value)return;const p=getPriceFromHistory(this.value);if(p!==null)document.getElementById('m-cost').value=p.toFixed(2);},350);});});
 
-function addManual(){const name=document.getElementById('m-name').value.trim();const qty=clampQty(parseFloat(document.getElementById('m-qty').value)||0);const unit=document.getElementById('m-unit').value||'each';const cost=parseFloat(document.getElementById('m-cost').value)||0;if(!name){toast('Enter an item name');return;}mergeOrPush({id:uid(),name,qty,unit,cost,ticked:false,source:'manual'},qty);document.getElementById('m-name').value='';document.getElementById('m-qty').value='';document.getElementById('m-cost').value='';buildUnitSel('m-unit','each');save();renderList();toast('"'+name+'" added');if(quickEnter)setTimeout(focusItemName,50);else document.getElementById('m-name').focus();}
+function addManual(){const name=document.getElementById('m-name').value.trim();const qty=clampQty(parseFloat(document.getElementById('m-qty').value)||0);const unit=document.getElementById('m-unit').value||'each';const cost=parseFloat(document.getElementById('m-cost').value)||0;if(!name){toast('Enter an item name');return;}const wasMerged=mergeOrPush({id:uid(),name,qty,unit,cost,ticked:false,source:'manual'},qty);document.getElementById('m-name').value='';document.getElementById('m-qty').value='';document.getElementById('m-cost').value='';buildUnitSel('m-unit','each');save();renderList();toast(wasMerged?'"'+name+'": items merged':'"'+name+'" added');if(quickEnter)setTimeout(focusItemName,50);else document.getElementById('m-name').focus();}
 function removeItem(id){saveForUndo();S.list=S.list.filter(i=>i.id!==id);openItemId=null;save();renderList();toast('Item removed',true);}
 function tickItem(id){const it=S.list.find(i=>i.id===id);if(it)it.ticked=!it.ticked;save();renderList();}
 function chgQty(id,d){const it=S.list.find(i=>i.id===id);if(it){const nq=Math.round(((it.qty||0)+d)*10)/10;it.qty=clampQty(nq);save();renderList();}}
@@ -1384,7 +1384,7 @@ function renderSpend(){
   const grid=[0,.25,.5,.75,1].map(f=>{const y=pT+cH*(1-f),v=mx*f;return '<line x1="'+pL+'" y1="'+y+'" x2="'+(W-pR)+'" y2="'+y+'" stroke="var(--bdr)" stroke-width="1"/><text x="'+(pL-4)+'" y="'+(y+4)+'" text-anchor="end" font-size="9" fill="var(--mid)" font-family="Outfit,sans-serif">'+fmtChartLabel(v)+'</text>';}).join('');
   const bars=data.map((e,i)=>{const x=pL+slot*i+(slot-bw)/2,bh=Math.max(3,(e.total/mx)*cH),by=pT+cH-bh,lbl=new Date(e.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'});return '<rect x="'+x+'" y="'+by+'" width="'+bw+'" height="'+bh+'" rx="4" fill="var(--chart-fill)" opacity=".82"/><text x="'+(x+bw/2)+'" y="'+(by-5)+'" text-anchor="middle" font-size="9" fill="var(--tx)" font-weight="600" font-family="Outfit,sans-serif">'+fmtChartLabel(e.total)+'</text><text x="'+(x+bw/2)+'" y="'+(H-pB+14)+'" text-anchor="middle" font-size="9.5" fill="var(--mid)" font-family="Outfit,sans-serif">'+lbl+'</text>';}).join('');
   chart.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;overflow:visible">'+grid+bars+'<line x1="'+pL+'" y1="'+avgY+'" x2="'+(W-pR)+'" y2="'+avgY+'" stroke="var(--amb)" stroke-width="1.5" stroke-dasharray="5,3"/><text x="'+(W-pR+3)+'" y="'+(avgY+4)+'" font-size="9" fill="var(--amb)" font-family="Outfit,sans-serif">avg</text></svg>';
-  const catSpend={};filtered.forEach(entry=>entry.items.forEach(item=>{const cat=getCatName(item.name);catSpend[cat]=(catSpend[cat]||0)+lt(item);}));
+  const catSpend={};filtered.forEach(entry=>(entry.items||[]).forEach(item=>{const cat=getCatName(item.name);catSpend[cat]=(catSpend[cat]||0)+lt(item);}));
   const sorted=Object.entries(catSpend).sort((a,b)=>b[1]-a[1]),catTotal=sorted.reduce((s,[,v])=>s+v,0),catMax=sorted[0]?.[1]||1;
   catChart.innerHTML=sorted.map(([cat,spend])=>{const pct=Math.round((spend/catTotal)*100),w=Math.round((spend/catMax)*100);return '<div class="cat-row"><div class="cat-name">'+esc(cat)+'</div><div class="cat-bar-bg"><div class="cat-bar-fill" style="width:'+w+'%"></div></div><div class="cat-amt">'+fmt(spend)+'<span class="cat-pct">'+pct+'%</span></div></div>';}).join('');
 }
@@ -1403,7 +1403,8 @@ function renderHistory(){
     const ds=d.toLocaleDateString('en-AU',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
     const ts=d.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
     const isOpen=openHistId===e.id;
-    return `<div class="hc"><div class="hh" onclick="togHist('${e.id}')"><div><div class="hdate">${esc(ds)}</div><div class="hmeta">${ts} &middot; ${e.items.length} item${e.items.length!==1?'s':''}</div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0" onclick="event.stopPropagation()"><span class="htot">${fmt(e.total)}</span><button class="btn bs sm" onclick="reloadShop('${e.id}')">&#8635; Reload</button></div></div><div class="hb${isOpen?' open':''}"><div>${e.items.map(i=>'<div class="hrow"><span>'+esc(i.name)+(i.qty>1?' \xd7'+qtyDisp(i.qty):'')+(i.unit?' '+i.unit:'')+' <span class="hsrc">('+esc(i.source)+')</span></span><span>'+fmt(lt(i))+'</span></div>').join('')}</div><div class="htr"><span>Total</span><span>${fmt(e.total)}</span></div><div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr);display:flex;gap:8px"><button class="btn bg sm" onclick="printHist('${e.id}')">Print</button><button class="btn bd sm" onclick="deleteHist('${e.id}')">Delete</button></div></div></div>`;
+    const eItems=e.items||[];
+    return `<div class="hc"><div class="hh" onclick="togHist('${e.id}')"><div><div class="hdate">${esc(ds)}</div><div class="hmeta">${ts} &middot; ${eItems.length} item${eItems.length!==1?'s':''}</div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0" onclick="event.stopPropagation()"><span class="htot">${fmt(e.total)}</span><button class="btn bs sm" onclick="reloadShop('${e.id}')">&#8635; Reload</button></div></div><div class="hb${isOpen?' open':''}"><div>${eItems.length?eItems.map(i=>'<div class="hrow"><span>'+esc(i.name)+(i.qty>1?' \xd7'+qtyDisp(i.qty):'')+(i.unit?' '+i.unit:'')+' <span class="hsrc">('+esc(i.source)+')</span></span><span>'+fmt(lt(i))+'</span></div>').join(''):'<div class="hrow" style="color:var(--mid)">No items recorded</div>'}</div><div class="htr"><span>Total</span><span>${fmt(e.total)}</span></div><div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr);display:flex;gap:8px"><button class="btn bg sm" onclick="printHist('${e.id}')">Print</button><button class="btn bd sm" onclick="deleteHist('${e.id}')">Delete</button></div></div></div>`;
   }).join('');
 }
 
