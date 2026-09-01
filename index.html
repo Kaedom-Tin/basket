@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Basket v5.6.2</title>
+<title>Basket v5.8.1</title>
 <!-- PWA manifest -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1E8E5A">
@@ -105,6 +105,7 @@ header::before{width:80px;height:80px;right:90px;bottom:5px}
 .hright{display:flex;align-items:center;gap:10px;z-index:1;flex-shrink:0}
 .sync-ind{font-size:.75rem;color:rgba(255,255,255,.65);font-weight:500;white-space:nowrap;display:flex;align-items:center;gap:5px;max-width:160px;overflow:hidden}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35);flex-shrink:0;transition:background .3s}
+.sync-dot.sd-set:not(.synced):not(.syncing):not(.error){background:var(--bdr)}
 .sync-dot.synced{background:#6fcf6f}
 .sync-dot.syncing{background:#f6c34a;animation:pulse 1s infinite}
 .sync-dot.error{background:#ff7070}
@@ -201,6 +202,8 @@ html[data-theme=dark] .scan-btn{background:linear-gradient(135deg,#1D3A28,#21504
 .si.ticked{opacity:.42;background:var(--glt);box-shadow:none}
 .si.ticked .iln{text-decoration:line-through}
 .si-head{display:flex;align-items:center;gap:8px;padding:11px 12px 10px}
+.si-head-notes{align-items:flex-start;padding-top:12px}
+.si-head-notes .sck,.si-head-notes .qc{margin-top:2px}
 /* si-body removed — badge+cost now in dropdown */
 .sck{width:19px;height:19px;cursor:pointer;accent-color:var(--gdk);flex-shrink:0}
 .iln{font-size:.97rem;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -305,6 +308,11 @@ html[data-theme=dark] .scan-btn{background:linear-gradient(135deg,#1D3A28,#21504
 .time-filter{display:flex;gap:5px;margin-bottom:16px;flex-wrap:nowrap}
 .tfbtn{padding:6px 10px;border:1.5px solid var(--bdr);border-radius:20px;background:none;color:var(--mid);font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;flex:1;text-align:center}
 .tfbtn.active{background:var(--gdk);border-color:var(--gdk);color:#fff}
+.list-nav-menu{display:none;position:fixed;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.16);z-index:250;overflow:hidden;min-width:150px}
+.list-nav-menu.show{display:block}
+.list-nav-menu button{display:block;width:100%;padding:11px 15px;background:none;border:none;text-align:left;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:500;color:var(--tx);cursor:pointer}
+.list-nav-menu button:not(:last-child){border-bottom:1px solid var(--bdr)}
+@media (hover:hover) and (pointer:fine){.list-nav-menu button:hover{background:var(--glt)}}
 .tfbtn:hover:not(.active){border-color:var(--g);color:var(--gdk)}
 .cat-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--div)}
 .cat-row:last-child{border-bottom:none}
@@ -910,24 +918,29 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
 <header>
   <div class="hl">
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M9.5 14C9.5 7 22.5 7 22.5 14" stroke="white" stroke-width="2.2" stroke-linecap="round"/><path d="M4 14h24l-2.8 13.2a1.4 1.4 0 01-1.4 1.1H8.2a1.4 1.4 0 01-1.4-1.1L4 14z" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="1.9" stroke-linejoin="round"/><line x1="11" y1="14" x2="10" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="16" y1="14" x2="16" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="21" y1="14" x2="22" y2="28" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="4.5" y1="19.5" x2="27.5" y2="19.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/><line x1="5.5" y1="24.5" x2="26.5" y2="24.5" stroke="white" stroke-width="1.2" stroke-opacity=".5"/></svg>
-    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v5.6.2</div></div>
+    <div><div class="htitle">Basket</div><div class="hver">Smart Shopping v5.8.1</div></div>
   </div>
   <div class="hright"><div class="sync-ind"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Local</span></div><button class="tbtn" id="tbtn" onclick="cycleTheme()">Auto</button></div>
 </header>
 
 <nav>
   <div class="nav-inner">
-    <button class="nb active" data-tab="shopping"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>List <span class="nbd" id="lbadge" style="display:none">0</span></button>
+    <button class="nb active" data-tab="shopping" id="nb-list-btn"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>List <span class="nbd" id="lbadge" style="display:none">0</span></button>
     <button class="nb" data-tab="recipes"><svg viewBox="0 0 24 24"><path d="M6 13.87A4 4 0 017.41 6a5.11 5.11 0 019.18 0A4 4 0 0118 13.87V21H6z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>Recipes</button>
     <button class="nb" data-tab="spend"><svg viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/><line x1="3" y1="20" x2="21" y2="20"/></svg>Spend</button>
     <button class="nb" data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</button>
   </div>
 </nav>
+<div class="list-nav-menu" id="list-nav-menu">
+  <button onclick="selectListNavView('shop')">Shopping List</button>
+  <button onclick="selectListNavView('wish')">Wish List</button>
+</div>
 
 <main id="main-content">
 
 <!-- SHOPPING TAB -->
 <div id="tab-shopping" class="tab active">
+  <div id="shop-view">
   <div class="card add-card">
     <div class="ct"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Add to your list</div>
     <!-- name full width, then qty/cost/unit on same row, no labels -->
@@ -953,6 +966,21 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
       <button class="btn bs bs-brd" id="select-all-btn" onclick="toggleSelectAll()" style="width:100%">Select All</button>
       <button class="btn bc btn-complete" id="shop-complete-btn" onclick="completeShop()">Complete Shop</button>
     </div>
+  </div>
+  </div>
+  <div id="wish-view" style="display:none">
+    <div class="card add-card">
+      <div class="ct"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Add to wish list</div>
+      <div style="margin-bottom:7px"><input type="text" id="w-name" placeholder="Name" autocomplete="off"></div>
+      <div class="add-form-row">
+        <div class="fg-qty" style="flex:1"><input type="number" id="w-qty" min="0" step="0.1" placeholder="Qty"></div>
+        <div class="fg-cost" style="flex:1"><input type="number" id="w-cost" placeholder="$ / Unit" min="0" step="0.01"></div>
+        <div class="fg-unit" id="w-unit-wrap" style="flex:0 0 76px;display:none"><select id="w-unit" class="isel isel-narrow"></select></div>
+      </div>
+      <div style="margin-top:7px"><input type="text" id="w-notes" placeholder="Notes / link (size, colour, where to buy)" autocomplete="off"></div>
+      <button class="btn bp btn-input-h" onclick="addWishItem()" style="width:100%;margin-top:7px">Add</button>
+    </div>
+    <div id="wishitems"></div>
   </div>
 </div>
 
@@ -992,6 +1020,10 @@ hr{border:none;border-top:1px solid var(--bdr);margin:15px 0}
   <div class="card" id="set-account-card">
     <div class="ct"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account</div>
     <div id="set-account-body"></div>
+    <div class="set-item">
+      <div><div class="set-key">Sync Status</div></div>
+      <div style="display:flex;align-items:center;gap:6px"><div class="sync-dot sd-set" id="sync-dot-set"></div><span id="sync-txt-set" style="font-size:.85rem;color:var(--mid)">Local</span></div>
+    </div>
   </div>
   <div class="card">
     <div class="ct"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Preferences</div>
@@ -1054,16 +1086,16 @@ const UNITS=['','each','g','kg','ml','L','tsp','tbsp','cup','bunch','can','bag',
 const SCI_THRESHOLD=1e13;
 // Abbreviation threshold: 7 significant digits + symbol/comma/decimal = ~$9,999,999.99
 // Values >= $10M abbreviate; >= SCI_THRESHOLD use scientific notation
-let S={recipes:[],staples:[],list:[],history:[],budget:null,darkMode:'auto',lastUpdatedBy:null};
+let S={recipes:[],staples:[],list:[],history:[],wishlist:[],budget:null,darkMode:'auto',lastUpdatedBy:null};
 let currentUser=null,editId=null,editTmpName='',formIngs=[],recipeScalers={};
 let dragId=null,dragType=null,undoData=null,fbPushTimer,lastPush=0,spendFilter='all';
 let scanImgData=null,scanImgType=null,scanResults=[],scanContext='list',scanRecipeName='';
 let ingDragRid=null,ingDragIdx=null;
-let openItemId=null,openRecipeId=null,openHistId=null;
+let openItemId=null,openRecipeId=null,openHistId=null,openWishId=null;
 
 function unitOptions(sel){return UNITS.map(u=>'<option value="'+u+'"'+(u===(sel||'')?' selected':'')+'>'+( u||'\u2014' )+'</option>').join('');}
 function buildUnitSel(id,sel){const el=document.getElementById(id);if(!el)return;el.innerHTML=unitOptions(sel);}
-buildUnitSel('m-unit','each');buildUnitSel('r-ing-unit','each');
+buildUnitSel('m-unit','each');buildUnitSel('r-ing-unit','each');buildUnitSel('w-unit','each');
 function save(){localStorage.setItem(KEY,JSON.stringify(S));clearTimeout(fbPushTimer);fbPushTimer=setTimeout(pushToFirebase,900);}
 function load(){
   try{const r=localStorage.getItem(KEY);if(r)S={...S,...JSON.parse(r)};}catch(e){}
@@ -1116,22 +1148,47 @@ function loadQuickCompleteToggle(){const on=localStorage.getItem('basket_quick_c
 function saveQuickCompleteToggle(){const on=document.getElementById('quick-complete-tog').checked;localStorage.setItem('basket_quick_complete',on?'1':'0');}
 function loadBudgetToggle(){const show=localStorage.getItem('basket_show_budget')!=='0';const t=document.getElementById('budget-tog');if(t)t.checked=show;const s=document.getElementById('budget-section');if(s)s.classList.toggle('hidden',!show);}
 function saveBudgetToggle(){const show=document.getElementById('budget-tog').checked;localStorage.setItem('basket_show_budget',show?'1':'0');const s=document.getElementById('budget-section');if(s)s.classList.toggle('hidden',!show);}
-function loadUnitToggle(){const show=localStorage.getItem('basket_show_unit')==='1';const t=document.getElementById('unit-tog');if(t)t.checked=show;const w=document.getElementById('m-unit-wrap');if(w)w.style.display=show?'':'none';}
-function saveUnitToggle(){const show=document.getElementById('unit-tog').checked;localStorage.setItem('basket_show_unit',show?'1':'0');const w=document.getElementById('m-unit-wrap');if(w)w.style.display=show?'':'none';}
-function focusItemName(){const el=document.getElementById('m-name');if(el)el.focus();}
+function loadUnitToggle(){const show=localStorage.getItem('basket_show_unit')==='1';const t=document.getElementById('unit-tog');if(t)t.checked=show;const w=document.getElementById('m-unit-wrap');if(w)w.style.display=show?'':'none';const ww=document.getElementById('w-unit-wrap');if(ww)ww.style.display=show?'':'none';}
+function saveUnitToggle(){const show=document.getElementById('unit-tog').checked;localStorage.setItem('basket_show_unit',show?'1':'0');const w=document.getElementById('m-unit-wrap');if(w)w.style.display=show?'':'none';const ww=document.getElementById('w-unit-wrap');if(ww)ww.style.display=show?'':'none';}
+
 
 function fbOK(){return FIREBASE_CONFIG.apiKey&&!FIREBASE_CONFIG.apiKey.includes('YOUR_');}
 function isAllowed(user){if(!ALLOWED_EMAILS.length)return true;return ALLOWED_EMAILS.map(e=>e.toLowerCase()).includes((user.email||'').toLowerCase());}
-function setSyncUI(status,who){const dot=document.getElementById('sync-dot'),txt=document.getElementById('sync-txt');if(!dot)return;dot.className='sync-dot'+(status==='synced'?' synced':status==='syncing'?' syncing':status==='error'?' error':'');if(status==='synced'&&who){txt.textContent=who.name.split(' ')[0]+' \xb7 '+(who.time?timeAgo(who.time):'');}else{const l={local:'Local',syncing:'Syncing\u2026',synced:'Synced',error:'Sync error'};txt.textContent=l[status]||'Local';}}
+function setSyncUI(status,who){
+  const statusClass=status==='synced'?' synced':status==='syncing'?' syncing':status==='error'?' error':'';
+  const l={local:'Local',syncing:'Syncing\u2026',synced:'Synced',error:'Sync error'};
+  const text=(status==='synced'&&who)?who.name.split(' ')[0]+' \xb7 '+(who.time?timeAgo(who.time):''):(l[status]||'Local');
+  [['sync-dot','sync-txt',''],['sync-dot-set','sync-txt-set',' sd-set']].forEach(([dotId,txtId,modifier])=>{
+    const dot=document.getElementById(dotId),txt=document.getElementById(txtId);
+    if(!dot||!txt)return;
+    dot.className='sync-dot'+modifier+statusClass;
+    txt.textContent=text;
+  });
+}
 function pushToFirebase(){if(!fbOK()||!currentUser)return;setSyncUI('syncing');const{darkMode,...toSync}=S;if(currentUser)toSync.lastUpdatedBy={name:currentUser.displayName||currentUser.email,time:new Date().toISOString()};firebase.database().ref('basket').set(toSync).then(()=>{setSyncUI('synced');lastPush=Date.now();}).catch(()=>setSyncUI('error'));}
-function sanitizeSync(data){['recipes','staples','list','history'].forEach(k=>{data[k]=Array.isArray(data[k])?data[k].filter(Boolean):[];});return data;}
+function sanitizeSync(data){['recipes','staples','list','history','wishlist'].forEach(k=>{data[k]=Array.isArray(data[k])?data[k].filter(Boolean):[];});return data;}
 function startDbListener(){setSyncUI('syncing');firebase.database().ref('basket').once('value').then(snap=>{const data=snap.val();if(data&&typeof data==='object'){sanitizeSync(data);const dm=S.darkMode;S={...S,...data,darkMode:dm};localStorage.setItem(KEY,JSON.stringify(S));renderAll();}setSyncUI('synced');}).catch(()=>setSyncUI('error'));firebase.database().ref('basket').on('value',snap=>{if(Date.now()-lastPush<2000)return;const data=snap.val();if(data&&typeof data==='object'){sanitizeSync(data);const dm=S.darkMode;S={...S,...data,darkMode:dm};localStorage.setItem(KEY,JSON.stringify(S));renderAll();setSyncUI('synced',data.lastUpdatedBy&&data.lastUpdatedBy.name!==currentUser?.displayName?data.lastUpdatedBy:null);}});}
-function initFirebase(){if(!fbOK()){setSyncUI('local');setTimeout(focusItemName,300);return;}firebase.initializeApp(FIREBASE_CONFIG);firebase.auth().onAuthStateChanged(user=>{if(user){if(!isAllowed(user)){document.getElementById('auth-err').textContent=user.email+' is not authorised. Contact the app owner.';firebase.auth().signOut();return;}currentUser=user;document.getElementById('auth-ov').style.display='none';startDbListener();renderSettings();}else{currentUser=null;try{firebase.database().ref('basket').off();}catch(e){}setSyncUI('local');if(fbOK()){document.getElementById('auth-ov').style.display='';}renderSettings();}});}
+function initFirebase(){if(!fbOK()){setSyncUI('local');return;}firebase.initializeApp(FIREBASE_CONFIG);firebase.auth().onAuthStateChanged(user=>{if(user){if(!isAllowed(user)){document.getElementById('auth-err').textContent=user.email+' is not authorised. Contact the app owner.';firebase.auth().signOut();return;}currentUser=user;document.getElementById('auth-ov').style.display='none';startDbListener();renderSettings();}else{currentUser=null;try{firebase.database().ref('basket').off();}catch(e){}setSyncUI('local');if(fbOK()){document.getElementById('auth-ov').style.display='';}renderSettings();}});}
 function signIn(){const p=new firebase.auth.GoogleAuthProvider();firebase.auth().signInWithPopup(p).catch(err=>{document.getElementById('auth-err').textContent='Sign-in failed: '+err.message;});}
 function signOut(){firebase.auth().signOut().then(()=>{document.getElementById('auth-ov').style.display='';});}
 
-function switchToTab(name){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');document.querySelector('[data-tab='+name+']').classList.add('active');renderAll();}
-document.querySelectorAll('.nb').forEach(btn=>btn.addEventListener('click',()=>switchToTab(btn.dataset.tab)));
+function switchToTab(name){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');document.querySelector('[data-tab='+name+']').classList.add('active');requestAnimationFrame(renderAll);}
+document.querySelectorAll('.nb').forEach(btn=>{
+  if(btn.id==='nb-list-btn'){btn.addEventListener('click',e=>{e.stopPropagation();toggleListNavMenu();});return;}
+  btn.addEventListener('click',()=>switchToTab(btn.dataset.tab));
+});
+function toggleListNavMenu(){
+  const menu=document.getElementById('list-nav-menu');
+  if(menu.classList.contains('show')){menu.classList.remove('show');return;}
+  const btn=document.getElementById('nb-list-btn');
+  const r=btn.getBoundingClientRect();
+  menu.style.top=(r.bottom+4)+'px';
+  menu.style.left=r.left+'px';
+  menu.classList.add('show');
+}
+function closeListNavMenu(){document.getElementById('list-nav-menu').classList.remove('show');}
+function selectListNavView(view){closeListNavMenu();const alreadyOnList=document.getElementById('tab-shopping').classList.contains('active');if(!alreadyOnList)switchToTab('shopping');setListSubView(view);}
+document.addEventListener('click',e=>{const menu=document.getElementById('list-nav-menu');if(menu&&menu.classList.contains('show')&&!menu.contains(e.target)&&e.target.id!=='nb-list-btn'&&!e.target.closest('#nb-list-btn'))closeListNavMenu();});
 
 const THMODES=['auto','dark','light'],THICONS={auto:'Auto',dark:'Dark',light:'Light'};
 function cycleTheme(){S.darkMode=THMODES[(THMODES.indexOf(S.darkMode||'auto')+1)%3];save();applyTheme();}
@@ -1151,13 +1208,14 @@ function toast(msg,undoable=false){
   const duration=undoable?7000:2500;
   setTimeout(function(){el.classList.remove('show');if(undoable&&currentUndoToastId===id){undoData=null;currentUndoToastId=null;}setTimeout(function(){el.remove();},300);},duration);
 }
-function saveForUndo(){undoData=JSON.parse(JSON.stringify(S.list));}
-function doUndo(){if(!undoData)return;S.list=undoData;undoData=null;if(currentUndoToastId){const el=document.getElementById(currentUndoToastId);if(el)el.remove();currentUndoToastId=null;}save();renderList();toast('Undone \u2713');}
+let undoType='list';
+function saveForUndo(type){undoType=type||'list';undoData=JSON.parse(JSON.stringify(undoType==='wishlist'?S.wishlist:S.list));}
+function doUndo(){if(!undoData)return;if(undoType==='wishlist'){S.wishlist=undoData;}else{S.list=undoData;}undoData=null;if(currentUndoToastId){const el=document.getElementById(currentUndoToastId);if(el)el.remove();currentUndoToastId=null;}save();if(undoType==='wishlist')renderWishlist();else renderList();toast('Undone \u2713');}
 
 function getPriceFromHistory(name){if(!name||name.length<2)return null;const nl=name.toLowerCase().trim();for(const entry of S.history){const found=entry.items.find(i=>i.name.toLowerCase()===nl);if(found&&found.cost>0)return found.cost;}return null;}
-function findMerge(name,cost,unit){return S.list.find(i=>i.name.toLowerCase()===name.toLowerCase()&&(i.cost||0)===(cost||0)&&(i.unit||'')===(unit||'')&&!i.ticked);}
-/* mergeOrPush: merges qty into existing unticked item with same name+cost, or pushes new. Returns true if merged. */
-function mergeOrPush(item,addQty){const ex=findMerge(item.name,item.cost,item.unit);if(ex){ex.qty=Math.round(((ex.qty||0)+(addQty||item.qty||1))*100)/100;return true;}S.list.unshift(item);return false;}
+function findMerge(name,cost,unit,notes){return S.list.find(i=>i.name.toLowerCase()===name.toLowerCase()&&(i.cost||0)===(cost||0)&&(i.unit||'')===(unit||'')&&(i.notes||'')===(notes||'')&&!i.ticked);}
+/* mergeOrPush: merges qty into existing unticked item with same name+cost+unit+notes, or pushes new. Returns true if merged. */
+function mergeOrPush(item,addQty){const ex=findMerge(item.name,item.cost,item.unit,item.notes);if(ex){ex.qty=Math.round(((ex.qty||0)+(addQty||item.qty||1))*100)/100;return true;}S.list.unshift(item);return false;}
 
 function saveBudget(){S.budget=parseFloat(document.getElementById('bud-in').value)||null;save();renderBudget();}
 function renderBudget(){const wrap=document.getElementById('budwrap');if(!wrap)return;const total=S.list.reduce((s,i)=>s+lt(i),0);if(!S.budget){wrap.style.display='none';return;}wrap.style.display='block';const pct=Math.min((total/S.budget)*100,100),fill=document.getElementById('budfill');fill.style.width=pct+'%';fill.style.background=pct<70?'var(--gmd)':pct<100?'var(--amb)':'var(--err)';document.getElementById('budspent').textContent=fmt(total)+' spent';const rem=S.budget-total,el=document.getElementById('budleft');el.textContent=rem>=0?fmt(rem)+' remaining':fmt(Math.abs(rem))+' over budget';el.style.color=rem<0?'var(--err)':'var(--mid)';}
@@ -1176,7 +1234,7 @@ function scrollCardIntoView(fieldId){
     },320);
   });
 }
-['m-name','m-qty','m-cost','m-unit','r-name','r-ing-name','r-ing-qty','r-ing-cost','r-ing-unit'].forEach(scrollCardIntoView);
+['m-name','m-qty','m-cost','m-unit','r-name','r-ing-name','r-ing-qty','r-ing-cost','r-ing-unit','w-name','w-qty','w-cost','w-unit','w-notes'].forEach(scrollCardIntoView);
 
 document.addEventListener('DOMContentLoaded',()=>{const mn=document.getElementById('m-name');if(mn)mn.addEventListener('input',function(){clearTimeout(pmTimer);pmTimer=setTimeout(()=>{if(document.getElementById('m-cost').value)return;const p=getPriceFromHistory(this.value);if(p!==null)document.getElementById('m-cost').value=p.toFixed(2);},350);});});
 
@@ -1189,6 +1247,93 @@ function saveEditItem(id){const item=S.list.find(i=>i.id===id);if(!item)return;c
 function clearTicked(){const n=S.list.filter(i=>i.ticked).length;if(!n){toast('No ticked items');return;}saveForUndo();S.list=S.list.filter(i=>!i.ticked);save();renderList();toast(n+' item'+(n>1?'s':'')+' removed',true);}
 function clearAll(){if(!S.list.length)return;if(!confirm('Clear the entire list? This cannot be undone.'))return;saveForUndo();S.list=[];openItemId=null;save();renderList();toast('List cleared',true);}
 function toggleSelectAll(){if(!S.list.length)return;const allTicked=S.list.every(i=>i.ticked);S.list.forEach(i=>i.ticked=!allTicked);save();renderList();}
+let listSubView='shop';
+function setListSubView(v){
+  listSubView=v;
+  document.getElementById('shop-view').style.display=v==='shop'?'':'none';
+  document.getElementById('wish-view').style.display=v==='wish'?'':'none';
+}
+function addWishItem(){
+  const name=document.getElementById('w-name').value.trim();
+  if(!name){toast('Enter an item name');return;}
+  const qty=clampQty(parseFloat(document.getElementById('w-qty').value)||0);
+  const unit=document.getElementById('w-unit').value||'each';
+  const cost=parseFloat(document.getElementById('w-cost').value)||0;
+  const notes=document.getElementById('w-notes').value.trim();
+  S.wishlist.unshift({id:uid(),name,qty,unit,cost,notes});
+  document.getElementById('w-name').value='';
+  document.getElementById('w-qty').value='';
+  document.getElementById('w-cost').value='';
+  document.getElementById('w-notes').value='';
+  buildUnitSel('w-unit','each');
+  save();renderWishlist();
+  toast('"'+name+'" added to wish list');
+}
+function promoteWishItem(id){
+  const item=S.wishlist.find(i=>i.id===id);
+  if(!item)return;
+  S.wishlist=S.wishlist.filter(i=>i.id!==id);
+  openWishId=null;
+  mergeOrPush({id:uid(),name:item.name,qty:item.qty||1,unit:item.unit||'',cost:item.cost||0,ticked:false,source:'manual',notes:item.notes||''},item.qty||1);
+  save();renderWishlist();renderList();
+  toast('"'+item.name+'" moved to shopping list');
+}
+function removeWishItem(id){
+  const item=S.wishlist.find(i=>i.id===id);
+  if(!item)return;
+  saveForUndo('wishlist');
+  S.wishlist=S.wishlist.filter(i=>i.id!==id);
+  openWishId=null;
+  save();renderWishlist();
+  toast('Removed from wish list',true);
+}
+function togWishItem(id,e){if(e)e.stopPropagation();openWishId=openWishId===id?null:id;renderWishlist();}
+function saveEditWishItem(id){
+  const item=S.wishlist.find(i=>i.id===id);
+  if(!item)return;
+  const name=document.getElementById('wi-n-'+id).value.trim();
+  const qty=clampQty(parseFloat(document.getElementById('wi-q-'+id).value)||0);
+  const unit=document.getElementById('wi-u-'+id).value;
+  const cost=parseFloat(document.getElementById('wi-c-'+id).value)||0;
+  const notes=document.getElementById('wi-notes-'+id).value.trim();
+  if(!name){toast('Enter a name');return;}
+  item.name=name;item.qty=qty;item.unit=unit;item.cost=cost;item.notes=notes;
+  openWishId=null;save();renderWishlist();
+  toast('Wish list item updated');
+}
+function renderWishlist(){
+  const cont=document.getElementById('wishitems');
+  if(!cont)return;
+  if(!S.wishlist.length){
+    cont.innerHTML='<div class="empty empty-list"><div class="et">Your wish list is empty.<br>Add things you want in the future.</div></div>';
+    return;
+  }
+  cont.innerHTML=S.wishlist.map(i=>{
+    const isOpen=openWishId===i.id;
+    const uSel=unitOptions(i.unit||'');
+    const qtyLine=(i.qty>0?qtyDisp(i.qty)+(i.unit?' '+i.unit:''):'')+(i.cost>0?(i.qty>0?' &middot; ':'')+fmt(i.cost):'');
+    return `<div class="si" id="wi-row-${i.id}">
+      <div class="si-head${i.notes?' si-head-notes':''}" onclick="togWishItem('${i.id}',event)">
+        <div style="flex:1;min-width:0"><span class="iln">${esc(i.name)}</span>${qtyLine?`<div class="hmeta">${qtyLine}</div>`:''}${i.notes?`<div class="hmeta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(i.notes)}</div>`:''}</div>
+        <button class="btn bs sm" onclick="event.stopPropagation();promoteWishItem('${i.id}')">Add to List</button>
+      </div>
+      ${isOpen?`<div class="si-edit">
+        <div class="si-edit-name"><label>Name</label><input type="text" id="wi-n-${i.id}" value="${esc(i.name)}" style="width:100%"></div>
+        <div class="si-edit-row">
+          <div class="fg-qty"><label>Qty</label><input type="number" id="wi-q-${i.id}" value="${qtyDisp(i.qty)}" min="0" step="0.1"></div>
+          <div class="fg-unit"><label>Unit</label><select id="wi-u-${i.id}" class="isel">${uSel}</select></div>
+          <div class="fg-cost"><label>$ / Unit</label><input type="number" id="wi-c-${i.id}" value="${Number(i.cost||0).toFixed(2)}" min="0" step="0.01"></div>
+        </div>
+        <div class="si-edit-name" style="margin-top:8px"><label>Notes / link</label><input type="text" id="wi-notes-${i.id}" value="${esc(i.notes||'')}" style="width:100%"></div>
+        <div class="si-edit-btns">
+          <button class="btn bp sm" onclick="saveEditWishItem('${i.id}')">\u2713 Save</button>
+          <button class="btn bg sm" onclick="togWishItem('${i.id}',null)">Cancel</button>
+          <button class="btn bd sm" onclick="removeWishItem('${i.id}')">Delete</button>
+        </div>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
 function nudgeAddItem(){toast('Add an item to your list first');}
 function sortByCategory(){if(!S.list.length){toast('List is empty');return;}saveForUndo();const order={};CATS.forEach((c,i)=>order[c.name]=i);S.list.sort((a,b)=>{const ia=order[getCatName(a.name)]??CATS.length,ib=order[getCatName(b.name)]??CATS.length;return ia-ib||a.name.localeCompare(b.name);});save();renderList();toast('Sorted by supermarket aisle',true);}
 function getCatName(n){const nl=n.toLowerCase();for(const cat of CATS){if(cat.kw.some(kw=>nl.includes(kw)))return cat.name;}return 'Other';}
@@ -1231,9 +1376,9 @@ function renderList(){
     const isOpen=openItemId===item.id;
     const uSel=unitOptions(item.unit||'');
     return `<div class="si${item.ticked?' ticked':''}" id="si-${item.id}" draggable="true" ondragstart="ds(event,'${item.id}','list')" ondragend="de()" ondragover="dov(event,'${item.id}','list')" ondragleave="dlv(event)" ondrop="drp(event,'${item.id}','list')">
-      <div class="si-head" onclick="togItem('${item.id}',event)">
+      <div class="si-head${item.notes?' si-head-notes':''}" onclick="togItem('${item.id}',event)">
         <input type="checkbox" class="sck" ${item.ticked?'checked':''} onchange="tickItem('${item.id}')" onclick="event.stopPropagation()">
-        <span class="iln">${esc(item.name)}</span>
+        <div style="flex:1;min-width:0"><span class="iln">${esc(item.name)}</span>${item.notes?`<div class="hmeta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(item.notes)}</div>`:''}</div>
         <div class="qc" onclick="event.stopPropagation()"><button class="qb" onclick="chgQty('${item.id}',-1)">&minus;</button><span class="qn">${qtyDisp(item.qty)}</span><button class="qb" onclick="chgQty('${item.id}',1)">+</button></div>
       </div>
       ${isOpen?`<div class="si-edit">
@@ -1727,7 +1872,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.addEventListener('mouseup',obDragEnd);
 });
 
-function renderAll(){renderList();renderRecipes();renderHistory();renderSpend();renderSettings();loadBudgetToggle();loadUnitToggle();loadQuickCompleteToggle();}
+function renderAll(){renderList();renderRecipes();renderHistory();renderSpend();renderSettings();renderWishlist();loadBudgetToggle();loadUnitToggle();loadQuickCompleteToggle();}
 load();applyTheme();loadBudgetToggle();loadUnitToggle();loadObAlwaysToggle();
 
 /* Swipe left/right on the main content area to move between tabs.
@@ -1759,8 +1904,7 @@ function swipeEnd(x,y){
 if(shouldShowOnboarding())showOnboarding();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('SW registration failed:',err));}
 if(S.budget)document.getElementById('bud-in').value=S.budget;
-renderAll();
-initFirebase();
+requestAnimationFrame(()=>{renderAll();initFirebase();});
 </script>
 </body>
 </html>
